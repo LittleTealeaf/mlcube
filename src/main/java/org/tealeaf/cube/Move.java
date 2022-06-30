@@ -1,5 +1,6 @@
 package org.tealeaf.cube;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,6 +57,11 @@ public enum Move {
             }, {
                     Point.RW, Point.RB, Point.RY, Point.RG
             }, {
+                Point.WRG, Point.BWR,Point.YRB,Point.GYR
+            },{
+                Point.GWR,Point.WRB,Point.BYR,Point.YRG
+            },{
+                Point.RWB,Point.RYB,Point.RYG,Point.RWG
             }
     }),
     D2(D, Transform.TWO),
@@ -106,6 +112,19 @@ public enum Move {
 
     public Set<Point[]> getPermutations() {
         return permutations;
+    }
+
+
+
+    public Point apply(Point point) {
+        return permutations.parallelStream().map(perm -> {
+            for(int i = 0; i < perm.length; i++) {
+                if(point == perm[i]) {
+                    return perm[(i+1)%2];
+                }
+            }
+            return null;
+        }).filter(Objects::nonNull).findAny().orElse(null);
     }
 
     private enum Transform {

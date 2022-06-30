@@ -1,5 +1,7 @@
 package org.tealeaf.cube;
 
+import java.util.Set;
+
 public enum Point {
     B,
     BO,
@@ -55,5 +57,9 @@ public enum Point {
     YR,
     YRB,
     YRG;
+
+    public static final Set<Point> piecePoints = Set.of(
+            W,WR,WB,WG,WO
+                                                       );
 }
 
