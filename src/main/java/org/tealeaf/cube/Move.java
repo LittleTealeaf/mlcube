@@ -1,22 +1,24 @@
 package org.tealeaf.cube;
 
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum Move {
     R(new Point[][]{
+
             {
-                    Point.OYB, Point.RWB, Point.WOB, Point.YRB
-            }, {
                     Point.WB, Point.OB, Point.YB, Point.RB
             }, {
-                    Point.BW, Point.BO, Point.BY, Point.BR
+                    Point.WOB, Point.OYB, Point.YRB, Point.RWB
             }, {
                     Point.WRB, Point.OWB, Point.YOB, Point.RYB
             }, {
-                    Point.BWR, Point.BWO, Point.BYO, Point.BYR
+                    Point.BW, Point.BO, Point.BY, Point.BR
+            }, {
+                    Point.BWO, Point.BYO, Point.BYR, Point.BWR
             }
     }),
     RP(R, Transform.PRIME),
@@ -107,58 +109,62 @@ public enum Move {
     }),
     M(MP, Transform.PRIME),
     M2(M, Transform.TWO),
-    E(new Point[][] {
+    E(new Point[][]{
             {
-                Point.W,Point.B,Point.Y,Point.G
-            },{
-                Point.WB,Point.BY,Point.YG,Point.GW
-            },{
-                Point.WG,Point.BW,Point.YB,Point.GY
+                    Point.W, Point.B, Point.Y, Point.G
+            }, {
+                    Point.WB, Point.BY, Point.YG, Point.GW
+            }, {
+                    Point.WG, Point.BW, Point.YB, Point.GY
             }
     }),
     E2(E, Transform.TWO),
     EP(E, Transform.PRIME),
-    S(new Point[][] {
+    S(new Point[][]{
             {
-                Point.O,Point.B,Point.R,Point.G
-            },{
-                Point.OB,Point.BR,Point.RG,Point.GO
-            },{
-                Point.OG,Point.BO,Point.RB,Point.GR
+                    Point.O, Point.B, Point.R, Point.G
+            }, {
+                    Point.OB, Point.BR, Point.RG, Point.GO
+            }, {
+                    Point.OG, Point.BO, Point.RB, Point.GR
             }
     }),
     SP(S, Transform.PRIME),
     S2(S, Transform.TWO),
-    X(M,L,RP),
-    Y(EP,U,DP),
-    Z(S,F,BP),
+    X(MP, LP, R),
+    Y(EP, U, DP),
+    Z(S, F, BP),
     XP(X, Transform.PRIME),
     X2(X, Transform.TWO),
     YP(Y, Transform.PRIME),
     Y2(Y, Transform.TWO),
     ZP(Z, Transform.PRIME),
     Z2(Z, Transform.TWO),
-    r(R,MP),
-    l(L,M),
-    f(F,S),
-    b(B,SP),
-    d(D,E),
-    u(U,EP),
-    rP(r,Transform.PRIME),
-    lP(l,Transform.PRIME),
-    fP(f,Transform.PRIME),
-    bP(b,Transform.PRIME),
-    dP(d,Transform.PRIME),
-    uP(u,Transform.PRIME),
-    r2(r,Transform.TWO),
-    l2(l,Transform.TWO),
-    f2(f,Transform.TWO),
-    b2(b,Transform.TWO),
-    d2(d,Transform.TWO),
-    u2(u,Transform.TWO),
-    ;
+    r(R, MP),
+    l(L, M),
+    f(F, S),
+    b(B, SP),
+    d(D, E),
+    u(U, EP),
+    rP(r, Transform.PRIME),
+    lP(l, Transform.PRIME),
+    fP(f, Transform.PRIME),
+    bP(b, Transform.PRIME),
+    dP(d, Transform.PRIME),
+    uP(u, Transform.PRIME),
+    r2(r, Transform.TWO),
+    l2(l, Transform.TWO),
+    f2(f, Transform.TWO),
+    b2(b, Transform.TWO),
+    d2(d, Transform.TWO),
+    u2(u, Transform.TWO),
+    NONE;
 
     private final Set<Point[]> permutations;
+
+    Move() {
+        permutations = Set.of();
+    }
 
     Move(Point[]... permutations) {
         this.permutations = Set.of(permutations);
@@ -206,6 +212,10 @@ public enum Move {
 
     public void apply(Piece piece) {
         piece.setPosition(apply(piece.getPosition()));
+    }
+
+    public static Move random() {
+        return values()[new Random().nextInt(values().length)];
     }
 
     private enum Transform {
