@@ -23,4 +23,8 @@ public class Piece {
     public void setPosition(Point position) {
         this.position = position;
     }
+
+    public String toString() {
+        return piece + "=" + position;
+    }
 }

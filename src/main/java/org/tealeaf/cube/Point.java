@@ -58,8 +58,6 @@ public enum Point {
     YRB,
     YRG;
 
-    public static final Set<Point> piecePoints = Set.of(
-            W,WR,WB,WG,WO
-                                                       );
+    public static final Set<Point> piecePoints = Set.of(W, WR, WB, WG, WO, WRB, WRG, WOG, WOB, Y, YR, YB, YG, YO, YRB, YRG, YOG, YOB, R, O, B, G, RB, RG, OB, OG);
 }
 
