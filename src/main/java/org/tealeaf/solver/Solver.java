@@ -19,7 +19,7 @@ public class Solver {
 
     public void solve() {
         orientCorrectly();
-        makeWhiteCross();
+        makeRedCross();
     }
 
     private void orientCorrectly() {
@@ -46,8 +46,23 @@ public class Solver {
         }
     }
 
-    private void makeWhiteCross() {
-        move(this::move, switch (cube.getPiece(Point.WR)) {
+    private void makeRedCross() {
+        //so apparently this makes STUFF SCREW UP AND NOW IT'S DOING BAD STUFF LIKE SETTING A BUNCH OF THINGS TO WHITE RED!?
+        move(this::makeRedCross, switch (cube.getPiece(Point.WR)) {
+            case WB -> Move.F;
+            case WO -> Move.F2;
+            case WG -> Move.FP;
+            case BR -> Move.DP;
+            case GR -> Move.D;
+            case YR -> Move.D2;
+            case OG -> Move.L;
+            case YG -> Move.L2;
+            case RG -> Move.LP;
+            case OB -> Move.RP;
+            case YB -> Move.R2;
+            case RB -> Move.R;
+            case RW -> Move.D;
+
             default -> Move.NONE;
         });
     }
