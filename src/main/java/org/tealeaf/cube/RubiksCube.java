@@ -14,18 +14,18 @@ public class RubiksCube {
 
     }
 
-    public void move(Stream<Move> moves) {
-        moves.forEach(move -> pieces.parallelStream().forEach(move::apply));
-    }
-
-    public void move(Move... moves) {
-
-        move(Stream.of(moves));
-    }
-
-    public void scramble(int count) {
-        move(IntStream.range(0, count).mapToObj(i -> Move.random()));
-    }
+//    public void move(Stream<Move> moves) {
+//        moves.forEach(move -> pieces.parallelStream().forEach(move::apply));
+//    }
+//
+//    public void move(Move... moves) {
+//
+//        move(Stream.of(moves));
+//    }
+//
+//    public void scramble(int count) {
+//        move(IntStream.range(0, count).mapToObj(i -> Move.random()));
+//    }
 
     public Set<Piece> getPieces() {
         return pieces;

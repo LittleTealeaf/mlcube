@@ -14,13 +14,11 @@ import java.util.stream.Stream;
 public class Main {
 
     public static void main(String[] args) {
-        RubiksCube cube = new RubiksCube();
-        cube.scramble(100);
-        System.out.println(cube);
-        Solver s = new Solver(cube);
-        s.solve();
-        System.out.println(s.getSteps());
-        System.out.println(cube);
+
+        Stream.of(Move.values()).forEach(move -> {
+            System.out.println(move + " " + move.getPermutations().stream().map(Arrays::toString).collect(Collectors.joining(", ")));
+        });
+
 //        for (Move move : Move.values()) {
 //            RubiksCube rubiksCube = new RubiksCube();
 //            rubiksCube.move(move);
