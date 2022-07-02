@@ -1,6 +1,7 @@
 package org.tealeaf.cube;
 
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -12,6 +13,18 @@ public class RubiksCube {
 
     public RubiksCube() {
 
+    }
+
+    public void move(Move... moves) {
+        for(Move move : moves) {
+            pieces.forEach(move::apply);
+        }
+    }
+
+    public void scramble(int count) {
+        for(int i = 0; i < count; i++) {
+            move(Move.values()[new Random().nextInt(Move.values().length)]);
+        }
     }
 
     public Set<Piece> getPieces() {

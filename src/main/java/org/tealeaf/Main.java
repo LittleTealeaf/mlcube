@@ -1,24 +1,24 @@
 package org.tealeaf;
 
+import org.tealeaf.cube.Move;
+import org.tealeaf.cube.RubiksCube;
+import org.tealeaf.solver.Solver;
+
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Main {
 
     public static void main(String[] args) {
-
-
-//        for (Move move : Move.values()) {
-//            RubiksCube rubiksCube = new RubiksCube();
-//            rubiksCube.move(move);
-//            Solver solver = new Solver(rubiksCube);
-//            solver.solve();
-//            if(Stream.of(Point.W, Point.R, Point.Y, Point.G, Point.B, Point.O).anyMatch(i -> rubiksCube.getPiece(i) != i)) {
-//                System.out.println(move);
-//                System.out.println(rubiksCube);
-//            }
-//        }
+        long time = System.currentTimeMillis();
+        IntStream.range(0,1000000).parallel().forEach(i -> {
+            RubiksCube rubiksCube = new RubiksCube();
+            rubiksCube.scramble(300);
+        });
+        long elapsed = System.currentTimeMillis() - time;
+        System.out.println(elapsed);
     }
 
 
