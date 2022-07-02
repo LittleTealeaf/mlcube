@@ -1,14 +1,17 @@
 package org.tealeaf.cube;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * White on bottom looking at red side
  */
-public enum Move {
-    //    //    B(perm(Point.OY, Point.OB, Point.OW, Point.OG), perm(Point.YO, Point.BO, Point.WO, Point.GO), perm(Point.OYB, Point.OWB, Point.OWG, Point.OYG),
+
+//    //    B(perm(Point.OY, Point.OB, Point.OW, Point.OG), perm(Point.YO, Point.BO, Point.WO, Point.GO), perm(Point.OYB, Point.OWB, Point
+// .OWG, Point.OYG),
 ////      perm(Point.YOB, Point.BWO, Point.WOG, Point.GYO), perm(Point.YOG, Point.BYO, Point.WOB, Point.GWO)
 ////    ),
 //    B,
@@ -27,13 +30,38 @@ public enum Move {
 //    x,
 //    y,
 //    z;
-    B(Stream.of(Perms.B.normal())),
-    BP(Stream.of(Perms.B.prime())),
-    B2(Set.of(Perms.B.two())),
-    D(Set.of(Perms.D.normal())),
-    DP(Set.of(Perms.D.prime())),
-    D2(Set.of(Perms.D.two())),
 
+public enum Move {
+    B(Set.of(Perms.B.normal())),
+    B2(Set.of(Perms.B.two())),
+    BP(Set.of(Perms.B.prime())),
+    D(Set.of(Perms.D.normal())),
+    D2(Set.of(Perms.D.two())),
+    DP(Set.of(Perms.D.prime())),
+    E(Set.of(Perms.E.normal())),
+    E2(Set.of(Perms.E.two())),
+    EP(Set.of(Perms.E.prime())),
+    F(Set.of(Perms.F.normal())),
+    F2(Set.of(Perms.F.two())),
+    FP(Set.of(Perms.F.prime())),
+    L(Set.of(Perms.L.normal())),
+    L2(Set.of(Perms.L.two())),
+    LP(Set.of(Perms.L.prime())),
+    M(Set.of(Perms.M.normal())),
+    M2(Set.of(Perms.M.two())),
+    MP(Set.of(Perms.M.prime())),
+    R(Set.of(Perms.R.normal())),
+    R2(Set.of(Perms.R.two())),
+    RP(Set.of(Perms.R.prime())),
+    S(Set.of(Perms.S.normal())),
+    S2(Set.of(Perms.S.two())),
+    SP(Set.of(Perms.S.prime())),
+    U(Set.of(Perms.U.normal())),
+    U2(Set.of(Perms.U.two())),
+    UP(Set.of(Perms.U.prime())),
+    u(Set.of(Perms.U.two(),Perms.E.prime())),
+    u2(Set.of(Perms.U.two(),Perms.E.two())),
+    uP(Set.of(Perms.U.prime(),Perms.E.normal())),
     ;
 
     private final Set<Point[]> permutations;
@@ -48,10 +76,6 @@ public enum Move {
 
     Move(Stream<Set<Point[]>> perms) {
         this.permutations = perms.flatMap(Collection::stream).collect(Collectors.toSet());
-    }
-
-    Move(Set<Point[]>[] perms) {
-        this(Stream.of(perms));
     }
 
     public Set<Point[]> getPermutations() {
@@ -91,7 +115,19 @@ public enum Move {
                         Point.YOG, Point.BYO, Point.WOB, Point.GWO
                 }
         }),
-        D,
+        D(new Point[][]{
+                {
+                        Point.RW, Point.GW, Point.OW, Point.BW
+                }, {
+                        Point.WR, Point.WG, Point.WO, Point.WB
+                }, {
+                        Point.WRG, Point.WOG, Point.WOB, Point.WRB
+                }, {
+                        Point.RWG, Point.GWO, Point.OWB, Point.BWR
+                }, {
+                        Point.BWO, Point.RWB, Point.GWR, Point.OWG
+                }
+        }),
         E,
         F,
         L,
