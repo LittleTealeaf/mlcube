@@ -1,9 +1,14 @@
 package org.tealeaf.cube;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * <img src="https://jperm.net/images/notation.png"/>
+ */
 public enum Move {
     B(build().normal(Perm.B)),
     B2(build().normal(Perm.B).makeTwo()),
@@ -165,12 +170,14 @@ public enum Move {
                 }, {
                         Point.WB, Point.BY, Point.YG, Point.GW
                 }, {
-                        Point.BW, Point.YB, Point.GY, Point.WG
+                        Point.BW, Point.GY, Point.WG, Point.YB
                 }
         }),
         U(new Point[][]{
                 {
                         Point.YR, Point.YB, Point.YO, Point.YG
+                }, {
+                        Point.RY, Point.BY, Point.OY, Point.GY
                 }, {
                         Point.YRG, Point.YRB, Point.YOB, Point.YOG
                 }, {
@@ -242,5 +249,34 @@ public enum Move {
 
     private static Builder build() {
         return new Builder();
+    }
+
+    public static List<Move> interpret(String set) {
+        boolean prime = false, two = false;
+
+        List<Move> moves = new ArrayList<>();
+
+
+        for(int i = set.length() - 1; i >= 0; i--) {
+            switch(set.charAt(i)) {
+                case '\'' -> {
+                    prime = true;
+                }
+                case '2' -> two = true;
+                case ' ' -> {}
+                default -> {
+                    String string = set.charAt(i) + "";
+                    if(two) {
+                        string += "2";
+                    } else if(prime) {
+                        string += "P";
+                    }
+                    prime = two = false;
+                    moves.add(0,valueOf(string));
+                }
+            }
+        }
+
+        return moves;
     }
 }

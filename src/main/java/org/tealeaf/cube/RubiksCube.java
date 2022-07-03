@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 public class RubiksCube {
 
-    private final Set<Piece> pieces = Point.piecePoints.stream().map(Piece::new).collect(Collectors.toSet());
+    private final Set<Piece> pieces = Piece.POINTS.stream().map(Piece::new).collect(Collectors.toSet());
 
     public RubiksCube() {
 

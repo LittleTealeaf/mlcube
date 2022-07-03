@@ -12,13 +12,15 @@ import java.util.stream.Stream;
 public class Main {
 
     public static void main(String[] args) {
-        long time = System.currentTimeMillis();
-        IntStream.range(0,1000000).parallel().forEach(i -> {
-            RubiksCube rubiksCube = new RubiksCube();
-            rubiksCube.scramble(300);
-        });
-        long elapsed = System.currentTimeMillis() - time;
-        System.out.println(elapsed);
+        RubiksCube rubiksCube = new RubiksCube();
+        rubiksCube.scramble(100);
+        Solver solver = new Solver(rubiksCube);
+        System.out.println(rubiksCube);
+        solver.solve();
+        System.out.println(solver.getSteps());
+        System.out.println(rubiksCube);
+
+        System.out.println(Move.interpret("R U' R' U' R U R D R' U' R D' R' U2 R'"));
     }
 
 
