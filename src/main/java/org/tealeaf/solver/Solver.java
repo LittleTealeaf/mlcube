@@ -6,6 +6,7 @@ import org.tealeaf.cube.RubiksCube;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class Solver {
 
@@ -22,175 +23,114 @@ public class Solver {
     }
 
     public void orient() {
-        step(() -> switch (cube.getPiece(Point.W)) {
-            case R -> Move.xP;
-            case O -> Move.x;
-            case B -> Move.zP;
-            case G -> Move.z;
-            case Y -> Move.x2;
-            default -> Move.NULL;
+        step(switch(cube.getPiece(Point.W)) {
+            case R -> alg(Move.xP);
+            case O -> alg(Move.x);
+            case B -> alg(Move.zP);
+            case G -> alg(Move.z);
+            case Y -> alg(Move.x2);
+            default -> alg();
         });
-        step(() -> switch (cube.getPiece(Point.R)) {
-            case G -> Move.y;
-            case B -> Move.yP;
-            case O -> Move.y2;
-            default -> Move.NULL;
+        step(switch (cube.getPiece(Point.R)) {
+            case G ->  alg(Move.y);
+            case B ->  alg(Move.yP);
+            case O ->  alg(Move.y2);
+            default -> alg();
         });
     }
 
     public void whiteCross() {
         //WR
-        step(() -> switch (cube.getPiece(Point.WR)) {
-            case WB, RW -> Move.D;
-            case WO -> Move.D2;
-            case WG -> Move.DP;
-            case BW, OB -> Move.LP;
-            case OW, OY -> Move.B;
-            case GW, OG -> Move.R;
-            case YR -> Move.F2;
-            case YB -> Move.UP;
-            case YO -> Move.U2;
-            case YG -> Move.U;
-            case RY, GR -> Move.F;
-            case BY, RB -> Move.L;
-            case GY, RG -> Move.RP;
-            case GO -> Move.R2;
-            case BR -> Move.FP;
-            case BO -> Move.L2;
+        step(switch(cube.getPiece(Point.WR)) {
+            case WR -> alg();
+            case WO -> alg(Move.D2);
+            case WG -> alg(Move.DP);
+            case WB -> alg(Move.D);
+            case YO -> alg(Move.B2,Move.D2);
+            case YB -> alg(Move.L2,Move.D);
+            case YG -> alg(Move.R2,Move.DP);
+            case YR -> alg(Move.F2);
+            case RY -> alg(Move.F,Move.RP,Move.DP);
+            case RB -> alg(Move.L,Move.D);
+            case RG -> alg(Move.RP,Move.DP);
+            case RW -> alg(Move.F,Move.L,Move.D);
+            case BO -> alg(Move.B,Move.D2);
+            case BR -> alg(Move.FP);
+            case BW -> alg(Move.LP,Move.FP);
+            case BY -> alg(Move.L,Move.FP);
+            case OW -> alg(Move.B,Move.R,Move.DP);
+            case OB -> alg(Move.LP,Move.D);
+            case OG -> alg(Move.R,Move.DP);
+            case OY -> alg(Move.B,Move.LP,Move.D);
+            case GO -> alg(Move.R2,Move.F);
+            case GW -> alg(Move.R,Move.F);
+            case GY -> alg(Move.RP,Move.F);
+            case GR -> alg(Move.F);
+            default -> alg();
+        });
+        step(switch(cube.getPiece(Point.WB)) {
+            case WR -> alg();
+            case WO -> alg(Move.BP,Move.DP,Move.B,Move.D);
+            case WG -> alg(Move.D2,Move.L,Move.D2,Move.LP);
+            case WB -> alg();
+            case YO -> alg(Move.UP,Move.L2);
+            case YB -> alg(Move.L2);
+            case YG -> alg(Move.U2,Move.L2);
+            case YR -> alg(Move.U,Move.L2);
+            case RY -> alg(Move.FP,Move.L,Move.F);
+            case RB -> alg(Move.L);
+            case RG -> alg(Move.F2,Move.L,Move.F2);
+            case RW -> alg();
+            case BO -> alg(Move.DP,Move.B,Move.D);
+            case BR -> alg(Move.D,Move.FP,Move.DP);
+            case BW -> alg(Move.LP,Move.D,Move.FP,Move.DP);
+            case BY -> alg(Move.U,Move.B,Move.LP);
+            case OW -> alg(Move.BP,Move.LP);
+            case OB -> alg(Move.LP);
+            case OG -> alg(Move.B2,Move.LP);
+            case OY -> alg(Move.B,Move.LP);
+            case GO -> alg(Move.DP,Move.BP,Move.D);
+            case GW -> alg(Move.D,Move.BP,Move.DP,Move.LP);
+            case GY -> alg(Move.UP,Move.B,Move.LP);
+            case GR -> alg(Move.D,Move.F,Move.DP);
+            default -> alg();
+        });
 
-            default -> Move.NULL;
-        });
-        step(() -> switch (cube.getPiece(Point.WB)) {
-            case WO -> switch (cube.getPiece(Point.WR)) {
-                case WR -> Move.B;
-                case WB -> Move.D;
-                default -> Move.NULL;
-            };
-            case WG -> switch (cube.getPiece(Point.WR)) {
-                case WR -> Move.R;
-                case WO -> Move.D2;
-                default -> Move.NULL;
-            };
-            case BW, BY, RB -> Move.L;
-            case OB -> Move.LP;
-            case OW -> Move.BP;
-            case OY -> Move.B;
-            case GW -> Move.RP;
-            case OG -> switch (cube.getPiece(Point.WR)) {
-                case WR -> Move.D2;
-                case WO -> Move.R;
-                default -> Move.NULL;
-            };
-            case YR -> Move.U;
-            case YB -> Move.L2;
-            case YO -> Move.UP;
-            case YG -> Move.U2;
-            case RY, GR, BR -> Move.F;
-            case GY -> Move.R;
-            case RG -> switch (cube.getPiece(Point.WR)) {
-                case WR -> Move.D2;
-                case WO -> Move.RP;
-                default -> Move.NULL;
-            };
-            case GO -> switch (cube.getPiece(Point.WR)) {
-                case WR -> Move.DP;
-                case WB -> Move.BP;
-                default -> Move.NULL;
-            };
-            case WR -> Move.DP;
-            case BO -> Move.B2;
-            case WB -> switch (cube.getPiece(Point.WR)) {
-                case GR -> Move.FP;
-                case BR -> Move.F;
-                default -> Move.NULL;
-            };
-            default -> Move.NULL;
-        });
-        step(() -> switch(cube.getPiece(Point.WO)) {
-            case WR -> Move.D2;
-            case WO -> switch(cube.getPiece(Point.WB)) {
-                case RB -> Move.L;
-                default -> Move.NULL;
-            };
-            case WG -> switch(cube.getPiece(Point.WR)) {
-                case WR -> Move.R;
-                case WB -> Move.D;
-                default -> Move.NULL;
-            };
-            case WB -> Move.DP;
-            case YO -> Move.B2;
-            case YB -> Move.U;
-            case YG -> Move.UP;
-            case YR -> Move.U2;
-            case RY -> Move.UP;
-            case RB -> switch(cube.getPiece(Point.WR)) {
-                case WR -> Move.D;
-                case WG -> Move.L;
-                default -> Move.NULL;
-            };
-            case RG -> switch(cube.getPiece(Point.WR)) {
-                case WR -> Move.DP;
-                case WB -> Move.RP;
-                default -> Move.NULL;
-            };
-            case RW -> Move.NULL;
-            case BO -> Move.B;
-            case BR -> switch(cube.getPiece(Point.WR)) {
-                case WR -> Move.D2;
-                case WO -> Move.FP;
-                default -> Move.NULL;
-            };
-            case BW -> Move.NULL;
-            case BY -> Move.LP;
-            case OW -> Move.B;
-            case OB -> Move.B2;
-            case OG -> switch (cube.getPiece(Point.WR)) {
-                case WR -> Move.DP;
-                case WB -> Move.R;
-                default -> Move.NULL;
-            };
-            case OY -> Move.BP;
-            case GO -> Move.BP;
-            case GW -> Move.RP;
-            case GY -> Move.R;
-            case GR -> Move.R2;
-            default -> Move.NULL;
-        });
-        Move move = switch(cube.getPiece(Point.WR)) {
-            case WR -> Move.NULL;
-            case WO -> Move.NULL;
-            case WG -> Move.NULL;
-            case WB -> Move.NULL;
-            case YO -> Move.NULL;
-            case YB -> Move.NULL;
-            case YG -> Move.NULL;
-            case YR -> Move.NULL;
-            case RY -> Move.NULL;
-            case RB -> Move.NULL;
-            case RG -> Move.NULL;
-            case RW -> Move.NULL;
-            case BO -> Move.NULL;
-            case BR -> Move.NULL;
-            case BW -> Move.NULL;
-            case BY -> Move.NULL;
-            case OW -> Move.NULL;
-            case OB -> Move.NULL;
-            case OG -> Move.NULL;
-            case OY -> Move.NULL;
-            case GO -> Move.NULL;
-            case GW -> Move.NULL;
-            case GY -> Move.NULL;
-            case GR -> Move.NULL;
-            default -> Move.NULL;
+        Move[] moves = switch(cube.getPiece(Point.WR)) {
+            case WR -> alg();
+            case WO -> alg();
+            case WG -> alg();
+            case WB -> alg();
+            case YO -> alg();
+            case YB -> alg();
+            case YG -> alg();
+            case YR -> alg();
+            case RY -> alg();
+            case RB -> alg();
+            case RG -> alg();
+            case RW -> alg();
+            case BO -> alg();
+            case BR -> alg();
+            case BW -> alg();
+            case BY -> alg();
+            case OW -> alg();
+            case OB -> alg();
+            case OG -> alg();
+            case OY -> alg();
+            case GO -> alg();
+            case GW -> alg();
+            case GY -> alg();
+            case GR -> alg();
+            default -> alg();
         };
     }
 
-    public void step(Step step) {
-        Move move;
-        while ((move = step.getStep()) != Move.NULL) {
-            cube.move(move);
-            steps.add(move);
-        }
+    public void step(Move[] moves) {
+        Stream.of(moves).forEach(this::step);
+    }
+
+    public Move[] alg(Move... moves) {
+        return moves;
     }
 
     public void step(Move move) {

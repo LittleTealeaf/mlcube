@@ -68,7 +68,6 @@ class MoveTest {
                 "R2 F R U R U' R' F' R U2 R' U2 R U",
                 "x R2 F R F' R U2 r' U r U2 x'",
                 "x' L' U L D' L' U' L D L' U' L D' L' U L D x",
-                "y' L U2 L' U2 L F' L' U' L U L F L2 y",
                 "y' R' U L' U2 R U' R' U2 R L y",
                 "y2 L' U' L F L' U' L U L F' L2 U L y2"
         }).map(Move::interpret).map(moves -> Arguments.of(2, moves.toArray(new Move[0]))).toList());

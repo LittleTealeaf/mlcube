@@ -19,8 +19,6 @@ public class Main {
         solver.solve();
         System.out.println(solver.getSteps());
         System.out.println(rubiksCube);
-
-        System.out.println(Move.interpret("R U' R' U' R U R D R' U' R D' R' U2 R'"));
     }
 
 
