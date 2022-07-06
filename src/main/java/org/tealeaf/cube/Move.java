@@ -170,7 +170,7 @@ public enum Move {
                 }, {
                         Point.WB, Point.BY, Point.YG, Point.GW
                 }, {
-                        Point.BW, Point.GY, Point.WG, Point.YB
+                        Point.BW,Point.YB,Point.GY,Point.WG
                 }
         }),
         U(new Point[][]{
