@@ -1,14 +1,9 @@
 package org.tealeaf;
 
-import org.tealeaf.cube.Move;
-import org.tealeaf.cube.Point;
+
 import org.tealeaf.cube.RubiksCube;
 import org.tealeaf.solver.Solver;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Main {
 

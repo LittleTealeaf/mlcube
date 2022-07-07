@@ -4,7 +4,6 @@ import org.tealeaf.cube.Move;
 import org.tealeaf.cube.Point;
 import org.tealeaf.cube.RubiksCube;
 
-import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -205,10 +204,5 @@ public class Solver {
 
     public List<Move> getSteps() {
         return steps;
-    }
-
-    private interface Step {
-
-        Move getStep();
     }
 }

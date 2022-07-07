@@ -22,11 +22,6 @@ class MoveTest {
         Piece.POINTS.forEach(piece -> assertEquals(piece, rubiksCube.getPiece(piece)));
     }
 
-    private static Stream<Arguments> provideNotations() {
-        return Stream.of(new String[]{
-                "RUR'F'RUR'U'R'FR2U'R'"
-        }).map(Arguments::of);
-    }
 
     private static Stream<Arguments> provideLoops() {
 

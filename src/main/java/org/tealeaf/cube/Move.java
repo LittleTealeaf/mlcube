@@ -221,15 +221,6 @@ public enum Move {
             return this;
         }
 
-        Builder two(Perm perm) {
-            Stream.of(perm.permutations).forEach(p -> {
-                for (int i = 0; i < p.length; i++) {
-                    map.put(p[i], p[(i + 2) % p.length]);
-                }
-            });
-            return this;
-        }
-
         Builder makePrime() {
             Map<Point, Point> primeMap = new HashMap<>();
             map.forEach((key, value) -> primeMap.put(value, key));
