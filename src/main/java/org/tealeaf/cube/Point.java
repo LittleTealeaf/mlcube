@@ -67,9 +67,8 @@ public enum Point {
     }
 
     public static Point fromColors(char[] colors, char first) {
-        char[] pool = Arrays.copyOf(colors,colors.length);
+        char[] pool = Arrays.copyOf(colors, colors.length);
         Arrays.sort(pool);
-
 
         char[] out = new char[colors.length];
 
@@ -77,17 +76,17 @@ public enum Point {
         out[0] = first;
 
         // null out the first character
-        pool[Arrays.binarySearch(pool,first)] = NULL;
+        pool[Arrays.binarySearch(pool, first)] = NULL;
 
-        //cycle through the next ones
-        for(int i = 1; i < out.length; i++) {
+        // cycle through the next ones
+        for (int i = 1; i < out.length; i++) {
             char a = NULL;
             int index = 0;
-            for(char c : pool) {
-                if(c != NULL) {
-                    for(int value = 0; value < COLOR_ORDER.length; value++) {
-                        if(COLOR_ORDER[value] == c) {
-                            if(a == NULL || value < index) {
+            for (char c : pool) {
+                if (c != NULL) {
+                    for (int value = 0; value < COLOR_ORDER.length; value++) {
+                        if (COLOR_ORDER[value] == c) {
+                            if (a == NULL || value < index) {
                                 a = c;
                                 index = value;
                             }
@@ -96,15 +95,14 @@ public enum Point {
                     }
                 }
             }
-            for(int b = 0; b < pool.length; b++) {
-                if(pool[b] == a) {
+            for (int b = 0; b < pool.length; b++) {
+                if (pool[b] == a) {
                     pool[b] = NULL;
                 }
             }
 
             out[i] = a;
         }
-
 
         return valueOf(new String(out));
     }
@@ -113,4 +111,3 @@ public enum Point {
         return toString().toCharArray();
     }
 }
-
