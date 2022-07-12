@@ -54,7 +54,7 @@ class MoveTest {
                 "M2 U M2 U2 M2 U M2",
 
                 "R U R' F' R U R' U' R' F R2 U' R' U'",
-                "R U R' F' R U2 R' U2 R' F R U R U2 R'",
+                "R U R' F' R U2 R' U2 R' F R U R U2 R' U'",
                 "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'",
                 "R U R' U' R' F R2 U' R' U' R U R' F'",
                 "R' U R U' R' F' U' F R U R' F R' F' R U' R",
@@ -63,24 +63,9 @@ class MoveTest {
                 "R2 F R U R U' R' F' R U2 R' U2 R U",
                 "x R2 F R F' R U2 r' U r U2 x'",
                 "x' L' U L D' L' U' L D L' U' L D' L' U L D x",
-                "y' R' U L' U2 R U' R' U2 R L y",
-                "y2 L' U' L F L' U' L U L F' L2 U L y2"
+                "y' R' U L' U2 R U' R' U2 R L y U'",
+                "y2 L' U' L F L' U' L U L F' L2 U L U' y2"
         }).map(Move::interpret).map(moves -> Arguments.of(2, moves.toArray(new Move[0]))).toList());
-
-//        Set.of(new Move[][] {
-//                {
-//                    Move.R,Move.U,Move.RP,Move.FP,Move.R,Move.U,Move.RP,Move.UP,Move.RP,Move.F,Move.R2,Move.UP,Move.RP,Move.UP
-//                },{
-//                    Move.MP,Move.UP,Move.M2,Move.UP,Move.M2,Move.UP,Move.MP,Move.U2,Move.M2,Move.U
-//                },{
-//                    Move.RP,Move.UP,Move.FP,Move.R,Move.U,Move.RP,Move.UP,Move.RP,Move.F,Move.R2,Move.UP,Move.RP,Move.UP,Move.R,Move.U,Move.RP,Move.U,Move.R
-//                }
-//        }).forEach(moves -> loops.add(new Loop(2, moves)));
-//        Set.of(new Move[][] {
-//                {
-//                    Move.R2,Move.U,Move.R,Move.U,Move.RP,Move.UP,Move.RP,Move.UP,Move.RP,Move.U,Move.RP
-//                }
-//        }).forEach(moves -> loops.add(new Loop(3, moves)));
 
         return arguments.stream();
     }

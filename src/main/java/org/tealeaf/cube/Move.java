@@ -80,8 +80,13 @@ public enum Move {
         piece.setPosition(permutations.getOrDefault(piece.getPosition(), piece.getPosition()));
     }
 
+    @Override
+    public String toString() {
+        return permutations.toString();
+    }
+
     private enum Perm {
-        B(new Point[][]{
+        L(new Point[][]{
                 {
                         Point.OY, Point.OB, Point.OW, Point.OG
                 }, {
@@ -94,7 +99,7 @@ public enum Move {
                         Point.BWO, Point.WOG, Point.GYO, Point.YOB
                 }
         }),
-        D(new Point[][]{
+        U(new Point[][]{
                 {
                         Point.WR, Point.WG, Point.WO, Point.WB
                 }, {
@@ -109,14 +114,14 @@ public enum Move {
         }),
         E(new Point[][]{
                 {
-                        Point.R, Point.G, Point.O, Point.B
+                        Point.B, Point.O, Point.G, Point.R
                 }, {
-                        Point.RG, Point.GO, Point.OB, Point.BR
+                        Point.BR, Point.OB, Point.GO, Point.RG
                 }, {
-                        Point.BO, Point.RB, Point.GR, Point.OG
+                        Point.OG, Point.BO, Point.RB, Point.GR
                 }
         }),
-        F(new Point[][]{
+        R(new Point[][]{
                 {
                         Point.RW, Point.RB, Point.RY, Point.RG
                 }, {
@@ -129,7 +134,7 @@ public enum Move {
                         Point.GWR, Point.WRB, Point.BYR, Point.YRG
                 }
         }),
-        L(new Point[][]{
+        B(new Point[][]{
                 {
                         Point.BR, Point.BW, Point.BO, Point.BY
                 }, {
@@ -142,16 +147,16 @@ public enum Move {
                         Point.YOB, Point.RYB, Point.WRB, Point.OWB
                 }
         }),
-        M(new Point[][]{
+        S(new Point[][]{
                 {
-                        Point.Y, Point.R, Point.W, Point.O
+                        Point.O, Point.W, Point.R, Point.Y
                 }, {
-                        Point.YR, Point.RW, Point.WO, Point.OY
+                        Point.OY, Point.WO, Point.RW, Point.YR
                 }, {
-                        Point.RY, Point.WR, Point.OW, Point.YO
+                        Point.YO, Point.OW, Point.WR, Point.RY
                 }
         }),
-        R(new Point[][]{
+        F(new Point[][]{
                 {
                         Point.GY, Point.GO, Point.GW, Point.GR
                 }, {
@@ -164,16 +169,16 @@ public enum Move {
                         Point.RWG, Point.YRG, Point.OYG, Point.WOG
                 }
         }),
-        S(new Point[][]{
+        M(new Point[][]{
                 {
-                        Point.Y, Point.G, Point.W, Point.B
+                        Point.B, Point.W, Point.G, Point.Y
                 }, {
-                        Point.WB, Point.BY, Point.YG, Point.GW
+                        Point.GW, Point.YG, Point.BY, Point.WB
                 }, {
-                        Point.BW,Point.YB,Point.GY,Point.WG
+                        Point.WG, Point.GY, Point.YB, Point.BW
                 }
         }),
-        U(new Point[][]{
+        D(new Point[][]{
                 {
                         Point.YR, Point.YB, Point.YO, Point.YG
                 }, {
@@ -247,9 +252,8 @@ public enum Move {
 
         List<Move> moves = new ArrayList<>();
 
-
-        for(int i = set.length() - 1; i >= 0; i--) {
-            switch(set.charAt(i)) {
+        for (int i = set.length() - 1; i >= 0; i--) {
+            switch (set.charAt(i)) {
                 case '\'' -> {
                     prime = true;
                 }
@@ -257,13 +261,13 @@ public enum Move {
                 case ' ' -> {}
                 default -> {
                     String string = set.charAt(i) + "";
-                    if(two) {
+                    if (two) {
                         string += "2";
-                    } else if(prime) {
+                    } else if (prime) {
                         string += "P";
                     }
                     prime = two = false;
-                    moves.add(0,valueOf(string));
+                    moves.add(0, valueOf(string));
                 }
             }
         }
