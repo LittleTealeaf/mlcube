@@ -71,7 +71,7 @@ public class RubiksCube {
         return map;
     }
 
-    public String print2d() {
+    public String print() {
         Map<Point, Character> map = makeColorMap();
 
         return Stream.of(DISPLAY_2D).map(row -> Stream.of(row).map(value -> map.getOrDefault(value, ' ').toString()).collect(Collectors.joining())).collect(
