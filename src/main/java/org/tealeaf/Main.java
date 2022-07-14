@@ -1,11 +1,9 @@
 package org.tealeaf;
 
-import org.tealeaf.cube.Move;
 import org.tealeaf.cube.RubiksCube;
 import org.tensorflow.ConcreteFunction;
 import org.tensorflow.Signature;
 import org.tensorflow.Tensor;
-import org.tensorflow.ndarray.NdArray;
 import org.tensorflow.ndarray.NdArrays;
 import org.tensorflow.op.Ops;
 import org.tensorflow.op.core.Placeholder;
@@ -22,18 +20,19 @@ public class Main {
 //    }
 
     public static void main(String[] args) {
-        RubiksCube rubiksCube = new RubiksCube();
-        System.out.println(rubiksCube.print());
-        rubiksCube.move(Move.yP);
-        System.out.println(rubiksCube.print());
 
-        try (ConcreteFunction dbl = ConcreteFunction.create(Main::dbl);
-             TInt32 x = TInt32.tensorOf(NdArrays.vectorOf(1,2,3,4,5,6,7,8,9,10));
-             Tensor dblx = dbl.call(x);
-        ){
-          System.out.println(x.getInt() + " doubled is " + ((TInt32) dblx).getInt());
-//          System.out.println(x.asRawTensor().data().asInts().);
-        }
+        long time = System.currentTimeMillis();
+        RubiksCube rubiksCube = new RubiksCube();
+        rubiksCube.scramble(1_000_000);
+        long time2 = System.currentTimeMillis();
+        System.out.println(time2 - time);
+
+//        try (ConcreteFunction dbl = ConcreteFunction.create(Main::dbl);
+//             TInt32 x = TInt32.tensorOf(NdArrays.vectorOf(1,2,3,4,5,6,7,8,9,10));
+//             Tensor dblx = dbl.call(x);
+//        ){
+//          System.out.println(x.getInt() + " doubled is " + ((TInt32) dblx).getInt());
+//        }
 
 
     }
