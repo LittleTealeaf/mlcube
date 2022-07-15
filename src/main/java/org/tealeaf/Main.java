@@ -1,6 +1,7 @@
 package org.tealeaf;
 
 import org.tealeaf.cube.RubiksCube;
+import org.tealeaf.environment.Move;
 import org.tensorflow.ConcreteFunction;
 import org.tensorflow.Signature;
 import org.tensorflow.Tensor;
@@ -20,12 +21,9 @@ public class Main {
 //    }
 
     public static void main(String[] args) {
-
-        long time = System.currentTimeMillis();
-        RubiksCube rubiksCube = new RubiksCube();
-        rubiksCube.scramble(1_000_000);
-        long time2 = System.currentTimeMillis();
-        System.out.println(time2 - time);
+        System.out.println(Move.R.getPermutations());
+        System.out.println(Move.RP.getPermutations());
+        System.out.println(Move.R2.getPermutations());
 
 //        try (ConcreteFunction dbl = ConcreteFunction.create(Main::dbl);
 //             TInt32 x = TInt32.tensorOf(NdArrays.vectorOf(1,2,3,4,5,6,7,8,9,10));
