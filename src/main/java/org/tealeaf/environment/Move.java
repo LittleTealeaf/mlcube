@@ -2,6 +2,7 @@ package org.tealeaf.environment;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public enum Move {
     B(Perm.B.build()),
@@ -29,12 +30,26 @@ public enum Move {
         this.permutations = permutations;
     }
 
+    public Position apply(Position position) {
+        return permutations.getOrDefault(position,position);
+   }
+
+   public void apply(Piece piece) {
+        piece.setPosition(permutations.getOrDefault(piece.getPosition(),piece.getPosition()));
+   }
+
     public Map<Position, Position> getPermutations() {
         return permutations;
     }
 
     private static Position[] LOOP(Position... positions) {
         return positions;
+    }
+
+    private static final Random rng = new Random();
+
+    public static Move random() {
+        return values()[rng.nextInt(values().length)];
     }
 
     private enum Perm {

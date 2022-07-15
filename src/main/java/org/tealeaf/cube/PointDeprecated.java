@@ -2,7 +2,9 @@ package org.tealeaf.cube;
 
 import java.util.Arrays;
 
-public enum Point {
+/**
+ */
+public enum PointDeprecated {
     B,
     BO,
     BR,
@@ -62,11 +64,11 @@ public enum Point {
 
     private static final char NULL = '\u0000';
 
-    public static Point fromColors(char[] colors) {
+    public static PointDeprecated fromColors(char[] colors) {
         return valueOf(new String(colors));
     }
 
-    public static Point fromColors(char[] colors, char first) {
+    public static PointDeprecated fromColors(char[] colors, char first) {
         char[] pool = Arrays.copyOf(colors, colors.length);
         Arrays.sort(pool);
 

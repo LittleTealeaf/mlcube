@@ -2,10 +2,13 @@ package org.tealeaf.environment;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Cube {
 
-    private Map<Position, Position> pieces;
+    private final Set<Piece> pieces;
 
     public Cube() {
         Position[] piece_locations = {
@@ -36,10 +39,11 @@ public class Cube {
                 Position.BR,
                 Position.BO
         };
-        pieces = new HashMap<>(piece_locations.length);
-        for (Position piece_location : piece_locations) {
-            pieces.put(piece_location,piece_location);
-        }
+        pieces = Stream.of(piece_locations).map(Piece::new).collect(Collectors.toSet());
+    }
+
+    public void move(Move move) {
+        pieces.forEach(move::apply);
     }
 
     @Override

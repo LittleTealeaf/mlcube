@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 /**
  * <img src="https://jperm.net/images/notation.png"/>
  */
-public enum Move {
+public enum MoveDeprecated {
     B(build().normal(Perm.B)),
     B2(build().normal(Perm.B).makeTwo()),
     BP(build().normal(Perm.B).makePrime()),
@@ -66,18 +66,18 @@ public enum Move {
     z2(build().normal(Perm.F).prime(Perm.B).normal(Perm.S).makeTwo()),
     zP(build().normal(Perm.F).prime(Perm.B).normal(Perm.S).makePrime());
 
-    private final Map<Point, Point> permutations;
+    private final Map<PointDeprecated, PointDeprecated> permutations;
 
-    Move() {
+    MoveDeprecated() {
         permutations = new HashMap<>();
     }
 
-    Move(Builder builder) {
+    MoveDeprecated(Builder builder) {
         permutations = builder.map;
     }
 
-    public void apply(Piece piece) {
-        piece.setPosition(permutations.getOrDefault(piece.getPosition(), piece.getPosition()));
+    public void apply(PieceDeprecated pieceDeprecated) {
+        pieceDeprecated.setPosition(permutations.getOrDefault(pieceDeprecated.getPosition(), pieceDeprecated.getPosition()));
     }
 
     @Override
@@ -86,122 +86,122 @@ public enum Move {
     }
 
     private enum Perm {
-        L(new Point[][]{
+        L(new PointDeprecated[][]{
                 {
-                        Point.OY, Point.OB, Point.OW, Point.OG
+                        PointDeprecated.OY, PointDeprecated.OB, PointDeprecated.OW, PointDeprecated.OG
                 }, {
-                        Point.WO, Point.GO, Point.YO, Point.BO
+                        PointDeprecated.WO, PointDeprecated.GO, PointDeprecated.YO, PointDeprecated.BO
                 }, {
-                        Point.OWG, Point.OYG, Point.OYB, Point.OWB
+                        PointDeprecated.OWG, PointDeprecated.OYG, PointDeprecated.OYB, PointDeprecated.OWB
                 }, {
-                        Point.WOB, Point.GWO, Point.YOG, Point.BYO
+                        PointDeprecated.WOB, PointDeprecated.GWO, PointDeprecated.YOG, PointDeprecated.BYO
                 }, {
-                        Point.BWO, Point.WOG, Point.GYO, Point.YOB
+                        PointDeprecated.BWO, PointDeprecated.WOG, PointDeprecated.GYO, PointDeprecated.YOB
                 }
         }),
-        U(new Point[][]{
+        U(new PointDeprecated[][]{
                 {
-                        Point.WR, Point.WG, Point.WO, Point.WB
+                        PointDeprecated.WR, PointDeprecated.WG, PointDeprecated.WO, PointDeprecated.WB
                 }, {
-                        Point.RW, Point.GW, Point.OW, Point.BW
+                        PointDeprecated.RW, PointDeprecated.GW, PointDeprecated.OW, PointDeprecated.BW
                 }, {
-                        Point.WRB, Point.WRG, Point.WOG, Point.WOB
+                        PointDeprecated.WRB, PointDeprecated.WRG, PointDeprecated.WOG, PointDeprecated.WOB
                 }, {
-                        Point.RWB, Point.GWR, Point.OWG, Point.BWO
+                        PointDeprecated.RWB, PointDeprecated.GWR, PointDeprecated.OWG, PointDeprecated.BWO
                 }, {
-                        Point.BWR, Point.RWG, Point.GWO, Point.OWB
+                        PointDeprecated.BWR, PointDeprecated.RWG, PointDeprecated.GWO, PointDeprecated.OWB
                 }
         }),
-        E(new Point[][]{
+        E(new PointDeprecated[][]{
                 {
-                        Point.B, Point.O, Point.G, Point.R
+                        PointDeprecated.B, PointDeprecated.O, PointDeprecated.G, PointDeprecated.R
                 }, {
-                        Point.BR, Point.OB, Point.GO, Point.RG
+                        PointDeprecated.BR, PointDeprecated.OB, PointDeprecated.GO, PointDeprecated.RG
                 }, {
-                        Point.OG, Point.BO, Point.RB, Point.GR
+                        PointDeprecated.OG, PointDeprecated.BO, PointDeprecated.RB, PointDeprecated.GR
                 }
         }),
-        R(new Point[][]{
+        R(new PointDeprecated[][]{
                 {
-                        Point.RW, Point.RB, Point.RY, Point.RG
+                        PointDeprecated.RW, PointDeprecated.RB, PointDeprecated.RY, PointDeprecated.RG
                 }, {
-                        Point.WR, Point.BR, Point.YR, Point.GR
+                        PointDeprecated.WR, PointDeprecated.BR, PointDeprecated.YR, PointDeprecated.GR
                 }, {
-                        Point.RWG, Point.RWB, Point.RYB, Point.RYG
+                        PointDeprecated.RWG, PointDeprecated.RWB, PointDeprecated.RYB, PointDeprecated.RYG
                 }, {
-                        Point.WRG, Point.BWR, Point.YRB, Point.GYR
+                        PointDeprecated.WRG, PointDeprecated.BWR, PointDeprecated.YRB, PointDeprecated.GYR
                 }, {
-                        Point.GWR, Point.WRB, Point.BYR, Point.YRG
+                        PointDeprecated.GWR, PointDeprecated.WRB, PointDeprecated.BYR, PointDeprecated.YRG
                 }
         }),
-        B(new Point[][]{
+        B(new PointDeprecated[][]{
                 {
-                        Point.BR, Point.BW, Point.BO, Point.BY
+                        PointDeprecated.BR, PointDeprecated.BW, PointDeprecated.BO, PointDeprecated.BY
                 }, {
-                        Point.RB, Point.WB, Point.OB, Point.YB
+                        PointDeprecated.RB, PointDeprecated.WB, PointDeprecated.OB, PointDeprecated.YB
                 }, {
-                        Point.BYR, Point.BWR, Point.BWO, Point.BYO
+                        PointDeprecated.BYR, PointDeprecated.BWR, PointDeprecated.BWO, PointDeprecated.BYO
                 }, {
-                        Point.RWB, Point.WOB, Point.OYB, Point.YRB
+                        PointDeprecated.RWB, PointDeprecated.WOB, PointDeprecated.OYB, PointDeprecated.YRB
                 }, {
-                        Point.YOB, Point.RYB, Point.WRB, Point.OWB
+                        PointDeprecated.YOB, PointDeprecated.RYB, PointDeprecated.WRB, PointDeprecated.OWB
                 }
         }),
-        S(new Point[][]{
+        S(new PointDeprecated[][]{
                 {
-                        Point.O, Point.W, Point.R, Point.Y
+                        PointDeprecated.O, PointDeprecated.W, PointDeprecated.R, PointDeprecated.Y
                 }, {
-                        Point.OY, Point.WO, Point.RW, Point.YR
+                        PointDeprecated.OY, PointDeprecated.WO, PointDeprecated.RW, PointDeprecated.YR
                 }, {
-                        Point.YO, Point.OW, Point.WR, Point.RY
+                        PointDeprecated.YO, PointDeprecated.OW, PointDeprecated.WR, PointDeprecated.RY
                 }
         }),
-        F(new Point[][]{
+        F(new PointDeprecated[][]{
                 {
-                        Point.GY, Point.GO, Point.GW, Point.GR
+                        PointDeprecated.GY, PointDeprecated.GO, PointDeprecated.GW, PointDeprecated.GR
                 }, {
-                        Point.YG, Point.OG, Point.WG, Point.RG
+                        PointDeprecated.YG, PointDeprecated.OG, PointDeprecated.WG, PointDeprecated.RG
                 }, {
-                        Point.GYR, Point.GYO, Point.GWO, Point.GWR
+                        PointDeprecated.GYR, PointDeprecated.GYO, PointDeprecated.GWO, PointDeprecated.GWR
                 }, {
-                        Point.YOG, Point.OWG, Point.WRG, Point.RYG
+                        PointDeprecated.YOG, PointDeprecated.OWG, PointDeprecated.WRG, PointDeprecated.RYG
                 }, {
-                        Point.RWG, Point.YRG, Point.OYG, Point.WOG
+                        PointDeprecated.RWG, PointDeprecated.YRG, PointDeprecated.OYG, PointDeprecated.WOG
                 }
         }),
-        M(new Point[][]{
+        M(new PointDeprecated[][]{
                 {
-                        Point.B, Point.W, Point.G, Point.Y
+                        PointDeprecated.B, PointDeprecated.W, PointDeprecated.G, PointDeprecated.Y
                 }, {
-                        Point.GW, Point.YG, Point.BY, Point.WB
+                        PointDeprecated.GW, PointDeprecated.YG, PointDeprecated.BY, PointDeprecated.WB
                 }, {
-                        Point.WG, Point.GY, Point.YB, Point.BW
+                        PointDeprecated.WG, PointDeprecated.GY, PointDeprecated.YB, PointDeprecated.BW
                 }
         }),
-        D(new Point[][]{
+        D(new PointDeprecated[][]{
                 {
-                        Point.YR, Point.YB, Point.YO, Point.YG
+                        PointDeprecated.YR, PointDeprecated.YB, PointDeprecated.YO, PointDeprecated.YG
                 }, {
-                        Point.RY, Point.BY, Point.OY, Point.GY
+                        PointDeprecated.RY, PointDeprecated.BY, PointDeprecated.OY, PointDeprecated.GY
                 }, {
-                        Point.YRG, Point.YRB, Point.YOB, Point.YOG
+                        PointDeprecated.YRG, PointDeprecated.YRB, PointDeprecated.YOB, PointDeprecated.YOG
                 }, {
-                        Point.RYB, Point.BYO, Point.OYG, Point.GYR
+                        PointDeprecated.RYB, PointDeprecated.BYO, PointDeprecated.OYG, PointDeprecated.GYR
                 }, {
-                        Point.GYO, Point.RYG, Point.BYR, Point.OYB
+                        PointDeprecated.GYO, PointDeprecated.RYG, PointDeprecated.BYR, PointDeprecated.OYB
                 }
         });
 
-        final Point[][] permutations;
+        final PointDeprecated[][] permutations;
 
-        Perm(Point[]... permutations) {
+        Perm(PointDeprecated[]... permutations) {
             this.permutations = permutations;
         }
     }
 
     private static class Builder {
 
-        Map<Point, Point> map = new HashMap<>();
+        Map<PointDeprecated, PointDeprecated> map = new HashMap<>();
 
         public Builder() {
 
@@ -227,14 +227,14 @@ public enum Move {
         }
 
         Builder makePrime() {
-            Map<Point, Point> primeMap = new HashMap<>();
+            Map<PointDeprecated, PointDeprecated> primeMap = new HashMap<>();
             map.forEach((key, value) -> primeMap.put(value, key));
             this.map = primeMap;
             return this;
         }
 
         Builder makeTwo() {
-            Map<Point, Point> twoMap = new HashMap<>();
+            Map<PointDeprecated, PointDeprecated> twoMap = new HashMap<>();
             map.forEach((key, value) -> {
                 twoMap.put(key, map.getOrDefault(value, key));
             });
@@ -247,10 +247,10 @@ public enum Move {
         return new Builder();
     }
 
-    public static List<Move> interpret(String set) {
+    public static List<MoveDeprecated> interpret(String set) {
         boolean prime = false, two = false;
 
-        List<Move> moves = new ArrayList<>();
+        List<MoveDeprecated> moveDeprecateds = new ArrayList<>();
 
         for (int i = set.length() - 1; i >= 0; i--) {
             switch (set.charAt(i)) {
@@ -267,11 +267,11 @@ public enum Move {
                         string += "P";
                     }
                     prime = two = false;
-                    moves.add(0, valueOf(string));
+                    moveDeprecateds.add(0, valueOf(string));
                 }
             }
         }
 
-        return moves;
+        return moveDeprecateds;
     }
 }
