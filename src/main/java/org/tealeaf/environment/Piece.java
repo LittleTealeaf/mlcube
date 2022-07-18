@@ -12,6 +12,11 @@ public class Piece {
         this.position = position;
     }
 
+    public Piece(Position piece, Position position) {
+        this.piece = piece;
+        this.position = position;
+    }
+
     public Position getPiece() {
         return piece;
     }
