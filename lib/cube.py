@@ -166,15 +166,69 @@ class Cube:
             self.state[4, 0],
         )
 
+    def U(self):
+        self.state[3, 3], self.state[3, 0], self.state[3, 9], self.state[3, 6] = (
+            self.state[3, 6],
+            self.state[3, 3],
+            self.state[3, 0],
+            self.state[3, 9],
+        )
+        self.state[3, 4], self.state[3, 1], self.state[3, 10], self.state[3, 7] = (
+            self.state[3, 7],
+            self.state[3, 4],
+            self.state[3, 1],
+            self.state[3, 10],
+        )
+        self.state[3, 5], self.state[3, 2], self.state[3, 11], self.state[3, 8] = (
+            self.state[3, 8],
+            self.state[3, 5],
+            self.state[3, 2],
+            self.state[3, 11],
+        )
+        self.state[0, 3], self.state[0, 5], self.state[2, 5], self.state[2, 3] = (
+            self.state[2, 3],
+            self.state[0, 3],
+            self.state[0, 5],
+            self.state[2, 5],
+        )
+        self.state[0, 4], self.state[1, 5], self.state[2, 4], self.state[1, 3] = (
+            self.state[1, 3],
+            self.state[0, 4],
+            self.state[1, 5],
+            self.state[2, 4],
+        )
 
-cube = Cube()
+    def UP(self):
+        self.state[3, 3], self.state[3, 0], self.state[3, 9], self.state[3, 6] = (
+            self.state[3, 0],
+            self.state[3, 9],
+            self.state[3, 6],
+            self.state[3, 3],
+        )
+        self.state[3, 4], self.state[3, 1], self.state[3, 10], self.state[3, 7] = (
+            self.state[3, 1],
+            self.state[3, 10],
+            self.state[3, 7],
+            self.state[3, 4],
+        )
+        self.state[3, 5], self.state[3, 2], self.state[3, 11], self.state[3, 8] = (
+            self.state[3, 2],
+            self.state[3, 11],
+            self.state[3, 8],
+            self.state[3, 5],
+        )
+        self.state[0, 3], self.state[0, 5], self.state[2, 5], self.state[2, 3] = (
+            self.state[0, 5],
+            self.state[2, 5],
+            self.state[2, 3],
+            self.state[0, 3],
+        )
+        self.state[0, 4], self.state[1, 5], self.state[2, 4], self.state[1, 3] = (
+            self.state[1, 5],
+            self.state[2, 4],
+            self.state[1, 3],
+            self.state[0, 4],
+        )
 
-start = round(time.time() * 1000)
 
-for i in range(1_000_000):
-    cube.R()
-
-end = round(time.time() * 1000)
-elapsed = end - start
-print(elapsed)
 # it's ~15 times slower than java
