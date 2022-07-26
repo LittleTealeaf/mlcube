@@ -19,6 +19,7 @@ class Color(Enum):
 
 # https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Japanese_color_scheme_of_a_Rubik%27s_Cube.svg/1200px-Japanese_color_scheme_of_a_Rubik%27s_Cube.svg.png
 
+# Reformat it so that it stores it as a 1xn array/matrix, and then when it prints, it just prints the pretty view. We can then build the move matrices as permutations
 
 class Cube:
     def __init__(self):
