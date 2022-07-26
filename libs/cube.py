@@ -115,8 +115,11 @@ class Cube:
         for i in range(self.state.size):
             self.state[i] = i / 9
 
+    def apply(self,*move):
+        for i in move:
+            self.state = self.state @ i
 
 
 c = Cube()
-c.state = c.state @ Move.R @ Move.R @ Move.L @ Move.L @ Move.U @ Move.U @ Move.D @ Move.D @ Move.F @ Move.F @ Move.B @ Move.B
+c.apply(Move.R,Move.R2,Move.RP,Move.R2)
 print(c.state)
