@@ -22,6 +22,8 @@ class Color(Enum):
 # Reformat it so that it stores it as a 1xn array/matrix, and then when it prints, it just prints the pretty view.
 #  We can then build the move matrices as permutations
 
+# Store it as an array of numbers (1-6) and when the network needs it, convert to between 0-1
+
 
 class Cube:
     def __init__(self):
