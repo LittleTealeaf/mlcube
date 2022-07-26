@@ -1,6 +1,5 @@
-import numpy as np
-import time
 from enum import Enum
+import numpy as np
 
 
 class Color(Enum):
@@ -230,5 +229,39 @@ class Cube:
             self.state[0, 4],
         )
 
+    def D(self):
+        self.state[5, 3], self.state[5, 6], self.state[5, 9], self.state[5, 0] = (
+            self.state[5, 0],
+            self.state[5, 3],
+            self.state[5, 6],
+            self.state[5, 9],
+        )
+        self.state[5, 4], self.state[5, 7], self.state[5, 10], self.state[5, 1] = (
+            self.state[5, 1],
+            self.state[5, 4],
+            self.state[5, 7],
+            self.state[5, 10],
+        )
+        self.state[5, 5], self.state[5, 8], self.state[5, 11], self.state[5, 2] = (
+            self.state[5, 2],
+            self.state[5, 5],
+            self.state[5, 8],
+            self.state[5, 11],
+        )
+        self.state[6, 3], self.state[6, 5], self.state[8, 5], self.state[8, 3] = (
+            self.state[8, 3],
+            self.state[6, 3],
+            self.state[6, 5],
+            self.state[8, 5],
+        )
+        self.state[6, 4], self.state[7, 5], self.state[8, 4], self.state[8, 3] = (
+            self.state[8, 3],
+            self.state[6, 4],
+            self.state[7, 5],
+            self.state[8, 4],
+        )
+
 
 # it's ~15 times slower than java
+
+print(Cube().state)
