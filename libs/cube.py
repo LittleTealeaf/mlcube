@@ -1,12 +1,13 @@
 from enum import Enum
 import numpy as np
 
+# https://towardsdatascience.com/reinforcement-learning-explained-visually-part-5-deep-q-networks-step-by-step-5a5317197f4b
+
 # https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhXUyatM9IZWfEoxXm2sHwbjr_6l_y-uTGXg&usqp=CAU
 # https://ruwix.com/pics/rubiks-cube/mathematics-permutation-group.jpg
 
 
 class Color(Enum):
-    "W"
     W = 0
     WHITE = 0
     Y = 1
@@ -35,7 +36,7 @@ class Move:
     def two(moves) -> np.ndarray[(54,54),np.int8]:
         return moves @ moves
     def prime(moves) -> np.ndarray[(54,54),np.int8]:
-        return moves.T
+        return moves.Ti
 
 
     R = build(
@@ -106,9 +107,6 @@ class Move:
     B2 = two(B)
 
 
-print(Move.R)
-
-
 class Cube:
     def __init__(self):
         self.state = np.zeros((9 * 6), dtype=np.int8)
@@ -122,4 +120,3 @@ class Cube:
 
 c = Cube()
 c.apply(Move.R,Move.R2,Move.RP,Move.R2)
-print(c.state)
