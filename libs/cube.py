@@ -1,4 +1,5 @@
 from enum import Enum
+import time
 import numpy as np
 
 # https://towardsdatascience.com/reinforcement-learning-explained-visually-part-5-deep-q-networks-step-by-step-5a5317197f4b
@@ -36,7 +37,7 @@ class Move:
     def two(moves) -> np.ndarray[(54,54),np.int8]:
         return moves @ moves
     def prime(moves) -> np.ndarray[(54,54),np.int8]:
-        return moves.Ti
+        return moves.T
 
 
     R = build(
@@ -119,4 +120,9 @@ class Cube:
 
 
 c = Cube()
-c.apply(Move.R,Move.R2,Move.RP,Move.R2)
+
+start_time = time.time()
+for i in range(1_000_000):
+    c.apply(Move.R)
+end_time = time.time()
+print("--- %s seconds ---" % (end_time - start_time))
