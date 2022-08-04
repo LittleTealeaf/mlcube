@@ -117,12 +117,3 @@ class Cube:
     def apply(self,*move):
         for i in move:
             self.state = self.state @ i
-
-
-c = Cube()
-
-start_time = time.time()
-for i in range(1_000_000):
-    c.apply(Move.R)
-end_time = time.time()
-print("--- %s seconds ---" % (end_time - start_time))
