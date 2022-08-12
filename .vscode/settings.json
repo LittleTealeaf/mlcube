@@ -1,4 +1,7 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "python.analysis.extraPaths": ["./libs"]
+    "python.analysis.extraPaths": [
+        "./libs"
+    ],
+    "python.formatting.provider": "black"
 }
