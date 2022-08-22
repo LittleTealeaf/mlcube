@@ -133,9 +133,31 @@ def create_scrambled_sample(count: int, pool: Pool = None, scramble_length: int 
 
 class Agent(tf.keras.Model):
     def __init__(self, layers: list[int]):
+        super(Agent,self).__init__()
         self.layers_layout = layers
+        self.layers = []
+        for i in range(len(layers)):
+            size = layers[i]
+            prev_size = layers[i-1] if i > 0 else 56 * 6
+
+            # W = tf.Variable(tf.random.normal([prev_size, size]),name=f"W{i+1}")
+            # b = tf.Variable(tf.random.normal([size]),name=f"b{i+1}")
+            # self.layers.append((W,b))
 
 
-    def call(self, x):
-        ...
+# https://www.tensorflow.org/api_docs/python/tf/keras/layers/Dense
+# So it's apparently a bit more complicated to make a model than I expected! Go me!
+#
 
+
+    def call(self, input_tensor, training=False):
+        x = input_tensor
+        for i in range(len(self.layers)):
+            W, b = self.layers[i]
+            if i > 0:
+                x = tf.nn.softsign(x)
+            x = tf.add(tf.matmul(x,W),b)
+        return x
+
+
+agent = Agent([50,30,18])
