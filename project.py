@@ -145,6 +145,7 @@ class Agent(tf.keras.Model):
             # self.layers.append((W,b))
 
 
+# https://www.tensorflow.org/api_docs/python/tf/keras/Model
 # https://www.tensorflow.org/api_docs/python/tf/keras/layers/Dense
 # So it's apparently a bit more complicated to make a model than I expected! Go me!
 #
