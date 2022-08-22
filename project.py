@@ -10,10 +10,10 @@ import json
 
 class Move:
     def __init__(
-        self, name: str, loops: list[list[int]], two: bool = False, prime: bool = False
+            self, name: str, loops: list[list[int]], two: bool = False, prime: bool = False
     ):
         self.name = name
-        self.matrix: np.ndarray[(54,54),np.int8] = np.identity(9 * 6, dtype=np.int8)
+        self.matrix: np.ndarray[(54, 54), np.int8] = np.identity(9 * 6, dtype=np.int8)
         for loop in loops:
             first = np.copy(self.matrix[loop[0]])
             for i in range(len(loop) - 1):
@@ -24,7 +24,7 @@ class Move:
         if prime:
             self.matrix = self.matrix.T
 
-    def apply(self,state: np.ndarray[(54),np.float32]):
+    def apply(self, state: np.ndarray[54, np.float32]):
         return state @ self.matrix
 
 
@@ -107,25 +107,35 @@ MOVES = [
 
 
 def create_cube():
-    state: np.ndarray[(54),np.int8] = np.zeros((54),dtype=np.int8)
+    state: np.ndarray[54, np.int8] = np.zeros(54, dtype=np.int8)
     for i in range(54):
         state[i] = i // 9
     return state
 
-def scramble_cube(cube: np.ndarray[(54),np.int8],count: int = 100):
+
+def scramble_cube(cube: np.ndarray[54, np.int8], count: int = 100):
     random = Random()
     return cube @ reduce(
         lambda a, b: a @ b, [random.choice(MOVES).matrix for i in range(count)]
     )
 
+
 def create_scrambled_cube(scramble_length: int):
-    return scramble_cube(create_cube(),scramble_length)
+    return scramble_cube(create_cube(), scramble_length)
 
-def create_scrambled_sample(count: int):
-    with Pool() as pool:
-        return pool.map(create_scrambled_cube,[100] * count)
 
-if __name__ == '__main__':
-    print("start")
-    create_scrambled_sample(1000)
-    print("done")
+def create_scrambled_sample(count: int, pool: Pool = None, scramble_length: int = 100):
+    if pool:
+        return pool.map(create_scrambled_cube, [scramble_length] * count)
+    else:
+        return [create_scrambled_cube(scramble_length) for _ in range(count)]
+
+
+class Agent(tf.keras.Model):
+    def __init__(self, layers: list[int]):
+        self.layers_layout = layers
+
+
+    def call(self, x):
+        ...
+
