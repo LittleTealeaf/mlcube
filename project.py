@@ -3,14 +3,16 @@ import tensorflow as tf
 from random import Random
 from functools import reduce
 from multiprocessing import Pool
-import pandas as pd
+from keras import Sequential
+from keras.layers import Dense, Input
+from keras.models import save_model
 import os
 import json
 
 
 class Move:
     def __init__(
-            self, name: str, loops: list[list[int]], two: bool = False, prime: bool = False
+        self, name: str, loops: list[list[int]], two: bool = False, prime: bool = False
     ):
         self.name = name
         self.matrix: np.ndarray[(54, 54), np.int8] = np.identity(9 * 6, dtype=np.int8)
@@ -113,35 +115,131 @@ def create_cube():
     return state
 
 
-def scramble_cube(cube: np.ndarray[54, np.int8], count: int = 100):
-    random = Random()
-    return cube @ reduce(
-        lambda a, b: a @ b, [random.choice(MOVES).matrix for i in range(count)]
-    )
+# def scramble_cube(cube: np.ndarray[54, np.int8], count: int = 100):
+#     random = Random()
+#     return cube @ reduce(
+#         lambda a, b: a @ b, [random.choice(MOVES).matrix for i in range(count)]
+#     )
 
 
-def create_scrambled_cube(scramble_length: int):
-    return scramble_cube(create_cube(), scramble_length)
+# def create_scrambled_cube(scramble_length: int):
+#     return scramble_cube(create_cube(), scramble_length)
 
 
-def create_scrambled_sample(count: int, pool: Pool = None, scramble_length: int = 100):
-    if pool:
-        return pool.map(create_scrambled_cube, [scramble_length] * count)
-    else:
-        return [create_scrambled_cube(scramble_length) for _ in range(count)]
+# def create_scrambled_sample(count: int, pool: Pool = None, scramble_length: int = 100):
+#     if pool:
+#         return pool.map(create_scrambled_cube, [scramble_length] * count)
+#     else:
+#         return [create_scrambled_cube(scramble_length) for _ in range(count)]
 
 
-class Agent(tf.keras.Model):
-    def __init__(self, layers: list[int]):
-        super(Agent,self).__init__()
-        self.layers_layout = layers
-        self.network = [tf.keras.layers.Dense(i,activation=tf.nn.softmax) for i in layers]
-
-    def call(self, input_tensor, training=False):
-        x = input_tensor
-        for layer in self.layers:
-            x = layer(x)
-        return x
+def state_to_tensor(state: np.ndarray[54, np.int8]):
+    # converted = [state[i // 6] for i in range(54 * 6)]
+    converted = [0] * 54 * 6
+    for i in range(len(state)):
+        converted[state[i] + i * 6] = 1
+    return tf.constant(converted, dtype=tf.float32)
 
 
-agent = Agent([50,30,18])
+def reward(state: np.ndarray[54, np.int8]):
+    for i in range(54):
+        if state[i] != i // 9:
+            return -1
+    return 1
+
+
+class Agent:
+    def __init__(self, layer_sizes: list[int] = None):
+        if layer_sizes:
+            self.model = Sequential(
+                layers=[Dense(i, activation=tf.nn.softmax) for i in layer_sizes] + [Dense(len(MOVES),activation=tf.nn.softmax)]
+            )
+
+    def save(self,file):
+        save_model(self.model,file)
+
+    def create_random_replay(self,count, EPSILON=0.5):
+        """
+        Outputs: (
+            first_states,
+            chosen_moves,
+            next_states,
+            rewards (for next state)
+        )
+        """
+        cube = create_cube()
+        random = Random()
+        first_states = []
+
+        # Create random cubes
+        for _ in range(count):
+            cube = random.choice(MOVES).apply(cube)
+            first_states.append(cube)
+
+        # convert replay states into tensors
+
+        first_states_tensor = tf.constant(np.array([state_to_tensor(state) for state in first_states]))
+
+        outputs = self.model.call(first_states_tensor)
+        
+        model_choices = tf.argmax(outputs,1)
+
+        # Randomly chooses between using thet model choice, or choose a random index
+        chosen_moves = tf.constant(np.array([
+            model_choices[i] if random.random() > EPSILON else random.randint(0,len(MOVES) - 1) for i in range(count)
+        ]))
+
+        # Calculate next states
+        next_states = [
+            MOVES[chosen_moves[i]].apply(first_states[i]) for i in range(count)
+        ]
+
+        next_states_tensor = tf.constant(np.array([
+            state_to_tensor(state) for state in next_states
+        ]))
+
+        rewards = tf.constant(np.array([
+            reward(state) for state in next_states
+        ]))
+
+        return (
+            first_states_tensor,
+            chosen_moves,
+            next_states_tensor,
+            rewards
+        )
+
+
+
+agent = Agent(layer_sizes=[50,50,20])
+
+agent.create_random_replay(1000)
+
+# class Network(Model):
+#     def __init__(self, layers: list[int]):
+#         super(Network,self).__init__()
+#         self.layers_layout = layers
+#         self.network = [Dense(layer_size,activation=tf.nn.softmax) for layer_size in layers]
+
+#     def call(self, input_tensor, training=False):
+#         x = input_tensor
+#         for layer in self.layers:
+#             x = layer(x)
+#         return x
+
+# file_name = './model.ckpt'
+
+# class Agent:
+#     def __init__(self,layers: list[int] = None) -> None:
+#         self.q_net = Network(layers)
+#         self.update_target()
+
+#     def update_target(self):
+#         self.target = clone_model(self.q_net)
+
+#     def save(self,fileName: str):
+#         self.q_net.save(fileName,overwrite=True)
+
+
+# agent = Agent([1,2,3,4])
+# agent.save()
