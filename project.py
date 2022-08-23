@@ -1,14 +1,9 @@
 import numpy as np
 import tensorflow as tf
 from random import Random
-from functools import reduce
-from multiprocessing import Pool
 from keras import Sequential
-from keras.layers import Dense, Input
+from keras.layers import Dense
 from keras.models import save_model
-import os
-import json
-
 
 class Move:
     def __init__(
@@ -181,7 +176,7 @@ class Agent:
         first_states_tensor = tf.constant(np.array([state_to_tensor(state) for state in first_states]))
 
         outputs = self.model.call(first_states_tensor)
-        
+
         model_choices = tf.argmax(outputs,1)
 
         # Randomly chooses between using thet model choice, or choose a random index
