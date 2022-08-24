@@ -288,13 +288,13 @@ class Agent:
             gradient = tape.gradient(loss,self.network.trainable_variables)
 
             return loss, gradient
-    def run_epoch(self, replay_size = 1000, min_moves = 1, max_moves = 5):
+    def run_epoch(self, replay_size = 1000, min_moves = 1, max_moves = 5, EPSILON = 0.5):
         epoch = len(self.training_history)
 
-        replay = self.create_replay(replay_size, min_moves=min_moves, max_moves = max_moves)
+        replay = self.create_replay(replay_size, min_moves=min_moves, max_moves = max_moves, EPSILON=EPSILON)
         loss, gradient = self.train_replays(replay)
         loss_avg = tf.math.reduce_mean(loss)
-        optimizer = SGD(learning_rate=loss_avg)
+        optimizer = SGD(learning_rate=min(loss_avg,0.01))
         optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
         self.training_history.append(float(loss_avg.numpy()))
         return epoch, loss_avg
@@ -308,11 +308,13 @@ class Agent:
 
 
 
-agent = Agent(layer_sizes=[20,20],dir="./agent")
-update_interval = 20
+agent = Agent(layer_sizes=[100,100],dir="./agent")
+update_interval = 10
+
+epoch = 0
 
 while True:
-    epoch, loss_avg = agent.run_epoch()
+    epoch, loss_avg = agent.run_epoch(replay_size=10_000, EPSILON = max(1,100.0/(epoch%1000 + 1) + 0.2))
 
     if epoch % update_interval == 0:
         agent.update_target()
