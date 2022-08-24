@@ -1,9 +1,10 @@
+import json
+import os
 import numpy as np
 import tensorflow as tf
 from random import Random
-from keras import Sequential
-from keras.layers import Dense
-from keras.models import save_model
+from keras.optimizers import SGD
+from keras.activations import sigmoid
 
 class Move:
     def __init__(
@@ -139,102 +140,182 @@ def state_to_tensor(state: np.ndarray[54, np.int8]):
 def reward(state: np.ndarray[54, np.int8]):
     for i in range(54):
         if state[i] != i // 9:
-            return -1
+            return 0
     return 1
 
 
-class Agent:
-    def __init__(self, layer_sizes: list[int] = None):
-        if layer_sizes:
-            self.model = Sequential(
-                layers=[Dense(i, activation=tf.nn.softmax) for i in layer_sizes] + [Dense(len(MOVES),activation=tf.nn.softmax)]
+
+class Network:
+    def __init__(self,layer_sizes: list[int] = None, layers = None, serialized_example=None):
+        self.trainable_variables = []
+
+        if serialized_example:
+            features = {}
+            for i in range(len(layer_sizes)):
+                features[f'W{i}'] = tf.io.RaggedFeature(dtype=tf.string)
+                features[f'b{i}'] = tf.io.RaggedFeature(dtype=tf.string)
+            example = tf.io.parse_example(serialized_example,features)
+            layers = []
+
+            for i in range(len(layer_sizes)):
+                W = tf.Variable(tf.io.parse_tensor(example[f'W{i}'][0],out_type=tf.float32,name=f'W{i}'))
+                b = tf.Variable( tf.io.parse_tensor(example[f'b{i}'][0],out_type=tf.float32,name=f'b{i}'))
+                layers.append((
+                    W,b
+                ))
+
+
+
+        if layers:
+            self.layers = layers
+
+            for W,b in self.layers:
+                self.trainable_variables.append(W)
+                self.trainable_variables.append(b)
+
+            return
+
+        self.layer_sizes = layer_sizes + [len(MOVES)]
+        self.layers = []
+        for i in range(len(self.layer_sizes)):
+            length_prev = self.layer_sizes[i-1] if i > 0 else 54 * 6
+            length_cur = self.layer_sizes[i]
+            W = tf.Variable(
+                tf.random.normal([length_prev, length_cur],stddev=0.03),dtype=tf.float32
             )
+            b = tf.Variable(tf.random.normal([length_cur],stddev=0.03),dtype=tf.float32)
+            self.layers.append((W,b))
+            self.trainable_variables.append(W)
+            self.trainable_variables.append(b)
 
-    def save(self,file):
-        save_model(self.model,file)
+    def apply(self,input):
+        x = input
+        for W,b in self.layers:
+            x = sigmoid(tf.add(tf.matmul(x,W),b))
+        return x
 
-    def create_random_replay(self,count, EPSILON=0.5):
-        """
-        Outputs: (
-            first_states,
-            chosen_moves,
-            next_states,
-            rewards (for next state)
+    def copy(self):
+        return Network(layers=self.layers)
+
+    def serialize(self):
+
+        features = {}
+
+        for i in range(len(self.layers)):
+            W,b = self.layers[i]
+
+            # W_feature = tf.train.Feature(bytes_list=tf.train.BytesList(value=[tf.io.serialize_tensor(W).numpy()]))
+            # b_feature = tf.train.Feature(bytes_list=tf.train.BytesList(value=[tf.io.serialize_tensor(b).numpy()]))
+
+            # features.append(W_feature)
+            # features.append(b_feature)
+            features[f'W{i}'] = tf.train.Feature(bytes_list=tf.train.BytesList(value=[tf.io.serialize_tensor(W).numpy()]))
+            features[f'b{i}'] = tf.train.Feature(bytes_list=tf.train.BytesList(value=[tf.io.serialize_tensor(b).numpy()]))
+
+        example = tf.train.Example(
+            features = tf.train.Features(feature=features)
         )
-        """
+
+        return example
+
+class Agent:
+    def __init__(self,layer_sizes: list[int] = [54 * 6, 18], dir: str = None):
+        self.network = None
+        self.dir = dir
+        self.training_history = []
+
+        if dir and os.path.exists(dir):
+            with open("/".join([self.dir,'training_history.json'])) as file:
+                self.training_history = json.load(file)
+
+            network_data = tf.io.read_file("/".join([self.dir,'agent']))
+            self.network = Network(layer_sizes,serialized_example=network_data)
+
+        if not self.network:
+            self.network: Network = Network(layer_sizes)
+
+
+
+        self.update_target()
+
+    def update_target(self):
+        self.target = self.network.copy()
+
+    def create_replay(self,replay_length, EPSILON = 0.5, min_moves = 1, max_moves = 1):
         cube = create_cube()
         random = Random()
-        first_states = []
+        state_1_cubes = []
 
-        # Create random cubes
-        for _ in range(count):
-            cube = random.choice(MOVES).apply(cube)
-            first_states.append(cube)
+        for _ in range(replay_length):
+            for _ in range(random.randint(min_moves,max_moves)):
+                cube = random.choice(MOVES).apply(cube)
+            state_1_cubes.append(cube)
 
-        # convert replay states into tensors
+        state_1 = tf.constant(np.array([state_to_tensor(state) for state in state_1_cubes]))
 
-        first_states_tensor = tf.constant(np.array([state_to_tensor(state) for state in first_states]))
+        state_1_outputs = self.network.apply(state_1)
 
-        outputs = self.model.call(first_states_tensor)
+        state_1_choices = tf.argmax(state_1_outputs,1)
+        state_1_choices = tf.map_fn(lambda i: i if random.random() > EPSILON else random.randint(0,len(MOVES)-1),state_1_choices)
 
-        model_choices = tf.argmax(outputs,1)
+        state_2_cubes = [MOVES[state_1_choices[i]].apply(state_1_cubes[i]) for i in range(replay_length)]
 
-        # Randomly chooses between using thet model choice, or choose a random index
-        chosen_moves = tf.constant(np.array([
-            model_choices[i] if random.random() > EPSILON else random.randint(0,len(MOVES) - 1) for i in range(count)
-        ]))
+        reward_1 = tf.constant(np.array([
+            reward(state) for state in state_2_cubes
+        ]),dtype=tf.float32)
 
-        # Calculate next states
-        next_states = [
-            MOVES[chosen_moves[i]].apply(first_states[i]) for i in range(count)
-        ]
+        state_2 = tf.constant(np.array([state_to_tensor(state) for state in state_2_cubes]))
 
-        next_states_tensor = tf.constant(np.array([
-            state_to_tensor(state) for state in next_states
-        ]))
+        return state_1, state_1_choices, reward_1, state_2
 
-        rewards = tf.constant(np.array([
-            reward(state) for state in next_states
-        ]))
+    def train_replays(self,replays):
+        with tf.GradientTape() as tape:
+            state_1, state_1_choices, reward_1, state_2 = replays
 
-        return (
-            first_states_tensor,
-            chosen_moves,
-            next_states_tensor,
-            rewards
-        )
+            state_1_output = self.network.apply(state_1)
+            state_1_choice_q = tf.gather(state_1_output,state_1_choices,batch_dims=1)
 
+            state_2_output = self.target.apply(state_2)
+            state_2_choices = tf.argmax(state_2_output,1)
+            state_2_choices_q = tf.gather(state_2_output,state_2_choices, batch_dims=1)
 
+            target_q = tf.add(state_2_choices_q, reward_1)
 
-agent = Agent(layer_sizes=[50,50,20])
+            predicted_q = state_1_choice_q
 
-agent.create_random_replay(1000)
+            loss = tf.square(tf.subtract(target_q, predicted_q))
 
-# class Network(Model):
-#     def __init__(self, layers: list[int]):
-#         super(Network,self).__init__()
-#         self.layers_layout = layers
-#         self.network = [Dense(layer_size,activation=tf.nn.softmax) for layer_size in layers]
+            gradient = tape.gradient(loss,self.network.trainable_variables)
 
-#     def call(self, input_tensor, training=False):
-#         x = input_tensor
-#         for layer in self.layers:
-#             x = layer(x)
-#         return x
+            return loss, gradient
+    def run_epoch(self, replay_size = 1000, min_moves = 1, max_moves = 5):
+        epoch = len(self.training_history)
 
-# file_name = './model.ckpt'
+        replay = self.create_replay(replay_size, min_moves=min_moves, max_moves = max_moves)
+        loss, gradient = self.train_replays(replay)
+        loss_avg = tf.math.reduce_mean(loss)
+        optimizer = SGD(learning_rate=loss_avg)
+        optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
+        self.training_history.append(float(loss_avg.numpy()))
+        return epoch, loss_avg
 
-# class Agent:
-#     def __init__(self,layers: list[int] = None) -> None:
-#         self.q_net = Network(layers)
-#         self.update_target()
-
-#     def update_target(self):
-#         self.target = clone_model(self.q_net)
-
-#     def save(self,fileName: str):
-#         self.q_net.save(fileName,overwrite=True)
+    def save_agent(self):
+        serialized = self.network.serialize()
+        tf.io.write_file("/".join([self.dir,'agent']),serialized.SerializeToString())
+        with open("/".join([self.dir,'training_history.json']),'w') as file:
+            file.write(json.dumps(self.training_history))
 
 
-# agent = Agent([1,2,3,4])
-# agent.save()
+
+
+agent = Agent(layer_sizes=[20,20],dir="./agent")
+update_interval = 20
+
+while True:
+    epoch, loss_avg = agent.run_epoch()
+
+    if epoch % update_interval == 0:
+        agent.update_target()
+        agent.save_agent()
+
+    print(f'Epoch #{epoch}\tAverage Loss: {loss_avg}')
