@@ -241,12 +241,12 @@ class Agent:
     def update_target(self):
         self.target = self.network.copy()
 
-    def create_replay(self,replay_length, EPSILON = 0.5, min_moves = 1, max_moves = 1):
-        cube = create_cube()
+    def create_replay(self,replay_length, EPSILON = 0.5,min_moves=1,max_moves=20):
         random = Random()
         state_1_cubes = []
 
         for _ in range(replay_length):
+            cube = create_cube()
             for _ in range(random.randint(min_moves,max_moves)):
                 cube = random.choice(MOVES).apply(cube)
             state_1_cubes.append(cube)
@@ -288,7 +288,7 @@ class Agent:
             gradient = tape.gradient(loss,self.network.trainable_variables)
 
             return loss, gradient
-    def run_epoch(self, replay_size = 1000, min_moves = 1, max_moves = 5, EPSILON = 0.5):
+    def run_epoch(self, replay_size = 1000, min_moves = 1, max_moves = 50, EPSILON = 0.5):
         epoch = len(self.training_history)
 
         replay = self.create_replay(replay_size, min_moves=min_moves, max_moves = max_moves, EPSILON=EPSILON)
@@ -314,7 +314,7 @@ update_interval = 10
 epoch = 0
 
 while True:
-    epoch, loss_avg = agent.run_epoch(replay_size=10_000, EPSILON = max(1,100.0/(epoch%1000 + 1) + 0.2))
+    epoch, loss_avg = agent.run_epoch(replay_size=1_000, EPSILON = 0.5)
 
     if epoch % update_interval == 0:
         agent.update_target()
