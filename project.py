@@ -223,10 +223,14 @@ class Agent:
         self.network = None
         self.dir = dir
         self.training_history = []
+        self.evals = []
 
         if dir and os.path.exists(dir):
             with open("/".join([self.dir,'training_history.json'])) as file:
                 self.training_history = json.load(file)
+
+            with open("/".join([self.dir,'evals.json'])) as file:
+                self.evals = json.load(file)
 
             network_data = tf.io.read_file("/".join([self.dir,'agent']))
             self.network = Network(layer_sizes,serialized_example=network_data)
@@ -241,13 +245,14 @@ class Agent:
     def update_target(self):
         self.target = self.network.copy()
 
+# TODO: use datasets as batches... something wonky going on here
     def create_replay(self,replay_length, EPSILON = 0.5,min_moves=1,max_moves=20):
         random = Random()
         state_1_cubes = []
 
-        for _ in range(replay_length):
+        for i in range(replay_length):
             cube = create_cube()
-            for _ in range(random.randint(min_moves,max_moves)):
+            for _ in range(i%max_moves + min_moves):
                 cube = random.choice(MOVES).apply(cube)
             state_1_cubes.append(cube)
 
@@ -304,20 +309,50 @@ class Agent:
         tf.io.write_file("/".join([self.dir,'agent']),serialized.SerializeToString())
         with open("/".join([self.dir,'training_history.json']),'w') as file:
             file.write(json.dumps(self.training_history))
+        with open("/".join([self.dir,'evals.json']),'w') as file:
+            file.write(json.dumps(self.evals))
+
+
+    def evaluate_self(self,max_moves = 10_000, scramble_length = 100):
+        cube = create_cube()
+        random = Random()
+        for _ in range(scramble_length):
+            cube = random.choice(MOVES).apply(cube)
+
+        moves = 0
+
+        goal_reward = reward(create_cube())
+
+        while moves < max_moves and reward(cube) != goal_reward:
+            moves = moves + 1
+            results = self.network.apply(state_to_tensor(cube))
+            print(results)
+
+
+            # cube = MOVES[move].apply(cube)
+
+        self.evals.append(moves)
 
 
 
 
-agent = Agent(layer_sizes=[100,100],dir="./agent")
+agent = Agent(layer_sizes=[100,50,25],dir="./agent")
 update_interval = 10
+evaluate_interval = 10
 
 epoch = 0
 
 while True:
-    epoch, loss_avg = agent.run_epoch(replay_size=1_000, EPSILON = 0.5)
+    epoch, loss_avg = agent.run_epoch(replay_size=100, EPSILON = 0.5)
 
     if epoch % update_interval == 0:
         agent.update_target()
         agent.save_agent()
+
+    if epoch % evaluate_interval == 0:
+        agent.evaluate_self()
+
+
+
 
     print(f'Epoch #{epoch}\tAverage Loss: {loss_avg}')
