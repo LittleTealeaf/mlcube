@@ -20,15 +20,36 @@ class Move:
         self, name: str, loops: list[list[int]], two: bool = False, prime: bool = False
     ):
         self.name = name
-        matrix = np.identity(9*6*6, dtype=np.float32)
+        copy = np.identity(9 * 6 * 6, dtype=np.float32)
+        matrix = np.copy(copy)
 
-        for loop in loops:
-            first = np.copy(matrix[loop[0]:loop[0]+6])
-            for i in range(len(loop) - 1):
-                matrix[loop[0]:loop[0]+6] = matrix[loop[i+1]:loop[i+1]+6]
-            matrix[loop[-1]:loop[-1]+6] = first
+        for offset in range(6):
+            for loop in loops:
+                for i in range(len(loop) - 1):
+                    matrix[loop[i] + offset] = copy[loop[i+1] + offset]
+                matrix[loop[-1] + offset] = copy[loop[0] + offset]
 
-        self.tensor = tf.constant(matrix,dtype=tf.float32)
+        # matrix = np.identity(9*6*6, dtype=np.float32)
+
+        # for offset in range(6):
+        #     for loop in loops:
+        #         first = np.copy(matrix[loop[0] + offset])
+        #         for i in range(len(loop) - 1):
+        #             matrix[loop[i] + offset] = matrix[loop[i+1] + offset]
+        #         matrix[loop[-1] + offset] = first
+
+        # for loop in loops:
+        #     first = np.copy(matrix[loop[0]:loop[0]+6])
+        #     for i in range(len(loop) - 1):
+        #         matrix[loop[i]:loop[i]+6] = matrix[loop[i+1]:loop[i+1]+6]
+        #     matrix[loop[-1]:loop[-1]+6] = first
+
+        if two:
+            matrix = matrix @ matrix
+        if prime:
+            matrix = matrix.T
+
+        self.tensor = tf.constant(matrix,dtype=tf.float32,name=f'MOVE{self.name}')
 
     def apply(self, state: np.ndarray[54, np.float32]):
         return tf.matmul(state,self.tensor)
@@ -146,7 +167,7 @@ class Network:
     def apply(self,input):
         x = input
         for W,b in self.layers:
-            x = tf.multiply(x,W)
+            x = tf.matmul(x,W)
             x = tf.add(x, b)
             x = sigmoid(x)
         return x
@@ -161,3 +182,4 @@ class Network:
         return tf.train.Example(
             features = tf.train.Features(features)
         )
+
