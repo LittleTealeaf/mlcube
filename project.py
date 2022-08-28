@@ -170,7 +170,7 @@ class Network:
 
         return tf.train.Example(
             features = tf.train.Features(features)
-        )\
+        )
 
 class Agent:
     def __init__(self,layer_sizes: list[int], dir: str = "agent"):
