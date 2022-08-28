@@ -29,21 +29,6 @@ class Move:
                     matrix[loop[i] + offset] = copy[loop[i+1] + offset]
                 matrix[loop[-1] + offset] = copy[loop[0] + offset]
 
-        # matrix = np.identity(9*6*6, dtype=np.float32)
-
-        # for offset in range(6):
-        #     for loop in loops:
-        #         first = np.copy(matrix[loop[0] + offset])
-        #         for i in range(len(loop) - 1):
-        #             matrix[loop[i] + offset] = matrix[loop[i+1] + offset]
-        #         matrix[loop[-1] + offset] = first
-
-        # for loop in loops:
-        #     first = np.copy(matrix[loop[0]:loop[0]+6])
-        #     for i in range(len(loop) - 1):
-        #         matrix[loop[i]:loop[i]+6] = matrix[loop[i+1]:loop[i+1]+6]
-        #     matrix[loop[-1]:loop[-1]+6] = first
-
         if two:
             matrix = matrix @ matrix
         if prime:
@@ -133,11 +118,11 @@ MOVES = [
 ]
 
 class Network:
-    def __init__(self,layer_sizes: list[int], serialized = None):
+    def __init__(self,layer_sizes: list[int], serialized = None, layers = None):
         self.layer_sizes = layer_sizes + [len(MOVES)]
 
         self.trainable_variables = []
-        self.layers = []
+        self.layers = layers or []
 
         if serialized:
             features = {}
@@ -148,7 +133,7 @@ class Network:
 
             for i in range(len(layer_sizes) + 1):
                 W = tf.variable(tf.io.parse_tensor(example[f'W{i}'][0],out_type=tf.float32, name=f'W{i}'))
-                b = tf.Variable( tf.io.parse_tensor(example[f'b{i}'][0],out_type=tf.float32,name=f'b{i}'))
+                b = tf.Variable(tf.io.parse_tensor(example[f'b{i}'][0],out_type=tf.float32,name=f'b{i}'))
                 self.layers.append((W,b))
         else:
             for i in range(len(self.layer_sizes)):
@@ -172,6 +157,10 @@ class Network:
             x = sigmoid(x)
         return x
 
+    def copy(self):
+        return Network(layers=self.layers)
+
+
     def serialize(self):
         features = {}
         for i in range(len(self.layers)):
@@ -181,5 +170,19 @@ class Network:
 
         return tf.train.Example(
             features = tf.train.Features(features)
-        )
+        )\
 
+class Agent:
+    def __init__(self,layer_sizes: list[int], dir: str = "agent"):
+        self.network = None
+        self.dir = dir
+
+
+
+        if not self.network:
+            self.network: Network = Network(layer_sizes)
+
+        self.update_target()
+
+    def update_target(self):
+        self.target: Network = self.network.copy()
