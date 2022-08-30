@@ -92,7 +92,6 @@ class Agent:
         state_1_list = []
         for _ in range(count):
             cube = create_cube()
-            # something's going on with this... it's coming out with FUNKY numbers
             for _ in range(1,100):
                 cube = random.choice(MOVES).apply(cube)
             state_1_list.append(cube)
@@ -100,7 +99,6 @@ class Agent:
 
         state_1_outputs = self.network.apply(state_1)
         state_1_choices = tf.argmax(state_1_outputs,2)
-        # state_1_choices = state_1_choices[:,0]
         state_1_choices = tf.map_fn(lambda i: i if random.random() > EPSILON else np.array([random.choice(MOVES).index]),state_1_choices)
 
         state_2_list = [MOVES[state_1_choices[i][0]].apply(state_1[i]) for i in range(count)]
