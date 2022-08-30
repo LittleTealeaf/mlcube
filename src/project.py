@@ -116,7 +116,6 @@ class Agent:
             state_1, state_1_choices, reward_1, state_2 = replays
 
             state_1_output = self.network.apply(state_1)
-            # state_1_choices = state_1_choi
             state_1_choice_q = tf.gather(state_1_output,state_1_choices,batch_dims=2)
 
             state_2_output = self.target.apply(state_2)
