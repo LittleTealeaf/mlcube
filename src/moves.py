@@ -23,6 +23,8 @@ class Move:
 
     def apply(self, state: np.ndarray[54, np.float32]):
         return tf.matmul(state,self.tensor)
+    def set_index(self,index):
+        self.index = index
 
 
 def create_move(letter: str, loops: list[list[int]]) -> list[Move]:
@@ -108,3 +110,5 @@ for move in MOVES:
         if sum(i) != 1:
             print(sum(i))
             print(f"Move {move.name} incorrect")
+for i in range(len(MOVES)):
+    MOVES[i].set_index(i)

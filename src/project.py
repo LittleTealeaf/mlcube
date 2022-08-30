@@ -45,8 +45,6 @@ class Network:
                 b = tf.Variable(tf.random.normal([length_cur],stddev=0.03),dtype=tf.float32)
                 self.layers.append((W,b))
 
-        print([f'{W.shape} {b.shape}' for W,b in self.layers])
-
         for W,b in self.layers:
             self.trainable_variables.append(W)
             self.trainable_variables.append(b)
@@ -101,20 +99,46 @@ class Agent:
         state_1 = tf.constant(np.array(state_1_list))
 
         state_1_outputs = self.network.apply(state_1)
-        state_1_choices = tf.argmax(state_1_outputs,0)
-        state_1_choices = state_1_choices[0]
-        state_1_choices = tf.map_fn(lambda i: i if random.random() > EPSILON else random.randint(0,len(MOVES)-1),state_1_choices)
+        state_1_choices = tf.argmax(state_1_outputs,2)
+        # state_1_choices = state_1_choices[:,0]
+        state_1_choices = tf.map_fn(lambda i: i if random.random() > EPSILON else np.array([random.choice(MOVES).index]),state_1_choices)
 
+        state_2_list = [MOVES[state_1_choices[i][0]].apply(state_1[i]) for i in range(count)]
 
-        state_2_list = [MOVES[state_1_choices[i]].apply(state_1_list[i]) for i in range(count)]
-
-        reward_1 = tf.constant(np.array([reward(state) for state in state_2_list]))
+        reward_1 = tf.constant(np.array([reward(state) for state in state_2_list]),dtype=tf.float32)
 
         state_2 = tf.constant(np.array(state_2_list))
 
         return state_1, state_1_choices, reward_1, state_2
 
+    def train_replay(self,replays):
+        with tf.GradientTape() as tape:
+            tape.watch(self.network.trainable_variables)
 
-agent = Agent([20,20])
+            state_1, state_1_choices, reward_1, state_2 = replays
+
+            state_1_output = self.network.apply(state_1)
+            # state_1_choices = state_1_choi
+            state_1_choice_q = tf.gather(state_1_output,state_1_choices,batch_dims=2)
+
+            state_2_output = self.target.apply(state_2)
+            state_2_choices = tf.argmax(state_2_output,2)
+            state_2_choices_q = tf.gather(state_2_output,state_2_choices, batch_dims=2)
+
+            target_q = tf.add(state_2_choices_q, reward_1)
+
+            predicted_q = state_1_choice_q
+
+            loss = tf.square(tf.subtract(target_q, predicted_q))
+
+            gradient = tape.gradient(loss,self.network.trainable_variables)
+
+            return loss, gradient
+
+
+cube = create_cube()
+new_cube = MOVES[0].apply(cube)
+
+agent = Agent([5,5])
 replay = agent.create_replay(10)
-print(replay)
+training = agent.train_replay(replay)
