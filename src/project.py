@@ -3,7 +3,6 @@ import os
 import numpy as np
 import tensorflow as tf
 from random import Random
-from keras.optimizers import SGD
 from keras.activations import sigmoid
 from moves import MOVES
 
@@ -19,19 +18,20 @@ def reward(state):
 class Network:
     def __init__(self,layer_sizes: list[int], serialized = None, layers = None):
         self.layer_sizes = layer_sizes + ([] if layers else [len(MOVES)])
-        print(self.layer_sizes)
 
         self.trainable_variables = []
-        self.layers = layers or []
+        self.layers = []
 
-        if serialized:
+        if layers:
+            self.layers = layers
+        elif serialized:
             features = {}
             for i in range(len(layer_sizes) + 1):
                 features[f'W{i}'] = tf.io.RaggedFeature(dtype=tf.string)
                 features[f'b{i}'] = tf.io.RaggedFeature(dtype=tf.string)
             example = tf.io.parse_example(serialized,features)
 
-            for i in range(len(layer_sizes) + 1):
+            for i in range(len(layer_sizes) - 1):
                 W = tf.variable(tf.io.parse_tensor(example[f'W{i}'][0],out_type=tf.float32, name=f'W{i}'))
                 b = tf.Variable(tf.io.parse_tensor(example[f'b{i}'][0],out_type=tf.float32,name=f'b{i}'))
                 self.layers.append((W,b))
@@ -45,6 +45,7 @@ class Network:
                 b = tf.Variable(tf.random.normal([length_cur],stddev=0.03),dtype=tf.float32)
                 self.layers.append((W,b))
 
+        print([f'{W.shape} {b.shape}' for W,b in self.layers])
 
         for W,b in self.layers:
             self.trainable_variables.append(W)
@@ -53,7 +54,6 @@ class Network:
     def apply(self,input):
         x = input
         for W,b in self.layers:
-            print(x.shape,W.shape,b.shape)
             x = tf.matmul(x,W)
             x = tf.add(x, b)
             x = sigmoid(x)
@@ -101,7 +101,8 @@ class Agent:
         state_1 = tf.constant(np.array(state_1_list))
 
         state_1_outputs = self.network.apply(state_1)
-        state_1_choices = tf.argmax(state_1_outputs,1)
+        state_1_choices = tf.argmax(state_1_outputs,0)
+        state_1_choices = state_1_choices[0]
         state_1_choices = tf.map_fn(lambda i: i if random.random() > EPSILON else random.randint(0,len(MOVES)-1),state_1_choices)
 
 
@@ -116,3 +117,4 @@ class Agent:
 
 agent = Agent([20,20])
 replay = agent.create_replay(10)
+print(replay)

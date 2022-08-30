@@ -6,21 +6,20 @@ class Move:
         self, name: str, loops: list[list[int]], two: bool = False, prime: bool = False
     ):
         self.name = name
-        copy = np.identity(9 * 6 * 6, dtype=np.float32)
-        matrix = np.copy(copy)
 
-        for offset in range(6):
-            for loop in loops:
-                for i in range(len(loop) - 1):
-                    matrix[loop[i] + offset] = copy[loop[i+1] + offset]
-                matrix[loop[-1] + offset] = copy[loop[0] + offset]
+        lookup = [i // 6 for i in range(9*6*6)]
+        matrix = np.identity(9*6*6,dtype=np.float32)
 
-        if two:
-            matrix = matrix @ matrix
-        if prime:
-            matrix = matrix.T
+        for loop in loops:
+            for o in range(6):
+                for i in range(len(loop)):
+                    index = loop[i] * 6 + o
+                    source = loop[i - 1] * 6 + o
 
-        self.tensor = tf.constant(matrix,dtype=tf.float32,name=f'MOVE{self.name}')
+                    matrix[index,index] = 0
+                    matrix[index,source] = 1
+
+        self.tensor = tf.constant(matrix,dtype=tf.float32, name=f'MOVE{self.name}')
 
     def apply(self, state: np.ndarray[54, np.float32]):
         return tf.matmul(state,self.tensor)
@@ -102,3 +101,10 @@ MOVES = [
     ]
     for move in moves
 ]
+
+for move in MOVES:
+    vals = move.tensor.numpy()
+    for i in vals:
+        if sum(i) != 1:
+            print(sum(i))
+            print(f"Move {move.name} incorrect")
