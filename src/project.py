@@ -57,7 +57,7 @@ class Network:
         return x
 
     def copy(self):
-        return Network(layers=self.layers)
+        return Network(layer_sizes = self.layer_sizes, layers=self.layers)
 
 
     def serialize(self):
@@ -85,3 +85,31 @@ class Agent:
 
     def update_target(self):
         self.target: Network = self.network.copy()
+
+    def create_replay(self,count,EPSILON = 0.5):
+        random = Random()
+        state_1_list = []
+        for _ in range(count):
+            cube = create_cube()
+            # something's going on with this... it's coming out with FUNKY numbers
+            for _ in range(1,100):
+                cube = random.choice(MOVES).apply(cube)
+            state_1_list.append(cube)
+        state_1 = tf.constant(np.array(state_1_list))
+
+        state_1_outputs = self.network.apply(state_1)
+        state_1_choices = tf.argmax(state_1_outputs,1)
+        state_1_choices = tf.map_fn(lambda i: i if random.random() > EPSILON else random.randint(0,len(MOVES)-1),state_1_choices)
+
+
+        state_2_list = [MOVES[state_1_choices[i]].apply(state_1_list[i]) for i in range(count)]
+
+        reward_1 = tf.constnat(np.array([reward(state) for state in state_2_list]))
+
+        state_2 = tf.constant(np.array(state_2_list))
+
+        return state_1, state_1_choices, reward_1, state_2
+
+
+agent = Agent([20,20])
+replay = agent.create_replay(10)
