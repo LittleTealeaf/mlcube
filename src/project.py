@@ -18,7 +18,8 @@ def reward(state):
 
 class Network:
     def __init__(self,layer_sizes: list[int], serialized = None, layers = None):
-        self.layer_sizes = layer_sizes + [len(MOVES)]
+        self.layer_sizes = layer_sizes + ([] if layers else [len(MOVES)])
+        print(self.layer_sizes)
 
         self.trainable_variables = []
         self.layers = layers or []
@@ -44,6 +45,7 @@ class Network:
                 b = tf.Variable(tf.random.normal([length_cur],stddev=0.03),dtype=tf.float32)
                 self.layers.append((W,b))
 
+
         for W,b in self.layers:
             self.trainable_variables.append(W)
             self.trainable_variables.append(b)
@@ -51,6 +53,7 @@ class Network:
     def apply(self,input):
         x = input
         for W,b in self.layers:
+            print(x.shape,W.shape,b.shape)
             x = tf.matmul(x,W)
             x = tf.add(x, b)
             x = sigmoid(x)
@@ -104,7 +107,7 @@ class Agent:
 
         state_2_list = [MOVES[state_1_choices[i]].apply(state_1_list[i]) for i in range(count)]
 
-        reward_1 = tf.constnat(np.array([reward(state) for state in state_2_list]))
+        reward_1 = tf.constant(np.array([reward(state) for state in state_2_list]))
 
         state_2 = tf.constant(np.array(state_2_list))
 
