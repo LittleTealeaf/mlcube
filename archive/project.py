@@ -330,7 +330,7 @@ class Agent:
 
 
 
-agent = Agent(layer_sizes=[100,50,25],dir="./agent")
+agent = Agent(layer_sizes=[100,50,25],dir="./agent_old")
 update_interval = 10
 evaluate_interval = 10
 

@@ -14,7 +14,7 @@ def create_cube():
     return tf.constant(state,dtype=tf.float32,shape=(1,324))
 
 def reward(state):
-    return 1 if tf.math.reduce_all(tf.math.equal(state,create_cube())) else -1
+    return 1 if tf.math.reduce_all(tf.math.equal(state,create_cube())) else 0
 
 class Network:
     def __init__(self,layer_sizes: list[int], serialized = None, layers = None):
@@ -70,14 +70,27 @@ class Network:
             features[f'b{i}'] = tf.train.Feature(bytes_list=tf.train.BytesList(value=[tf.io.serialize_tensor(b).numpy()]))
 
         return tf.train.Example(
-            features = tf.train.Features(features)
+            features = tf.train.Features(feature=features)
         )
 
 class Agent:
-    def __init__(self,layer_sizes: list[int], dir: str = "agent"):
+    def __init__(self,layer_sizes: list[int], dir: str = "./agent"):
         self.network = None
         self.dir = dir
+        self.eval_history = []
+        self.epoch = 0
 
+        if os.path.exists(dir):
+            try:
+                with open("/".join([self.dir,'config.json'])) as file:
+                    values = json.load(file)
+                    self.eval_history = values['eval_history']
+                    self.epoch = values['epoch_count']
+
+                network_data = tf.io.read_file("/".join([self.dir,'agent']))
+                self.network = Network(layer_sizes,serialized_example=network_data)
+            except:
+                ...
 
 
         if not self.network:
@@ -91,9 +104,9 @@ class Agent:
     def create_replay(self,count,EPSILON = 0.5):
         random = Random()
         state_1_list = []
-        for _ in range(count):
+        for i in range(count):
             cube = create_cube()
-            for _ in range(1,100):
+            for _ in range(1,i%100 + 1):
                 cube = random.choice(MOVES).apply(cube)
             state_1_list.append(cube)
         state_1 = tf.constant(np.array(state_1_list))
@@ -112,7 +125,7 @@ class Agent:
 
     def train_replay(self,replays):
         with tf.GradientTape() as tape:
-            tape.watch(self.network.trainable_variables)
+            # tape.watch(self.network.trainable_variables)
 
             state_1, state_1_choices, reward_1, state_2 = replays
 
@@ -123,11 +136,13 @@ class Agent:
             state_2_choices = tf.argmax(state_2_output,2)
             state_2_choices_q = tf.gather(state_2_output,state_2_choices, batch_dims=2)
 
-            target_q = tf.add(state_2_choices_q, reward_1)
+            target_q = tf.add(state_2_choices_q, tf.reshape(reward_1,(reward_1.shape[0],1)))
 
             predicted_q = state_1_choice_q
 
-            loss = tf.square(tf.subtract(target_q, predicted_q))
+            abs_loss = tf.subtract(target_q, predicted_q)
+
+            loss = tf.square(abs_loss)
 
             gradient = tape.gradient(loss,self.network.trainable_variables)
 
@@ -140,6 +155,7 @@ class Agent:
         loss_avg = tf.math.reduce_mean(loss)
         optimizer = SGD(learning_rate=learning_rate)
         optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
+        self.epoch = self.epoch + 1
         return loss_avg
 
     def evaluate_network(self):
@@ -153,7 +169,42 @@ class Agent:
         while reward(cube) != 1 and move_count < 1000:
             move_count = move_count + 1
             values = self.network.apply(cube)
-            move = MOVES[tf.argmax(values).numpy()]
+            move = MOVES[tf.argmax(values).numpy()[0]]
             cube = move.apply(cube)
 
-        return move_count if reward(cube) == 1 else -1
+        self.eval_history.append({
+            'x': self.epoch,
+            'y': move_count
+        })
+
+        return move_count
+
+    def save(self):
+        serialized = self.network.serialize()
+        tf.io.write_file("/".join([self.dir,'agent']),serialized.SerializeToString())
+        with open("/".join([self.dir,'config.json']),'w') as file:
+            file.write(json.dumps({
+                'epoch_count': self.epoch,
+                'eval_history': self.eval_history
+            }))
+
+
+agent = Agent(layer_sizes=[100,50],dir="./agent")
+target_interval = 10
+eval_interval = 5
+save_interval = 1
+
+
+while True:
+    avg_loss = agent.run_epoch(replay_size=1000, EPSILON = (agent.epoch % 20) / 20)
+    print(f'Epoch {agent.epoch} Completed. Average Loss: {avg_loss}')
+
+    if agent.epoch % target_interval == 0:
+        agent.update_target()
+
+    if agent.epoch % eval_interval == 0:
+        eval_result = agent.evaluate_network()
+        print(f"Evaluated at {agent.epoch}: {eval_result}")
+
+    if agent.epoch % save_interval == 0:
+        agent.save()
