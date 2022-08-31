@@ -133,12 +133,12 @@ class Agent:
 
             return loss, gradient
 
-    def run_epoch(self,replay_size = 1000, EPSILON=0.5):
+    def run_epoch(self,replay_size = 1000, EPSILON=0.5, learning_rate=0.01):
 
         replay = self.create_replay(replay_size, EPSILON=EPSILON)
         loss, gradient = self.train_replay(replay)
         loss_avg = tf.math.reduce_mean(loss)
-        optimizer = SGD(learning_rate=0.01)
+        optimizer = SGD(learning_rate=learning_rate)
         optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
         return loss_avg
 
@@ -157,6 +157,3 @@ class Agent:
             cube = move.apply(cube)
 
         return move_count if reward(cube) == 1 else -1
-
-
-
