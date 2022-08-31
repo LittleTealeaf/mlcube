@@ -332,7 +332,7 @@ class Agent:
 
 agent = Agent(layer_sizes=[100,50,25],dir="./agent")
 update_interval = 10
-evaluate_interval: Literal[10] = 10
+evaluate_interval = 10
 
 epoch = 0
 

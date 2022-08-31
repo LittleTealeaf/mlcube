@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 from random import Random
 from keras.activations import sigmoid
+from keras.optimizers import SGD
 from moves import MOVES
 
 def create_cube():
@@ -132,10 +133,30 @@ class Agent:
 
             return loss, gradient
 
+    def run_epoch(self,replay_size = 1000, EPSILON=0.5):
 
-cube = create_cube()
-new_cube = MOVES[0].apply(cube)
+        replay = self.create_replay(replay_size, EPSILON=EPSILON)
+        loss, gradient = self.train_replay(replay)
+        loss_avg = tf.math.reduce_mean(loss)
+        optimizer = SGD(learning_rate=0.01)
+        optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
+        return loss_avg
 
-agent = Agent([5,5])
-replay = agent.create_replay(10)
-training = agent.train_replay(replay)
+    def evaluate_network(self):
+        random = Random()
+        cube = create_cube()
+        for _ in range(100):
+            cube = random.choice(MOVES).apply(cube)
+
+        move_count = 0
+
+        while reward(cube) != 1 and move_count < 1000:
+            move_count = move_count + 1
+            values = self.network.apply(cube)
+            move = MOVES[tf.argmax(values).numpy()]
+            cube = move.apply(cube)
+
+        return move_count if reward(cube) == 1 else -1
+
+
+
