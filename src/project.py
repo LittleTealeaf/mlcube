@@ -3,9 +3,9 @@ import os
 import numpy as np
 import tensorflow as tf
 from random import Random
-from keras.activations import sigmoid
+from keras.activations import softsign, sigmoid
 from keras.optimizers import SGD
-from moves import MOVES
+from network import Network, MOVES
 
 def create_cube():
     state = np.zeros(9 * 6 * 6, dtype=np.float32)
@@ -16,62 +16,9 @@ def create_cube():
 def reward(state):
     return 1 if tf.math.reduce_all(tf.math.equal(state,create_cube())) else 0
 
-class Network:
-    def __init__(self,layer_sizes: list[int], serialized = None, layers = None):
-        self.layer_sizes = layer_sizes + ([] if layers else [len(MOVES)])
+def exponential_decay(initial,index,decay_rate,decay_interval):
+    return initial * (decay_rate ** (index // decay_interval))
 
-        self.trainable_variables = []
-        self.layers = []
-
-        if layers:
-            self.layers = layers
-        elif serialized:
-            features = {}
-            for i in range(len(layer_sizes) + 1):
-                features[f'W{i}'] = tf.io.RaggedFeature(dtype=tf.string)
-                features[f'b{i}'] = tf.io.RaggedFeature(dtype=tf.string)
-            example = tf.io.parse_example(serialized,features)
-
-            for i in range(len(layer_sizes) - 1):
-                W = tf.variable(tf.io.parse_tensor(example[f'W{i}'][0],out_type=tf.float32, name=f'W{i}'))
-                b = tf.Variable(tf.io.parse_tensor(example[f'b{i}'][0],out_type=tf.float32,name=f'b{i}'))
-                self.layers.append((W,b))
-        else:
-            for i in range(len(self.layer_sizes)):
-                length_prev = self.layer_sizes[i-1] if i > 0 else 54 * 6
-                length_cur: int = self.layer_sizes[i]
-                W = tf.Variable(
-                    tf.random.normal([length_prev, length_cur],stddev=0.03),dtype=tf.float32
-                )
-                b = tf.Variable(tf.random.normal([length_cur],stddev=0.03),dtype=tf.float32)
-                self.layers.append((W,b))
-
-        for W,b in self.layers:
-            self.trainable_variables.append(W)
-            self.trainable_variables.append(b)
-
-    def apply(self,input):
-        x = input
-        for W,b in self.layers:
-            x = tf.matmul(x,W)
-            x = tf.add(x, b)
-            x = sigmoid(x)
-        return x
-
-    def copy(self):
-        return Network(layer_sizes = self.layer_sizes, layers=self.layers)
-
-
-    def serialize(self):
-        features = {}
-        for i in range(len(self.layers)):
-            W, b = self.layers[i]
-            features[f'W{i}'] = tf.train.Feature(bytes_list=tf.train.BytesList(value=[tf.io.serialize_tensor(W).numpy()]))
-            features[f'b{i}'] = tf.train.Feature(bytes_list=tf.train.BytesList(value=[tf.io.serialize_tensor(b).numpy()]))
-
-        return tf.train.Example(
-            features = tf.train.Features(feature=features)
-        )
 
 class Agent:
     def __init__(self,layer_sizes: list[int], dir: str = "./agent"):
@@ -106,7 +53,7 @@ class Agent:
         state_1_list = []
         for i in range(count):
             cube = create_cube()
-            for _ in range(1,i%100 + 1):
+            for _ in range(1,i%50 + 1):
                 cube = random.choice(MOVES).apply(cube)
             state_1_list.append(cube)
         state_1 = tf.constant(np.array(state_1_list))
@@ -148,12 +95,12 @@ class Agent:
 
             return loss, gradient
 
-    def run_epoch(self,replay_size = 1000, EPSILON=0.5, learning_rate=0.01):
+    def run_epoch(self,replay_size = 1000, EPSILON=0.5, learning_rate=0.1, learning_rate_decay=0.9, learning_rate_decay_interval=100):
 
         replay = self.create_replay(replay_size, EPSILON=EPSILON)
         loss, gradient = self.train_replay(replay)
         loss_avg = tf.math.reduce_mean(loss)
-        optimizer = SGD(learning_rate=min(loss_avg,learning_rate))
+        optimizer = SGD(learning_rate=exponential_decay(learning_rate,self.epoch,learning_rate_decay,learning_rate_decay_interval))
         optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
         self.epoch = self.epoch + 1
         return loss_avg
@@ -191,13 +138,13 @@ class Agent:
 
 agent = Agent(layer_sizes=[100,50],dir="./agent")
 target_interval = 10
-eval_interval = 5
+eval_interval = 100
 save_interval = 1
 
 
 while True:
-    avg_loss = agent.run_epoch(replay_size=1000, EPSILON = (agent.epoch % 20) / 20)
-    print(f'Epoch {agent.epoch} Completed. Average Loss: {avg_loss}')
+    avg_loss = agent.run_epoch(replay_size=1000, EPSILON = exponential_decay(1,agent.epoch % 100,0.75,5))
+    print(f'Epoch {agent.epoch}\tAverage Loss \t{avg_loss} \t({avg_loss**(0.5)})')
 
     if agent.epoch % target_interval == 0:
         agent.update_target()
