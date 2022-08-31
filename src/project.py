@@ -166,7 +166,7 @@ class Agent:
 
         move_count = 0
 
-        while reward(cube) != 1 and move_count < 1000:
+        while reward(cube) != 1 and move_count < 10000:
             move_count = move_count + 1
             values = self.network.apply(cube)
             move = MOVES[tf.argmax(values).numpy()[0]]
