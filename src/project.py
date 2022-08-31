@@ -153,7 +153,7 @@ class Agent:
         replay = self.create_replay(replay_size, EPSILON=EPSILON)
         loss, gradient = self.train_replay(replay)
         loss_avg = tf.math.reduce_mean(loss)
-        optimizer = SGD(learning_rate=learning_rate)
+        optimizer = SGD(learning_rate=min(loss_avg,learning_rate))
         optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
         self.epoch = self.epoch + 1
         return loss_avg
