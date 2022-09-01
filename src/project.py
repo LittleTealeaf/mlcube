@@ -1,4 +1,5 @@
 import json
+from math import log
 import os
 import numpy as np
 import tensorflow as tf
@@ -53,7 +54,7 @@ class Agent:
         state_1_list = []
         for i in range(count):
             cube = create_cube()
-            for _ in range(1,i%50 + 1):
+            for _ in range(1,i%40 + 1):
                 cube = random.choice(MOVES).apply(cube)
             state_1_list.append(cube)
         state_1 = tf.constant(np.array(state_1_list))
@@ -136,14 +137,14 @@ class Agent:
             }))
 
 
-agent = Agent(layer_sizes=[100,50],dir="./agent")
-target_interval = 10
+agent = Agent(layer_sizes=[100,50],dir="./agents/2")
+target_interval = 5
 eval_interval = 100
 save_interval = 1
 
 
 while True:
-    avg_loss = agent.run_epoch(replay_size=1000, EPSILON = exponential_decay(1,agent.epoch % 100,0.75,5))
+    avg_loss = agent.run_epoch(replay_size=1000, EPSILON = 0.2)
     print(f'Epoch {agent.epoch}\tAverage Loss \t{avg_loss} \t({avg_loss**(0.5)})')
 
     if agent.epoch % target_interval == 0:

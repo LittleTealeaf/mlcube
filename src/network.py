@@ -45,7 +45,10 @@ class Network:
         return x
 
     def copy(self):
-        return Network(layer_sizes = self.layer_sizes, layers=self.layers)
+        layers = []
+        for W,b in self.layers:
+            layers.append((tf.Variable(W.numpy(),dtype=tf.float32),tf.Variable(b.numpy(),dtype=tf.float32)))
+        return Network(layer_sizes = self.layer_sizes, layers=layers)
 
 
     def serialize(self):
