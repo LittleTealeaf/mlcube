@@ -18,7 +18,7 @@ class Network:
                 features[f'b{i}'] = tf.io.RaggedFeature(dtype=tf.string)
             example = tf.io.parse_example(serialized,features)
 
-            for i in range(len(layer_sizes) - 1):
+            for i in range(len(layer_sizes) + 1):
                 W = tf.Variable(tf.io.parse_tensor(example[f'W{i}'][0],out_type=tf.float32, name=f'W{i}'))
                 b = tf.Variable(tf.io.parse_tensor(example[f'b{i}'][0],out_type=tf.float32,name=f'b{i}'))
                 self.layers.append((W,b))
