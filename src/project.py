@@ -41,8 +41,9 @@ class Agent:
 
                 network_data = tf.io.read_file("/".join([self.dir, 'agent']))
                 self.network = Network(layer_sizes, serialized=network_data)
-            except:
-                print("Tried opening and failed")
+            except Exception as e:
+
+                print(f"Tried opening and failed: {str(e)}")
 
         if not self.network:
             self.network: Network = Network(layer_sizes)
@@ -57,11 +58,11 @@ class Agent:
         state_1_list = []
         for i in range(count):
             cube = create_cube()
-            for _ in range(1, i % 30 + 1):
+            for _ in range(1, i % 40 + 1):
                 cube = random.choice(MOVES).apply(cube)
             state_1_list.append(cube)
-        state_1 = tf.constant(np.array(state_1_list))
 
+        state_1 = tf.constant(np.array(state_1_list))
         state_1_outputs = self.network.apply(state_1)
         state_1_choices = tf.argmax(state_1_outputs, 2)
         state_1_choices = tf.map_fn(
@@ -107,14 +108,12 @@ class Agent:
 
 
 
-    def run_epoch(self, replay_size=1000, EPSILON=0.5, learning_rate=0.1, learning_rate_decay=0.9,
-                  learning_rate_decay_interval=1000):
+    def run_epoch(self, replay_size=1000, EPSILON=0.5, learning_rate=0.1):
 
         replay = self.create_replay(replay_size, epsilon=EPSILON)
         loss, gradient = self.train_replay(replay)
         loss_avg = tf.math.reduce_mean(loss)
-        optimizer = SGD(learning_rate=exponential_decay(learning_rate, self.epoch, learning_rate_decay,
-                                                        learning_rate_decay_interval))
+        optimizer = SGD(learning_rate=learning_rate)
         optimizer.apply_gradients(zip(gradient, self.network.trainable_variables))
         self.epoch = self.epoch + 1
         return loss_avg
@@ -150,13 +149,13 @@ class Agent:
             }))
 
 
-agent = Agent(layer_sizes=[100, 50], directory="./agents/3")
+agent = Agent(layer_sizes=[100, 50], directory="./agents/1")
 target_interval = 500
 eval_interval = 500
 save_interval = target_interval
 
 while True:
-    avg_loss = agent.run_epoch(replay_size=5_000, EPSILON=0.2)
+    avg_loss = agent.run_epoch(replay_size=10_000, EPSILON=0.2, learning_rate=exponential_decay(exponential_decay(1,agent.epoch%500,0.9,3),agent.epoch // 500, 0.9, 1))
     print(f'Epoch {agent.epoch}\tAverage Loss \t{avg_loss} \t({avg_loss ** (0.5)})')
 
     if agent.epoch % target_interval == 0:
