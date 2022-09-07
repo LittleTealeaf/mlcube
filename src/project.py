@@ -9,6 +9,7 @@ from keras.optimizers import SGD
 from network import Network, MOVES
 
 
+
 def create_cube():
     state = np.zeros(9 * 6 * 6, dtype=np.float32)
     for i in range(0, 9 * 6 * 6, 6):
@@ -56,7 +57,7 @@ class Agent:
         state_1_list = []
         for i in range(count):
             cube = create_cube()
-            for _ in range(1, i % 40 + 1):
+            for _ in range(1, i % 30 + 1):
                 cube = random.choice(MOVES).apply(cube)
             state_1_list.append(cube)
         state_1 = tf.constant(np.array(state_1_list))
@@ -87,6 +88,10 @@ class Agent:
             state_2_choices = tf.argmax(state_2_output, 2)
             state_2_choices_q = tf.gather(state_2_output, state_2_choices, batch_dims=2)
 
+            state_2_choices_q = tf.multiply(state_2_choices_q, 0.75)
+
+            # scale the choice Qs
+
             target_q = tf.add(state_2_choices_q, tf.reshape(reward_1, (reward_1.shape[0], 1)))
 
             predicted_q = state_1_choice_q
@@ -99,8 +104,11 @@ class Agent:
 
             return loss, gradient
 
+
+
+
     def run_epoch(self, replay_size=1000, EPSILON=0.5, learning_rate=0.1, learning_rate_decay=0.9,
-                  learning_rate_decay_interval=100):
+                  learning_rate_decay_interval=1000):
 
         replay = self.create_replay(replay_size, epsilon=EPSILON)
         loss, gradient = self.train_replay(replay)
@@ -142,13 +150,13 @@ class Agent:
             }))
 
 
-agent = Agent(layer_sizes=[100, 50], directory="./agents/2")
-target_interval = 5
-eval_interval = 100
-save_interval = 1
+agent = Agent(layer_sizes=[100, 50], directory="./agents/3")
+target_interval = 500
+eval_interval = 500
+save_interval = target_interval
 
 while True:
-    avg_loss = agent.run_epoch(replay_size=1000, EPSILON=0.2)
+    avg_loss = agent.run_epoch(replay_size=10_000, EPSILON=0.2)
     print(f'Epoch {agent.epoch}\tAverage Loss \t{avg_loss} \t({avg_loss ** (0.5)})')
 
     if agent.epoch % target_interval == 0:
