@@ -156,7 +156,7 @@ eval_interval = 500
 save_interval = target_interval
 
 while True:
-    avg_loss = agent.run_epoch(replay_size=10_000, EPSILON=0.2)
+    avg_loss = agent.run_epoch(replay_size=5_000, EPSILON=0.2)
     print(f'Epoch {agent.epoch}\tAverage Loss \t{avg_loss} \t({avg_loss ** (0.5)})')
 
     if agent.epoch % target_interval == 0:
