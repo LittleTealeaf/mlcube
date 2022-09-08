@@ -3,7 +3,7 @@ import numpy as np
 class Action:
     def __init__(self, name: str, loops: list[list[int]], two=False, prime=False):
         self.name = name
-        self.matrix = np.identity(9 * 6)
+        self.matrix = np.identity(9 * 6,dtype=np.int8)
 
         for loop in loops:
           initial = np.copy(self.matrix[loop[0]])
@@ -19,7 +19,7 @@ class Environment:
         self.reset()
 
     def reset(self):
-        self.state = np.array([i // 9 for i in range(9 * 6)])
+        self.state = np.array([i // 9 for i in range(9 * 6)],dtype=np.int8)
 
     def apply_action(self,action: Action):
       self.state = action.apply(self.state)
@@ -29,6 +29,22 @@ class Environment:
         if self.state[i] != i // 9:
           return False
       return True
+
+    def to_observations(self):
+
+      def create_set(i):
+        val = [0] * 6
+        val[i] = 1
+        return val
+
+
+
+      # I think this works
+      return [
+        value for position in [
+          create_set(i) for i in self.state
+        ] for value in position
+      ]
 
 
 def create_moves(name: str, loops: list[list[int]]):

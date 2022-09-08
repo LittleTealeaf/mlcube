@@ -46,3 +46,30 @@ def test_actions_contains_required_moves():
     assert action.name in REQUIRED_MOVES
     REQUIRED_MOVES.remove(action.name)
   assert len(REQUIRED_MOVES) == 0
+
+def test_actions_have_permutation_matricies():
+  for action in ACTIONS:
+    assert action.matrix is not None
+
+def test_cube_can_be_scrambled():
+  env = Environment()
+  for _ in range(100):
+    env.apply_action(random.choice(ACTIONS))
+
+def test_to_observation_returns_array():
+  env = Environment()
+  assert len(env.to_observations()) > 0
+
+def test_observation_formats_correctly():
+  env =  Environment()
+  observations = env.to_observations()
+  for i in range(0,len(observations),6):
+    assert sum(observations[i:i+6]) == 1
+
+def test_observation_formats_on_scrambled_cube():
+  env = Environment()
+  for _ in range(100):
+    env.apply_action(random.choice(ACTIONS))
+  observations = env.to_observations()
+  for i in range(0,len(observations),6):
+    assert sum(observations[i:i+6]) == 1
