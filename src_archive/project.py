@@ -31,6 +31,7 @@ class Agent:
         self.dir = directory
         self.eval_history = []
         self.epoch = 0
+        self.epoch_history = []
 
         if os.path.exists(directory):
             try:
@@ -38,9 +39,12 @@ class Agent:
                     values = json.load(file)
                     self.eval_history = values['eval_history']
                     self.epoch = values['epoch_count']
+                    self.epoch_history = values['epoch_history']
 
                 network_data = tf.io.read_file("/".join([self.dir, 'agent']))
+                target_data = tf.io.read_file("/".join([self.dir,'target']))
                 self.network = Network(layer_sizes, serialized=network_data)
+                self.target = Network(layer_sizes,serialized=target_data)
             except Exception as e:
 
                 print(f"Tried opening and failed: {str(e)}")
@@ -115,6 +119,12 @@ class Agent:
         loss_avg = tf.math.reduce_mean(loss)
         optimizer = SGD(learning_rate=learning_rate)
         optimizer.apply_gradients(zip(gradient, self.network.trainable_variables))
+
+        self.epoch_history.append({
+            'epoch': self.epoch,
+            'avg_loss': float(loss_avg.numpy()),
+            'abs_avg_loss': (float(loss_avg.numpy()))**0.5
+        })
         self.epoch = self.epoch + 1
         return loss_avg
 
@@ -141,18 +151,21 @@ class Agent:
 
     def save(self):
         serialized = self.network.serialize()
+        serialized_target = self.target.serialize()
         tf.io.write_file("/".join([self.dir, 'agent']), serialized.SerializeToString())
+        tf.io.write_file("/".join([self.dir,'target']),serialized_target.SerializeToString())
         with open("/".join([self.dir, 'config.json']), 'w') as file:
             file.write(json.dumps({
                 'epoch_count': self.epoch,
-                'eval_history': self.eval_history
-            }))
+                'eval_history': self.eval_history,
+                'epoch_history': self.epoch_history
+            },indent=2))
 
 
 agent = Agent(layer_sizes=[100, 50], directory="./agents/1")
 target_interval = 500
-eval_interval = 500
-save_interval = target_interval
+eval_interval = 100
+save_interval = 10
 
 while True:
     avg_loss = agent.run_epoch(replay_size=10_000, EPSILON=0.2, learning_rate=exponential_decay(exponential_decay(1,agent.epoch%500,0.9,3),agent.epoch // 500, 0.9, 1))
