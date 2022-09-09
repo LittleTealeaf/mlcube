@@ -36,15 +36,13 @@ class Environment:
         val = [0] * 6
         val[i] = 1
         return val
-
-
-
+        
       # I think this works
-      return [
+      return [[
         value for position in [
           create_set(i) for i in self.state
         ] for value in position
-      ]
+      ]]
 
 
 def create_moves(name: str, loops: list[list[int]]):

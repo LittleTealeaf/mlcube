@@ -62,7 +62,7 @@ def test_to_observation_returns_array():
 
 def test_observation_formats_correctly():
   env =  Environment()
-  observations = env.to_observations()
+  observations = env.to_observations()[0]
   for i in range(0,len(observations),6):
     assert sum(observations[i:i+6]) == 1
 
@@ -70,6 +70,6 @@ def test_observation_formats_on_scrambled_cube():
   env = Environment()
   for _ in range(100):
     env.apply_action(random.choice(ACTIONS))
-  observations = env.to_observations()
+  observations = env.to_observations()[0]
   for i in range(0,len(observations),6):
     assert sum(observations[i:i+6]) == 1
