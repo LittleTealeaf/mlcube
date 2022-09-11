@@ -1,7 +1,6 @@
 from src.network import *
 from src.environment import *
 
-
 def test_new_network():
   assert Network([10,10]) is not None
 
