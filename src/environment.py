@@ -1,3 +1,4 @@
+from random import Random
 import numpy as np
 
 class Action:
@@ -13,37 +14,6 @@ class Action:
 
     def apply(self,state):
       return state @ self.matrix
-
-class Environment:
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.state = np.array([i // 9 for i in range(9 * 6)],dtype=np.int8)
-
-    def apply_action(self,action: Action):
-      self.state = action.apply(self.state)
-
-    def is_complete(self):
-      for i in range(9 * 6):
-        if self.state[i] != i // 9:
-          return False
-      return True
-
-    def to_observations(self):
-
-      def create_set(i):
-        val = [0] * 6
-        val[i] = 1
-        return val
-        
-      # I think this works
-      return [[
-        value for position in [
-          create_set(i) for i in self.state
-        ] for value in position
-      ]]
-
 
 def create_moves(name: str, loops: list[list[int]]):
     return [
@@ -118,3 +88,46 @@ ACTIONS = [
     ]
     for move in moves
 ]
+
+class Environment:
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.state = np.array([i // 9 for i in range(9 * 6)],dtype=np.int8)
+        return self
+
+    def apply_action(self,action: Action):
+      self.state = action.apply(self.state)
+      return self
+
+    def is_complete(self):
+      for i in range(9 * 6):
+        if self.state[i] != i // 9:
+          return False
+      return True
+
+    def to_observations(self):
+
+      def create_set(i):
+        val = [0] * 6
+        val[i] = 1
+        return val
+
+      # I think this works
+      return [[
+        value for position in [
+          create_set(i) for i in self.state
+        ] for value in position
+      ]]
+
+    def scramble(self,count: int = 100):
+        random = Random()
+        for _ in range(count):
+            self.apply_action(random.choice(ACTIONS))
+        return self
+
+    def copy(self):
+        env = Environment()
+        env.state = np.copy(self.state)
+        return env

@@ -68,7 +68,7 @@ class Agent:
   def get_epoch(self):
     return len(self.epochs)
 
-
+  
 
   def save(self):
     serialized_network = self.network.serialize()
