@@ -1,4 +1,4 @@
-from src.environment import *
+from src import *
 from random import Random
 
 random = Random()
