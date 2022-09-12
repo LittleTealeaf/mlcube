@@ -3,6 +3,7 @@ import os
 import tensorflow as tf
 import numpy as np
 from random import Random
+from tensorflow import data as tfd
 
 from src.network import *
 from src.environment import Environment, ACTIONS
@@ -91,12 +92,13 @@ class Agent:
       choice[i] = tf.argmax(value,axis=1).numpy() if i % epsilon_inverse != 0 else [random.randint(0,17)]
       cube.apply_action(ACTIONS[int(choice[i][0])])
       state_2[i] = cube.to_observations()
+      cube.apply_action(random.choice(ACTIONS))
       rewards[i] = 1 if cube.is_complete() else 0
 
-    return state_1, choice, state_2, rewards
+    return tfd.Dataset.from_tensor_slices((state_1,choice,state_2,rewards))
 
 
-
+    # return tfd.Dataset.from_tensor_slices([tf.constant(i,dtype=tf.float32) for i in [state_1, choice, state_2, rewards]])
 
   def save(self):
     serialized_network = self.network.serialize()

@@ -3,8 +3,7 @@ import time
 
 agent = Agent([100,50],"test")
 
-start = time.perf_counter()
-agent.create_replay(count=10000)
-end = time.perf_counter()
+dataset = agent.create_replay(count=100)
+dataset = dataset.shuffle(50)
+batch = dataset.batch(10)
 
-print(f'Elapsed: {end - start}')
