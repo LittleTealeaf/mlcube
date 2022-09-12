@@ -73,3 +73,12 @@ def test_observation_formats_on_scrambled_cube():
   observations = env.to_observations()[0]
   for i in range(0,len(observations),6):
     assert sum(observations[i:i+6]) == 1
+
+def test_create_from_observations():
+  env = Environment()
+  for _ in range(100):
+    env.apply_action(random.choice(ACTIONS))
+  env_observations = env.to_observations()
+  env_from_observations = Environment(env_observations)
+  for i in range(9 * 6):
+    assert env_from_observations.state[i] == env.state[i]

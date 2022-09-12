@@ -90,8 +90,14 @@ ACTIONS = [
 ]
 
 class Environment:
-    def __init__(self):
-        self.reset()
+    def __init__(self, observations: list[list[int]] = None):
+        if observations:
+            self.state = np.array([0] * (9 * 6),dtype=np.int8)
+            for i in range(len(observations[0])):
+                self.state[i//6] += observations[0][i] * (i%6)
+        else:
+            self.reset()
+
 
     def reset(self):
         self.state = np.array([i // 9 for i in range(9 * 6)],dtype=np.int8)
