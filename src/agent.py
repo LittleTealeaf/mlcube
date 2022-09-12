@@ -89,7 +89,6 @@ class Agent:
       state_1[i] = cube.to_observations()
       value = self.network.apply(tf.constant(state_1[i],dtype=tf.float32))
       choice[i] = tf.argmax(value,axis=1).numpy() if i % epsilon_inverse != 0 else [random.randint(0,17)]
-      # cube.apply_action(ACTIONS[int(choice[i][0])] if i % epsilon_inverse != 0 else random.choice(ACTIONS))
       cube.apply_action(ACTIONS[int(choice[i][0])])
       state_2[i] = cube.to_observations()
       rewards[i] = 1 if cube.is_complete() else 0
