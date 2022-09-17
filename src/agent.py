@@ -53,7 +53,7 @@ class Agent:
 
     while (not env.is_complete()) and move_count < max_moves:
       move_count = move_count + 1
-      values = self.network.apply(env.to_observations())
+      values = self.network.apply(tf.constant(np.array(env.to_observations()),dtype=tf.float32))
       move = ACTIONS[tf.argmax(values).numpy()[0]]
       env.apply_action(move)
 
