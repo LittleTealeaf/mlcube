@@ -1,5 +1,6 @@
 import tensorflow as tf
 from keras.activations import sigmoid
+import numpy as np
 
 LAYER_SIZE_INPUT = 9 * 6 * 6
 LAYER_SIZE_OUTPUT = 18
@@ -60,15 +61,12 @@ class Network:
         return x
 
     def copy(self):
-        layers = []
-        for W, b in self.layers:
-            layers.append(
-                (
-                    tf.Variable(W.numpy(), dtype=tf.float32),
-                    tf.Variable(b.numpy(), dtype=tf.float32),
-                )
-            )
-        return Network(layer_sizes=self.layer_sizes, layers=layers)
+        return Network(layer_sizes=self.layer_sizes,layers=[
+            (
+                tf.Variable(np.copy(W.numpy()),dtype=tf.float32),
+                tf.Variable(np.copy(b.numpy()),dtype=tf.float32),
+            ) for W,b in self.layers
+        ])
 
     def serialize(self):
         features = {}

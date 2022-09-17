@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 import numpy as np
 from random import Random
-from tensorflow import data as tfd
+from keras.optimizers import SGD
 
 from src.network import *
 from src.environment import Environment, ACTIONS
@@ -70,9 +70,9 @@ class Agent:
   def get_epoch(self):
     return len(self.epochs)
 
-  def create_replay(self,count=1_000,epsilon=0.2,moves_min=1,moves_max=40):
+  def create_replay(self,replay_size=1_000,epsilon=0.2,moves_min=1,moves_max=40):
     random = Random()
-    entries_per_move = int(count / (moves_max - moves_min)) + 1
+    entries_per_move = int(replay_size / (moves_max - moves_min)) + 1
     epsilon_inverse = int(1 / 0.2)
 
     cubes = [Environment() for _ in range(entries_per_move)]
@@ -80,12 +80,12 @@ class Agent:
       for cube in cubes:
         cube.apply_action(random.choice(ACTIONS))
 
-    state_1 = np.zeros(shape=(count,1,9*6*6),dtype=np.float32)
-    choice = np.zeros(shape=(count,1,1),dtype=np.float32)
-    state_2 = np.zeros(shape=(count,1,9*6*6),dtype=np.float32)
-    rewards = np.zeros(shape=(count,1,1),dtype=np.float32)
+    state_1 = np.zeros(shape=(replay_size,1,9*6*6),dtype=np.float32)
+    choice = np.zeros(shape=(replay_size,1,1),dtype=np.float32)
+    state_2 = np.zeros(shape=(replay_size,1,9*6*6),dtype=np.float32)
+    rewards = np.zeros(shape=(replay_size,1,1),dtype=np.float32)
 
-    for i in range(count):
+    for i in range(replay_size):
       cube = cubes[i%len(cubes)]
       state_1[i] = cube.to_observations()
       value = self.network.apply(tf.constant(state_1[i],dtype=tf.float32))
@@ -95,10 +95,9 @@ class Agent:
       cube.apply_action(random.choice(ACTIONS))
       rewards[i] = 1 if cube.is_complete() else 0
 
-    return tfd.Dataset.from_tensor_slices((state_1,choice,state_2,rewards))
+    return (state_1,choice,state_2,rewards)
 
 
-    # return tfd.Dataset.from_tensor_slices([tf.constant(i,dtype=tf.float32) for i in [state_1, choice, state_2, rewards]])
 
   def save(self):
     serialized_network = self.network.serialize()
@@ -115,3 +114,56 @@ class Agent:
 
   def update_target(self):
     self.target = self.network.copy()
+
+  def train_replay(self,replay: tuple[(np.ndarray,np.ndarray,np.ndarray,np.ndarray)]):
+    "Replay must be a tensor slice dataset"
+    state_1, choice, state_2, rewards = replay
+
+
+
+    with tf.GradientTape() as tape:
+
+      tape.watch(self.network.trainable_variables)
+
+      t_state_1 = tf.constant(state_1,dtype=tf.float32)
+      t_choice = tf.constant(choice,dtype=tf.int64)
+      t_state_2 = tf.constant(state_2,dtype=tf.float32)
+      t_rewards = tf.constant(rewards,dtype=tf.float32)
+
+      t_state_1_output = self.network.apply(t_state_1)
+      t_state_1_choice_q = tf.gather(t_state_1_output,t_choice,batch_dims=2)
+
+      t_state_2_output = self.target.apply(t_state_2)
+      t_state_2_choices = tf.argmax(t_state_2_output,2)
+      t_state_2_choices_q = tf.gather(t_state_2_output,t_state_2_choices,batch_dims=2)
+
+      t_state_2_choices_q = tf.multiply(t_state_2_choices_q,0.75)
+
+      t_target_q = tf.add(t_state_2_choices_q, tf.reshape(t_rewards, (t_rewards.shape[0],1)))
+
+      t_predicted_q = tf.reshape(t_state_1_choice_q,(t_state_1_choice_q.shape[0],1))
+
+      t_abs_loss = tf.subtract(t_target_q,t_predicted_q)
+
+      t_loss = tf.square(t_abs_loss)
+
+      gradient = tape.gradient(t_loss,self.network.trainable_variables)
+
+      return t_loss, gradient
+
+  def run_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40, learning_rate=0.1):
+    replay = self.create_replay(replay_size=replay_size,epsilon=epsilon,moves_min=moves_min,moves_max=moves_max)
+
+    loss, gradient = self.train_replay(replay)
+
+    loss_avg = float(tf.math.reduce_mean(loss).numpy())
+
+    optimizer = SGD(learning_rate=learning_rate)
+    optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
+
+    self.epochs.append({
+      'epoch': self.get_epoch(),
+      'loss': loss_avg
+    })
+
+    return loss_avg, loss_avg**0.5
