@@ -1,5 +1,7 @@
+from multiprocessing.util import is_abstract_socket_namespace
 from random import Random
 import numpy as np
+import hashlib
 
 class Action:
     def __init__(self, name: str, loops: list[list[int]], two=False, prime=False):
@@ -91,6 +93,8 @@ ACTIONS = [
     for move in moves
 ]
 
+REWARDS = {}
+
 class Environment:
     def __init__(self, observations: list[list[int]] = None):
         if observations:
@@ -139,3 +143,30 @@ class Environment:
         env = Environment()
         env.state = np.copy(self.state)
         return env
+
+    def hash(self):
+        return "".join([str(i) for i in self.state])
+
+    def reward(self):
+        hash = self.hash()
+        return REWARDS[hash] if hash in REWARDS else 0
+        # return REWARDS[] if hashlib.sha1(self.state) in REWARDS
+
+# Calculate the rewards
+depth = 8
+discount = 0.75
+stack = [Environment()]
+
+for i in range(depth):
+    print(f"Calculating rewards for depth {i}")
+    t_stack = stack.copy()
+    stack = []
+    for item in t_stack:
+        # compute hash of item
+        hash = item.hash()
+        if hash not in REWARDS:
+            REWARDS[hash] = 1 * (0.75**i)
+            for action in ACTIONS:
+                env = item.copy()
+                env.apply_action(action)
+                stack.append(env)

@@ -93,7 +93,7 @@ class Agent:
       cube.apply_action(ACTIONS[int(choice[i][0])])
       state_2[i] = cube.to_observations()
       cube.apply_action(random.choice(ACTIONS))
-      rewards[i] = 1 if cube.is_complete() else 0
+      rewards[i] = cube.reward()
 
     return (state_1,choice,state_2,rewards)
 
