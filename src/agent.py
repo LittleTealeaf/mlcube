@@ -141,6 +141,9 @@ class Agent:
 
       t_target_q = tf.add(t_state_2_choices_q, tf.reshape(t_rewards, (t_rewards.shape[0],1)))
 
+  
+
+
       t_predicted_q = tf.reshape(t_state_1_choice_q,(t_state_1_choice_q.shape[0],1))
 
       t_abs_loss = tf.subtract(t_target_q,t_predicted_q)

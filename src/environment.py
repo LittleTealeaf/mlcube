@@ -145,7 +145,7 @@ class Environment:
         return env
 
     def hash(self):
-        return "".join([str(i) for i in self.state])
+        return int("".join([str(i) for i in self.state]),6)
 
     def reward(self):
         hash = self.hash()
