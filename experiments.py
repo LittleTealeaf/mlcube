@@ -17,3 +17,5 @@ LAYERS = []
 for i in range(1,LAYER_COUNT):
   LAYERS.append(INPUTS - DIFF * i)
 print(LAYERS)
+
+# [264, 202, 141, 80]

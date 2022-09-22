@@ -11,6 +11,7 @@ from src.environment import Environment, ACTIONS
 
 class Agent:
   def __init__(self, layer_sizes: list[int], directory: str):
+    "Create a new agent"
     self.directory = directory
     self.network: Network = None
     self.target: Network = None
@@ -20,7 +21,6 @@ class Agent:
 
     if os.path.exists(directory):
       try:
-        ...
         # Epoch History
         with open(os.path.join(directory,"epochs.json")) as file:
           self.epochs = json.load(file)
@@ -32,6 +32,7 @@ class Agent:
         # network and target
         network_data = tf.io.read_file(os.path.join(directory,"network"))
         target_data = tf.io.read_file(os.path.join(directory,"target"))
+
 
         self.network = Network(layer_sizes,serialized=network_data)
         self.target = Network(layer_sizes,serialized=target_data)
@@ -68,12 +69,14 @@ class Agent:
     return (move_count, solved)
 
   def get_epoch(self):
+    "Get the current epoch"
     return len(self.epochs)
 
   def create_replay(self,replay_size=1_000,epsilon=0.2,moves_min=1,moves_max=40):
+    "Create a replay of random moves"
     random = Random()
     entries_per_move = int(replay_size / (moves_max - moves_min)) + 1
-    epsilon_inverse = int(1 / 0.2)
+    epsilon_inverse = int(1 / epsilon)
 
     cubes = [Environment() for _ in range(entries_per_move)]
     for _ in range(moves_min):
@@ -100,6 +103,7 @@ class Agent:
 
 
   def save(self):
+    "Save the network and target to disk"
     serialized_network = self.network.serialize()
     serialized_target = self.target.serialize()
 
@@ -113,13 +117,12 @@ class Agent:
       file.write(json.dumps(self.evaluations))
 
   def update_target(self):
+    "Update the target network to match the current network"
     self.target = self.network.copy()
 
   def train_replay(self,replay: tuple[(np.ndarray,np.ndarray,np.ndarray,np.ndarray)]):
     "Replay must be a tensor slice dataset"
     state_1, choice, state_2, rewards = replay
-
-
 
     with tf.GradientTape() as tape:
 
@@ -137,12 +140,11 @@ class Agent:
       t_state_2_choices = tf.argmax(t_state_2_output,2)
       t_state_2_choices_q = tf.gather(t_state_2_output,t_state_2_choices,batch_dims=2)
 
-      t_state_2_choices_q = tf.multiply(t_state_2_choices_q,0.75)
+      t_state_2_choices_q_scaled = tf.multiply(t_state_2_choices_q, 0.75)
 
-      t_target_q = tf.add(t_state_2_choices_q, tf.reshape(t_rewards, (t_rewards.shape[0],1)))
+      t_rewards = tf.reshape(t_rewards, (t_rewards.shape[0],1))
 
-  
-
+      t_target_q = tf.add(t_state_2_choices_q_scaled, t_rewards)
 
       t_predicted_q = tf.reshape(t_state_1_choice_q,(t_state_1_choice_q.shape[0],1))
 
@@ -152,21 +154,26 @@ class Agent:
 
       gradient = tape.gradient(t_loss,self.network.trainable_variables)
 
-      return t_loss, gradient
+      return t_loss, gradient, t_rewards
 
   def run_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40, learning_rate=0.1):
+    "Run a cycle of training and evaluation"
     replay = self.create_replay(replay_size=replay_size,epsilon=epsilon,moves_min=moves_min,moves_max=moves_max)
 
-    loss, gradient = self.train_replay(replay)
+    loss, gradient, t_rewards = self.train_replay(replay)
+
+    avg_reward = float(tf.math.reduce_mean(t_rewards).numpy())
 
     loss_avg = float(tf.math.reduce_mean(loss).numpy())
 
     optimizer = SGD(learning_rate=learning_rate)
     optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
 
+
     self.epochs.append({
       'epoch': self.get_epoch(),
-      'loss': loss_avg
+      'loss': loss_avg,
+      'reward': avg_reward
     })
 
-    return loss_avg, loss_avg**0.5
+    return loss_avg, loss_avg**0.5,avg_reward

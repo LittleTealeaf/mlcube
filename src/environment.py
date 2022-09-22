@@ -149,12 +149,14 @@ class Environment:
 
     def reward(self):
         hash = self.hash()
-        return REWARDS[hash] if hash in REWARDS else 0
-        # return REWARDS[] if hashlib.sha1(self.state) in REWARDS
+        if hash in REWARDS:
+            return REWARDS[hash]
+        else:
+            return 0
 
 # Calculate the rewards
 depth = 8
-discount = 0.75
+discount = 0.8
 stack = [Environment()]
 
 for i in range(depth):
@@ -165,8 +167,9 @@ for i in range(depth):
         # compute hash of item
         hash = item.hash()
         if hash not in REWARDS:
-            REWARDS[hash] = 1 * (0.75**i)
+            REWARDS[hash] = 1 * (discount**i)
             for action in ACTIONS:
                 env = item.copy()
                 env.apply_action(action)
                 stack.append(env)
+print(f"Calculated rewards for {len(REWARDS)} states")
