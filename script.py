@@ -15,7 +15,7 @@ def main():
   target_interval = 500
   eval_interval = 100
   save_interval = 10
-  learning_rate_function = lambda epoch: exponential_decay(exponential_decay(1,epoch%target_interval,0.9,2),epoch,0.95,target_interval)
+  learning_rate_function = lambda epoch: exponential_decay(exponential_decay(1,epoch%target_interval,0.95,2),epoch,0.95,target_interval)
 
   while True:
     epoch = agent.get_epoch()
