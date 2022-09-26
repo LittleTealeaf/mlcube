@@ -51,22 +51,27 @@ class Agent:
       env.apply_action(random.choice(ACTIONS))
 
     move_count = 0
+    max_reward = 0.0
 
     while (not env.is_complete()) and move_count < max_moves:
+      max_reward = max(max_reward,env.reward())
       move_count = move_count + 1
       values = self.network.apply(tf.constant(np.array(env.to_observations()),dtype=tf.float32))
       move = ACTIONS[tf.argmax(values).numpy()[0]]
       env.apply_action(move)
+
+
 
     solved = env.is_complete()
 
     self.evaluations.append({
       'epoch': self.get_epoch(),
       'solved': solved,
-      'moves': move_count
+      'moves': move_count,
+      'max_reward': max_reward
     })
 
-    return (move_count, solved)
+    return (move_count, solved, max_reward)
 
   def get_epoch(self):
     "Get the current epoch"
@@ -119,9 +124,11 @@ class Agent:
     "Update the target network to match the current network"
     self.target = self.network.copy()
 
-  def train_replay(self,replay: tuple[(np.ndarray,np.ndarray,np.ndarray,np.ndarray)]):
+  def train_replay(self,replay: tuple[(np.ndarray,np.ndarray,np.ndarray,np.ndarray)], gamma = 0.5):
     "Replay must be a tensor slice dataset"
     state_1, choice, state_2, rewards = replay
+
+    assert gamma >= 0 and gamma <= 1
 
     with tf.GradientTape() as tape:
 
@@ -139,11 +146,13 @@ class Agent:
       t_state_2_choices = tf.argmax(t_state_2_output,2)
       t_state_2_choices_q = tf.gather(t_state_2_output,t_state_2_choices,batch_dims=2)
 
-      t_state_2_choices_q_scaled = tf.multiply(t_state_2_choices_q, 0.75)
+      t_state_2_choices_q_scaled = tf.multiply(t_state_2_choices_q, gamma)
 
       t_rewards = tf.reshape(t_rewards, (t_rewards.shape[0],1))
 
-      t_target_q = tf.add(t_state_2_choices_q_scaled, t_rewards)
+      t_rewards_scaled = tf.multiply(t_rewards,1 - gamma)
+
+      t_target_q = tf.add(t_state_2_choices_q_scaled, t_rewards_scaled)
 
       t_predicted_q = tf.reshape(t_state_1_choice_q,(t_state_1_choice_q.shape[0],1))
 
@@ -155,11 +164,11 @@ class Agent:
 
       return t_loss, gradient, t_rewards
 
-  def run_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40, learning_rate=0.1):
+  def run_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40, learning_rate=0.1, gamma = 0.5):
     "Run a cycle of training and evaluation"
     replay = self.create_replay(replay_size=replay_size,epsilon=epsilon,moves_min=moves_min,moves_max=moves_max)
 
-    loss, gradient, t_rewards = self.train_replay(replay)
+    loss, gradient, t_rewards = self.train_replay(replay,gamma=gamma)
 
     avg_reward = float(tf.math.reduce_mean(t_rewards).numpy())
 
