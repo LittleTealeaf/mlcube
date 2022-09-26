@@ -72,31 +72,30 @@ class Agent:
     "Get the current epoch"
     return len(self.epochs)
 
-  def create_replay(self,replay_size=1_000,epsilon=0.2,moves_min=1,moves_max=40):
+  def create_replay(self,replay_size=1_000,epsilon=0.2,moves_min=1,moves_max=40, pool = None):
     "Create a replay of random moves"
-    random = Random()
-    entries_per_move = int(replay_size / (moves_max - moves_min)) + 1
-    epsilon_inverse = int(1 / epsilon)
-
-    cubes = [Environment() for _ in range(entries_per_move)]
-    for _ in range(moves_min):
-      for cube in cubes:
-        cube.apply_action(random.choice(ACTIONS))
 
     state_1 = np.zeros(shape=(replay_size,1,9*6*6),dtype=np.float32)
     choice = np.zeros(shape=(replay_size,1,1),dtype=np.float32)
     state_2 = np.zeros(shape=(replay_size,1,9*6*6),dtype=np.float32)
     rewards = np.zeros(shape=(replay_size,1,1),dtype=np.float32)
 
+    random = Random()
+    entries_per_move = int(replay_size / (moves_max - moves_min)) + 1
+    cubes = [Environment() for _ in range(entries_per_move)]
+    for _ in range(moves_min):
+      for cube in cubes:
+        cube.apply_action(random.choice(ACTIONS))
     for i in range(replay_size):
       cube = cubes[i%len(cubes)]
       state_1[i] = cube.to_observations()
       value = self.network.apply(tf.constant(state_1[i],dtype=tf.float32))
-      choice[i] = tf.argmax(value,axis=1).numpy() if i % epsilon_inverse != 0 else [random.randint(0,17)]
+      choice[i] = tf.argmax(value,axis=1).numpy() if random.random() >= epsilon else [random.randint(0,17)]
       cube.apply_action(ACTIONS[int(choice[i][0])])
       state_2[i] = cube.to_observations()
       cube.apply_action(random.choice(ACTIONS))
       rewards[i] = cube.reward()
+
 
     return (state_1,choice,state_2,rewards)
 

@@ -7,14 +7,15 @@ def exponential_decay(initial, index, decay_rate, decay_interval):
     return initial * (decay_rate ** (index // decay_interval))
 
 def main():
+  calculate_rewards()
+
   agent = Agent([264, 202, 141, 80],"agents/1")
 
 
   target_interval = 500
   eval_interval = 100
   save_interval = 10
-
-  learning_rate_function = lambda epoch: exponential_decay(exponential_decay(1,epoch%target_interval,0.9,3),epoch // target_interval,0.9,1)
+  learning_rate_function = lambda epoch: exponential_decay(exponential_decay(1,epoch%target_interval,0.9,2),epoch,0.95,target_interval)
 
   while True:
     epoch = agent.get_epoch()

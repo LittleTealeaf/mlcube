@@ -1,7 +1,5 @@
-from multiprocessing.util import is_abstract_socket_namespace
 from random import Random
 import numpy as np
-import hashlib
 
 class Action:
     def __init__(self, name: str, loops: list[list[int]], two=False, prime=False):
@@ -148,28 +146,31 @@ class Environment:
         return int("".join([str(i) for i in self.state]),6)
 
     def reward(self):
+        if len(REWARDS) == 0:
+            print("ERROR")
         hash = self.hash()
         if hash in REWARDS:
             return REWARDS[hash]
         else:
             return 0
 
-# Calculate the rewards
-depth = 8
-discount = 0.8
-stack = [Environment()]
+def calculate_rewards():
+    # Calculate the rewards
+    depth = 8
+    discount = 0.8
+    stack = [Environment()]
 
-for i in range(depth):
-    print(f"Calculating rewards for depth {i}")
-    t_stack = stack.copy()
-    stack = []
-    for item in t_stack:
-        # compute hash of item
-        hash = item.hash()
-        if hash not in REWARDS:
-            REWARDS[hash] = 1 * (discount**i)
-            for action in ACTIONS:
-                env = item.copy()
-                env.apply_action(action)
-                stack.append(env)
-print(f"Calculated rewards for {len(REWARDS)} states")
+    for i in range(depth):
+        print(f"Calculating rewards for depth {i}")
+        t_stack = stack.copy()
+        stack = []
+        for item in t_stack:
+            # compute hash of item
+            hash = item.hash()
+            if hash not in REWARDS:
+                REWARDS[hash] = 1 * (discount**i)
+                for action in ACTIONS:
+                    env = item.copy()
+                    env.apply_action(action)
+                    stack.append(env)
+    print(f"Calculated rewards for {len(REWARDS)} states")
