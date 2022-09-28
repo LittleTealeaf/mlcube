@@ -119,29 +119,29 @@ class Agent:
 
 
 
-  def run_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40, learning_rate=0.1, gamma = 0.5):
-    "Run a cycle of training and evaluation"
+  # def run_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40, learning_rate=0.1, gamma = 0.5):
+  #   "Run a cycle of training and evaluation"
 
-    # This is what takes up most of the time
-    replay = self.create_replay_deprecated(replay_size=replay_size,epsilon=epsilon,moves_min=moves_min,moves_max=moves_max)
+  #   # This is what takes up most of the time
+  #   replay = self.create_replay_deprecated(replay_size=replay_size,epsilon=epsilon,moves_min=moves_min,moves_max=moves_max)
 
-    loss, gradient, t_rewards = self.train_replay_deprecated(replay,gamma=gamma)
+  #   loss, gradient, t_rewards = self.train_replay_deprecated(replay,gamma=gamma)
 
-    avg_reward = float(tf.math.reduce_mean(t_rewards).numpy())
+  #   avg_reward = float(tf.math.reduce_mean(t_rewards).numpy())
 
-    loss_avg = float(tf.math.reduce_mean(loss).numpy())
+  #   loss_avg = float(tf.math.reduce_mean(loss).numpy())
 
-    optimizer = SGD(learning_rate=learning_rate)
-    optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
+  #   optimizer = SGD(learning_rate=learning_rate)
+  #   optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
 
 
-    self.epochs.append({
-      'epoch': self.get_epoch(),
-      'loss': loss_avg,
-      'reward': avg_reward
-    })
+  #   self.epochs.append({
+  #     'epoch': self.get_epoch(),
+  #     'loss': loss_avg,
+  #     'reward': avg_reward
+  #   })
 
-    return loss_avg, loss_avg**0.5,avg_reward
+  #   return loss_avg, loss_avg**0.5,avg_reward
 
   # def run_multithread_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40,learning_rate=0.1,gamma=0.5,pool=Pool(1),rewards=None):
   #   with tf.GradientTape() as tape:
