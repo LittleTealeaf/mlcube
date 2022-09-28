@@ -154,9 +154,8 @@ class Environment:
         else:
             return 0
 
-def calculate_rewards():
+def calculate_rewards(depth = 8):
     # Calculate the rewards
-    depth = 8
     discount = 0.8
     stack = [Environment()]
 
@@ -174,3 +173,11 @@ def calculate_rewards():
                     env.apply_action(action)
                     stack.append(env)
     print(f"Calculated rewards for {len(REWARDS)} states")
+
+def create_scrambled_env(scramble_depth):
+    env = Environment()
+    env.scramble(scramble_depth)
+    return env
+
+def action_from_choice(choice):
+    return ACTIONS[choice[0]]

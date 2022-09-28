@@ -1,13 +1,34 @@
 import json
+import math
+from multiprocessing import Pool
 import os
+import time
 import tensorflow as tf
 import numpy as np
 from random import Random
 from keras.optimizers import SGD
+import functools
 
 from src.network import *
-from src.environment import Environment, ACTIONS
+from src.environment import REWARDS, Environment, ACTIONS, create_scrambled_env, action_from_choice
 
+def pool_apply_epsilon(args):
+  choice,epsilon = args
+  random = Random()
+  if random.random() < epsilon:
+    return choice
+  else:
+    return random.randint(0,17)
+
+def pool_apply_actions(args):
+  env, action = args
+  env.apply_action(action)
+  return env
+
+def pool_get_rewards(args):
+  env, rewards = args
+  hash = env.hash()
+  return rewards[hash] if hash in rewards else 0
 
 class Agent:
   def __init__(self, layer_sizes: list[int], directory: str):
@@ -63,15 +84,16 @@ class Agent:
 
 
     solved = env.is_complete()
+    final_reward = env.reward()
 
     self.evaluations.append({
       'epoch': self.get_epoch(),
-      'solved': solved,
       'moves': move_count,
-      'max_reward': max_reward
+      'max_reward': max_reward,
+      'final_reward': final_reward
     })
 
-    return (move_count, solved, max_reward)
+    return (move_count, solved, max_reward, final_reward)
 
   def get_epoch(self):
     "Get the current epoch"
@@ -166,6 +188,8 @@ class Agent:
 
   def run_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40, learning_rate=0.1, gamma = 0.5):
     "Run a cycle of training and evaluation"
+
+    # This is what takes up most of the time
     replay = self.create_replay(replay_size=replay_size,epsilon=epsilon,moves_min=moves_min,moves_max=moves_max)
 
     loss, gradient, t_rewards = self.train_replay(replay,gamma=gamma)
@@ -185,3 +209,52 @@ class Agent:
     })
 
     return loss_avg, loss_avg**0.5,avg_reward
+
+  def run_multithread_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40,learning_rate=0.1,gamma=0.5,pool=Pool(1),rewards=None):
+    with tf.GradientTape() as tape:
+      assert moves_max > moves_min
+
+      tape.watch(self.network.trainable_variables)
+
+      moves_diff = moves_max - moves_min
+      replay_scramble_depths = [i%moves_diff + moves_min for i in range(replay_size)]
+      replay_environments = pool.map(create_scrambled_env,replay_scramble_depths)
+      del replay_scramble_depths
+      state_1_observations = pool.map(Environment.to_observations,replay_environments)
+      tf_state_1 = tf.constant(np.array(state_1_observations),dtype=tf.float32)
+      tf_state_1_output = self.network.apply(tf_state_1)
+      tf_state_1_choices = tf.argmax(tf_state_1_output,2)
+      np_state_1_choices = tf_state_1_choices.numpy()
+      del tf_state_1_choices
+
+      cubes_per_random = math.ceil(1 / epsilon)
+      random = Random()
+      for i in range(0,replay_size,cubes_per_random):
+        np_state_1_choices[i] = [random.randint(0,17)]
+
+      actions = pool.map(action_from_choice,np_state_1_choices)
+      action_pairs = [(replay_environments[i],actions[i]) for i in range(replay_size)]
+      replay_environments = pool.map(pool_apply_actions,action_pairs)
+      state_2_observations = pool.map(Environment.to_observations,replay_environments)
+
+      rewards = pool.map(pool_get_rewards,[(i,REWARDS) for i in replay_environments])
+
+      del replay_environments
+
+      tf_rewards = tf.constant(np.array(rewards),dtype=tf.float32)
+      del rewards
+
+      tf_state_2 = tf.constant(np.array(state_2_observations),dtype=tf.float32)
+      tf_state_2_output = self.target.apply(tf_state_2)
+
+
+# https://czxttkl.com/2015/09/28/python-multiprocessing-map-function-with-shared-memory-object-as-additional-parameter/
+
+
+
+
+
+      # replay_environments = pool.map(create_scrambled_env,replay_scramble_depths)
+      # tf_state_1 = tf.constant(np.array(replay_environments),dtype=tf.float32)
+      # tf_state_1_output = self.network.apply(tf_state_1)
+      # tf_state_1_choice = tf.argmax(tf_state_1_output,2)
