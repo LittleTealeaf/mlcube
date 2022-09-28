@@ -123,7 +123,7 @@ class Environment:
           return False
       return True
 
-    def to_observations(self):
+    def to_observations_deprecated(self):
 
 
       # I think this works
@@ -132,6 +132,12 @@ class Environment:
           create_observation_set(i) for i in self.state
         ] for value in position
       ]]
+
+    def to_observations(self):
+        array = np.zeros((1,9 * 6 * 6),dtype=np.float32)
+        for i in range(9 * 6):
+            array[0][i * 6 + self.state[i]] = 1
+        return array
 
     def scramble(self,count: int = 100):
         random = Random()

@@ -9,7 +9,7 @@ def test_proper_layers():
 
 def test_applies_to_environment():
   env = Environment()
-  env_observations = env.to_observations()
+  env_observations = env.to_observations_deprecated()
   env_tensor = tf.constant(env_observations, dtype=tf.float32)
   network = Network([10,10])
 
