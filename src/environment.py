@@ -93,6 +93,12 @@ ACTIONS = [
 
 REWARDS = {}
 
+def create_observation_set(i):
+    val = [0] * 6
+    val[i] = 1
+    return val
+
+
 class Environment:
     def __init__(self, observations: list[list[int]] = None):
         if observations:
@@ -119,15 +125,11 @@ class Environment:
 
     def to_observations(self):
 
-      def create_set(i):
-        val = [0] * 6
-        val[i] = 1
-        return val
 
       # I think this works
       return [[
         value for position in [
-          create_set(i) for i in self.state
+          create_observation_set(i) for i in self.state
         ] for value in position
       ]]
 
@@ -154,6 +156,7 @@ class Environment:
         else:
             return 0
 
+# Deprecating
 def calculate_rewards(depth = 8):
     # Calculate the rewards
     discount = 0.8
@@ -174,10 +177,12 @@ def calculate_rewards(depth = 8):
                     stack.append(env)
     print(f"Calculated rewards for {len(REWARDS)} states")
 
+# Deprecating
 def create_scrambled_env(scramble_depth):
     env = Environment()
     env.scramble(scramble_depth)
     return env
 
+# Deprecating
 def action_from_choice(choice):
     return ACTIONS[choice[0]]

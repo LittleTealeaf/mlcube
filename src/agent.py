@@ -210,42 +210,42 @@ class Agent:
 
     return loss_avg, loss_avg**0.5,avg_reward
 
-  def run_multithread_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40,learning_rate=0.1,gamma=0.5,pool=Pool(1),rewards=None):
-    with tf.GradientTape() as tape:
-      assert moves_max > moves_min
+  # def run_multithread_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40,learning_rate=0.1,gamma=0.5,pool=Pool(1),rewards=None):
+  #   with tf.GradientTape() as tape:
+  #     assert moves_max > moves_min
 
-      tape.watch(self.network.trainable_variables)
+  #     tape.watch(self.network.trainable_variables)
 
-      moves_diff = moves_max - moves_min
-      replay_scramble_depths = [i%moves_diff + moves_min for i in range(replay_size)]
-      replay_environments = pool.map(create_scrambled_env,replay_scramble_depths)
-      del replay_scramble_depths
-      state_1_observations = pool.map(Environment.to_observations,replay_environments)
-      tf_state_1 = tf.constant(np.array(state_1_observations),dtype=tf.float32)
-      tf_state_1_output = self.network.apply(tf_state_1)
-      tf_state_1_choices = tf.argmax(tf_state_1_output,2)
-      np_state_1_choices = tf_state_1_choices.numpy()
-      del tf_state_1_choices
+  #     moves_diff = moves_max - moves_min
+  #     replay_scramble_depths = [i%moves_diff + moves_min for i in range(replay_size)]
+  #     replay_environments = pool.map(create_scrambled_env,replay_scramble_depths)
+  #     del replay_scramble_depths
+  #     state_1_observations = pool.map(Environment.to_observations,replay_environments)
+  #     tf_state_1 = tf.constant(np.array(state_1_observations),dtype=tf.float32)
+  #     tf_state_1_output = self.network.apply(tf_state_1)
+  #     tf_state_1_choices = tf.argmax(tf_state_1_output,2)
+  #     np_state_1_choices = tf_state_1_choices.numpy()
+  #     del tf_state_1_choices
 
-      cubes_per_random = math.ceil(1 / epsilon)
-      random = Random()
-      for i in range(0,replay_size,cubes_per_random):
-        np_state_1_choices[i] = [random.randint(0,17)]
+  #     cubes_per_random = math.ceil(1 / epsilon)
+  #     random = Random()
+  #     for i in range(0,replay_size,cubes_per_random):
+  #       np_state_1_choices[i] = [random.randint(0,17)]
 
-      actions = pool.map(action_from_choice,np_state_1_choices)
-      action_pairs = [(replay_environments[i],actions[i]) for i in range(replay_size)]
-      replay_environments = pool.map(pool_apply_actions,action_pairs)
-      state_2_observations = pool.map(Environment.to_observations,replay_environments)
+  #     actions = pool.map(action_from_choice,np_state_1_choices)
+  #     action_pairs = [(replay_environments[i],actions[i]) for i in range(replay_size)]
+  #     replay_environments = pool.map(pool_apply_actions,action_pairs)
+  #     state_2_observations = pool.map(Environment.to_observations,replay_environments)
 
-      rewards = pool.map(pool_get_rewards,[(i,REWARDS) for i in replay_environments])
+  #     rewards = pool.map(pool_get_rewards,[(i,REWARDS) for i in replay_environments])
 
-      del replay_environments
+  #     del replay_environments
 
-      tf_rewards = tf.constant(np.array(rewards),dtype=tf.float32)
-      del rewards
+  #     tf_rewards = tf.constant(np.array(rewards),dtype=tf.float32)
+  #     del rewards
 
-      tf_state_2 = tf.constant(np.array(state_2_observations),dtype=tf.float32)
-      tf_state_2_output = self.target.apply(tf_state_2)
+  #     tf_state_2 = tf.constant(np.array(state_2_observations),dtype=tf.float32)
+  #     tf_state_2_output = self.target.apply(tf_state_2)
 
 
 # https://czxttkl.com/2015/09/28/python-multiprocessing-map-function-with-shared-memory-object-as-additional-parameter/
