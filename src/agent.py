@@ -99,35 +99,6 @@ class Agent:
     "Get the current epoch"
     return len(self.epochs)
 
-  # def create_replay_deprecated(self,replay_size=1_000,epsilon=0.2,moves_min=1,moves_max=40, pool = None):
-  #   "Create a replay of random moves"
-
-  #   state_1 = np.zeros(shape=(replay_size,1,9*6*6),dtype=np.float32)
-  #   choice = np.zeros(shape=(replay_size,1,1),dtype=np.float32)
-  #   state_2 = np.zeros(shape=(replay_size,1,9*6*6),dtype=np.float32)
-  #   rewards = np.zeros(shape=(replay_size,1,1),dtype=np.float32)
-
-  #   random = Random()
-  #   entries_per_move = int(replay_size / (moves_max - moves_min)) + 1
-  #   cubes = [Environment() for _ in range(entries_per_move)]
-  #   for _ in range(moves_min):
-  #     for cube in cubes:
-  #       cube.apply_action(random.choice(ACTIONS))
-  #   for i in range(replay_size):
-  #     cube = cubes[i%len(cubes)]
-  #     state_1[i] = cube.to_observations_deprecated()
-  #     value = self.network.apply(tf.constant(state_1[i],dtype=tf.float32))
-  #     choice[i] = tf.argmax(value,axis=1).numpy() if random.random() >= epsilon else [random.randint(0,17)]
-  #     cube.apply_action(ACTIONS[int(choice[i][0])])
-  #     state_2[i] = cube.to_observations_deprecated()
-  #     cube.apply_action(random.choice(ACTIONS))
-  #     rewards[i] = cube.reward()
-
-
-  #   return (state_1,choice,state_2,rewards)
-
-
-
   def save(self):
     "Save the network and target to disk"
     serialized_network = self.network.serialize()
@@ -146,45 +117,7 @@ class Agent:
     "Update the target network to match the current network"
     self.target = self.network.copy()
 
-  # def train_replay_deprecated(self,replay: tuple[(np.ndarray,np.ndarray,np.ndarray,np.ndarray)], gamma = 0.5):
-  #   "Replay must be a tensor slice dataset"
-  #   state_1, choice, state_2, rewards = replay
 
-  #   assert gamma >= 0 and gamma <= 1
-
-  #   with tf.GradientTape() as tape:
-
-  #     tape.watch(self.network.trainable_variables)
-
-  #     t_state_1 = tf.constant(state_1,dtype=tf.float32)
-  #     t_choice = tf.constant(choice,dtype=tf.int64)
-  #     t_state_2 = tf.constant(state_2,dtype=tf.float32)
-  #     t_rewards = tf.constant(rewards,dtype=tf.float32)
-
-  #     t_state_1_output = self.network.apply(t_state_1)
-  #     t_state_1_choice_q = tf.gather(t_state_1_output,t_choice,batch_dims=2)
-
-  #     t_state_2_output = self.target.apply(t_state_2)
-  #     t_state_2_choices = tf.argmax(t_state_2_output,2)
-  #     t_state_2_choices_q = tf.gather(t_state_2_output,t_state_2_choices,batch_dims=2)
-
-  #     t_state_2_choices_q_scaled = tf.multiply(t_state_2_choices_q, gamma)
-
-  #     t_rewards = tf.reshape(t_rewards, (t_rewards.shape[0],1))
-
-  #     t_rewards_scaled = tf.multiply(t_rewards,1 - gamma)
-
-  #     t_target_q = tf.add(t_state_2_choices_q_scaled, t_rewards_scaled)
-
-  #     t_predicted_q = tf.reshape(t_state_1_choice_q,(t_state_1_choice_q.shape[0],1))
-
-  #     t_abs_loss = tf.subtract(t_target_q,t_predicted_q)
-
-  #     t_loss = tf.square(t_abs_loss)
-
-  #     gradient = tape.gradient(t_loss,self.network.trainable_variables)
-
-  #     return t_loss, gradient, t_rewards
 
   def run_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40, learning_rate=0.1, gamma = 0.5):
     "Run a cycle of training and evaluation"
@@ -258,3 +191,72 @@ class Agent:
       # tf_state_1 = tf.constant(np.array(replay_environments),dtype=tf.float32)
       # tf_state_1_output = self.network.apply(tf_state_1)
       # tf_state_1_choice = tf.argmax(tf_state_1_output,2)
+
+
+  # def create_replay_deprecated(self,replay_size=1_000,epsilon=0.2,moves_min=1,moves_max=40, pool = None):
+  #   "Create a replay of random moves"
+
+  #   state_1 = np.zeros(shape=(replay_size,1,9*6*6),dtype=np.float32)
+  #   choice = np.zeros(shape=(replay_size,1,1),dtype=np.float32)
+  #   state_2 = np.zeros(shape=(replay_size,1,9*6*6),dtype=np.float32)
+  #   rewards = np.zeros(shape=(replay_size,1,1),dtype=np.float32)
+
+  #   random = Random()
+  #   entries_per_move = int(replay_size / (moves_max - moves_min)) + 1
+  #   cubes = [Environment() for _ in range(entries_per_move)]
+  #   for _ in range(moves_min):
+  #     for cube in cubes:
+  #       cube.apply_action(random.choice(ACTIONS))
+  #   for i in range(replay_size):
+  #     cube = cubes[i%len(cubes)]
+  #     state_1[i] = cube.to_observations_deprecated()
+  #     value = self.network.apply(tf.constant(state_1[i],dtype=tf.float32))
+  #     choice[i] = tf.argmax(value,axis=1).numpy() if random.random() >= epsilon else [random.randint(0,17)]
+  #     cube.apply_action(ACTIONS[int(choice[i][0])])
+  #     state_2[i] = cube.to_observations_deprecated()
+  #     cube.apply_action(random.choice(ACTIONS))
+  #     rewards[i] = cube.reward()
+
+
+  #   return (state_1,choice,state_2,rewards)
+
+
+  # def train_replay_deprecated(self,replay: tuple[(np.ndarray,np.ndarray,np.ndarray,np.ndarray)], gamma = 0.5):
+  #   "Replay must be a tensor slice dataset"
+  #   state_1, choice, state_2, rewards = replay
+
+  #   assert gamma >= 0 and gamma <= 1
+
+  #   with tf.GradientTape() as tape:
+
+  #     tape.watch(self.network.trainable_variables)
+
+  #     t_state_1 = tf.constant(state_1,dtype=tf.float32)
+  #     t_choice = tf.constant(choice,dtype=tf.int64)
+  #     t_state_2 = tf.constant(state_2,dtype=tf.float32)
+  #     t_rewards = tf.constant(rewards,dtype=tf.float32)
+
+  #     t_state_1_output = self.network.apply(t_state_1)
+  #     t_state_1_choice_q = tf.gather(t_state_1_output,t_choice,batch_dims=2)
+
+  #     t_state_2_output = self.target.apply(t_state_2)
+  #     t_state_2_choices = tf.argmax(t_state_2_output,2)
+  #     t_state_2_choices_q = tf.gather(t_state_2_output,t_state_2_choices,batch_dims=2)
+
+  #     t_state_2_choices_q_scaled = tf.multiply(t_state_2_choices_q, gamma)
+
+  #     t_rewards = tf.reshape(t_rewards, (t_rewards.shape[0],1))
+
+  #     t_rewards_scaled = tf.multiply(t_rewards,1 - gamma)
+
+  #     t_target_q = tf.add(t_state_2_choices_q_scaled, t_rewards_scaled)
+
+  #     t_predicted_q = tf.reshape(t_state_1_choice_q,(t_state_1_choice_q.shape[0],1))
+
+  #     t_abs_loss = tf.subtract(t_target_q,t_predicted_q)
+
+  #     t_loss = tf.square(t_abs_loss)
+
+  #     gradient = tape.gradient(t_loss,self.network.trainable_variables)
+
+  #     return t_loss, gradient, t_rewards
