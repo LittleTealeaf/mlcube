@@ -1,3 +1,6 @@
+import functools
+from multiprocessing import Manager, Pool, pool
+from multiprocessing.managers import DictProxy, ListProxy
 from random import Random
 import numpy as np
 
@@ -13,6 +16,12 @@ class Action:
           self.matrix[loop[-1]] = initial
 
         del initial
+
+        if two:
+            self.matrix = self.matrix @ self.matrix
+
+        if prime:
+            self.matrix = self.matrix @ self.matrix @ self.matrix
 
     def apply(self,state):
       return state @ self.matrix
@@ -93,10 +102,10 @@ ACTIONS = [
 
 REWARDS = {}
 
-def create_observation_set(i):
-    val = [0] * 6
-    val[i] = 1
-    return val
+# def create_observation_set(i):
+#     val = [0] * 6
+#     val[i] = 1
+#     return val
 
 
 class Environment:
@@ -123,15 +132,15 @@ class Environment:
           return False
       return True
 
-    def to_observations_deprecated(self):
+    # def to_observations_deprecated(self):
 
 
-      # I think this works
-      return [[
-        value for position in [
-          create_observation_set(i) for i in self.state
-        ] for value in position
-      ]]
+    #   # I think this works
+    #   return [[
+    #     value for position in [
+    #       create_observation_set(i) for i in self.state
+    #     ] for value in position
+    #   ]]
 
     def to_observations(self):
         array = np.zeros((1,9 * 6 * 6),dtype=np.float32)
@@ -153,42 +162,74 @@ class Environment:
     def hash(self):
         return int("".join([str(i) for i in self.state]),6)
 
-    def reward(self):
-        if len(REWARDS) == 0:
+    def reward(self, rewards={}):
+        if len(rewards) == 0:
             print("ERROR")
         hash = self.hash()
-        if hash in REWARDS:
-            return REWARDS[hash]
+        if hash in rewards:
+            return rewards[hash]
         else:
             return 0
 
-# Deprecating
-def calculate_rewards(depth = 8):
-    # Calculate the rewards
-    discount = 0.8
-    stack = [Environment()]
+# def iter_calculate_reward(env: Environment,rewards: DictProxy, buffer: ListProxy, reward=1):
+#     hash = env.hash()
+#     if not rewards.get(hash):
+#         rewards.update({hash: reward})
+#         for action in ACTIONS:
+#             buffer.append(env.copy().apply_action(action))
 
+
+
+def calculate_rewards(depth=8,decay=0.8):
+    rewards = {}
+    buffer = [Environment()]
     for i in range(depth):
-        print(f"Calculating rewards for depth {i}")
-        t_stack = stack.copy()
-        stack = []
-        for item in t_stack:
-            # compute hash of item
-            hash = item.hash()
-            if hash not in REWARDS:
-                REWARDS[hash] = 1 * (discount**i)
-                for action in ACTIONS:
-                    env = item.copy()
-                    env.apply_action(action)
-                    stack.append(env)
-    print(f"Calculated rewards for {len(REWARDS)} states")
+        print(f"Calculating depth {i} with length {len(buffer)}")
+        tmp_buffer = []
+        for env in buffer:
+            hash = env.hash()
+            if hash not in rewards:
+                rewards[hash] = decay ** i
+                if i < depth - 1:
+                    for action in ACTIONS:
+                        tmp_buffer.append(env.copy().apply_action(action))
+        buffer = tmp_buffer
+    return rewards
 
-# Deprecating
-def create_scrambled_env(scramble_depth):
+def create_scrambled_environment(depth):
     env = Environment()
-    env.scramble(scramble_depth)
+    env.scramble(depth)
     return env
 
-# Deprecating
-def action_from_choice(choice):
-    return ACTIONS[choice[0]]
+ACTION_COUNT = len(ACTIONS)
+
+# # Deprecating
+# def calculate_rewards(depth = 8):
+#     # Calculate the rewards
+#     discount = 0.8
+#     stack = [Environment()]
+
+#     for i in range(depth):
+#         print(f"Calculating rewards for depth {i}")
+#         t_stack = stack.copy()
+#         stack = []
+#         for item in t_stack:
+#             # compute hash of item
+#             hash = item.hash()
+#             if hash not in REWARDS:
+#                 REWARDS[hash] = 1 * (discount**i)
+#                 for action in ACTIONS:
+#                     env = item.copy()
+#                     env.apply_action(action)
+#                     stack.append(env)
+#     print(f"Calculated rewards for {len(REWARDS)} states")
+
+# # Deprecating
+# def create_scrambled_env(scramble_depth):
+#     env = Environment()
+#     env.scramble(scramble_depth)
+#     return env
+
+# # Deprecating
+# def action_from_choice(choice):
+#     return ACTIONS[choice[0]]
