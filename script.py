@@ -1,4 +1,5 @@
 from src import *
+from multiprocessing import Manager
 import os
 
 def exponential_decay(initial, index, decay_rate, decay_interval =  1):
@@ -14,7 +15,8 @@ if __name__ == "__main__":
 
     REWARDS = calculate_rewards(depth=5,decay=0.9)
 
-    agent = Agent([264, 202, 141, 80],"agents/A-1")
+    agent = Agent([264, 202, 141, 80],"agents/A-2")
+
 
     # 4 - 500 INTERVAL
     # 5 - 30 INTERVAL
@@ -28,18 +30,14 @@ if __name__ == "__main__":
 
     while not os.path.exists("./stop"):
       epoch = agent.get_epoch()
+      # learning_rate = exponential_decay(exponential_decay(1,epoch%target_interval,0.99),epoch,0.94,target_interval)
+      # epsilon = exponential_decay(1,epoch%target_interval,0.99)
+      # gamma = exponential_decay(linear_trend(0,target_interval,1,0,epoch%target_interval),epoch,0.995,target_interval)
 
-      # learning_rate = exponential_decay(exponential_decay(1,epoch,0.9,target_interval),epoch%target_interval,0.99)
-      # learning_rate = exponential_decay(exponential_decay(1,epoch%target_interval,0.98,1),epoch,0.98,target_interval)
-      # epsilon = exponential_decay(1,epoch,0.9,target_interval)
-      learning_rate = exponential_decay(exponential_decay(1,epoch%target_interval,0.99),epoch,0.94,target_interval)
-      # epsilon = exponential_decay(1,epoch,0.95,target_interval)
-      # epsilon = linear_trend(0,target_interval,1,0,epoch%target_interval)
-      epsilon = exponential_decay(1,epoch%target_interval,0.99)
-      # gamma = 1 - (exponential_decay(exponential_decay(1,epoch,0.99,target_interval),epoch%target_interval,0.995,1) * max_gamma + (1 - max_gamma))
-      gamma = exponential_decay(linear_trend(0,target_interval,1,0,epoch%target_interval),epoch,0.9,target_interval)
+      learning_rate = exponential_decay(1,epoch,0.99,target_interval)
+      epsilon = exponential_decay(1,epoch,0.99,target_interval)
+      gamma = linear_trend(0,target_interval,1,0,epoch%target_interval)
       gamma = 1 - (gamma * max_gamma + (1 - max_gamma))
-      gamma = 0.8
 
       outputs = agent.run_cycle(
         pool=pool,

@@ -1,6 +1,3 @@
-import functools
-from multiprocessing import Manager, Pool, pool
-from multiprocessing.managers import DictProxy, ListProxy
 from random import Random
 import numpy as np
 
@@ -133,8 +130,6 @@ class Environment:
       return True
 
     # def to_observations_deprecated(self):
-
-
     #   # I think this works
     #   return [[
     #     value for position in [
@@ -162,13 +157,13 @@ class Environment:
     def hash(self):
         return int("".join([str(i) for i in self.state]),6)
 
-    def reward(self, rewards={}):
+    def reward(self, rewards):
         if len(rewards) == 0:
             print("ERROR")
         hash = self.hash()
-        if hash in rewards:
+        try:
             return rewards[hash]
-        else:
+        except KeyError:
             return 0
 
 # def iter_calculate_reward(env: Environment,rewards: DictProxy, buffer: ListProxy, reward=1):
