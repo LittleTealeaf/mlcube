@@ -56,7 +56,7 @@ class Agent:
 
         count = 0
         reward_max = env.reward(rewards)
-        moves = {}
+        moves = []
         visited_states: list[int] = []
 
         while (not env.is_complete()) and count < max_moves and env.hash() not in visited_states:
@@ -70,10 +70,11 @@ class Agent:
             move = ACTIONS[move_index]
             env.apply_action(move)
 
-            if move.name not in moves:
-                moves[move.name] = 1
-            else:
-                moves[move.name] = moves[move.name] + 1
+            moves.append(move.name)
+            # if move.name not in moves:
+            #     moves[move.name] = 1
+            # else:
+            #     moves[move.name] = moves[move.name] + 1
 
             reward_max = max(reward_max,env.reward(rewards))
 
@@ -177,16 +178,16 @@ class Agent:
             del ls_observations_2
 
             # Get Rewards
-            ls_rewards = pool.starmap(pool_get_rewards,[
-                (i,rewards) for i in ls_state_2
-            ])
+            np_rewards = np.zeros((replay_size))
+            for i in range(0,replay_size):
+                np_rewards[i] = ls_state_2[i].reward(rewards)
 
             del ls_state_2
 
             # Get the max of the output of state_2
             tf_output_2_max = tf.reduce_max(tf_output_2, 2)
 
-            tf_rewards = tf.reshape(tf.constant(np.array(ls_rewards),dtype=tf.float32),[replay_size,1])
+            tf_rewards = tf.reshape(tf.constant(np_rewards,dtype=tf.float32),[replay_size,1])
 
             tf_output_2_max_scaled = tf.multiply(tf_output_2_max,tf.constant(gamma,dtype=tf.float32))
 

@@ -2,6 +2,10 @@ from src import *
 from multiprocessing import Manager
 import os
 
+# THOUGHTS
+# - Switch to a legitimate reinforced method that builds a replay that it trains on (from a single solved cube). -> this may fix the whole "repeating the same move" over and over because it's training on what it actually ends up doing (well, also epsilon but start epsilon at 0.75 and it'll be significant towards completion)
+# I need to look up how it ends up building the replay
+
 def exponential_decay(initial, index, decay_rate, decay_interval =  1):
     return initial * (decay_rate ** (index // decay_interval))
 
@@ -13,18 +17,17 @@ if __name__ == "__main__":
   with Pool(24) as pool:
     thread_manager = Manager()
 
-    REWARDS = calculate_rewards(depth=5,decay=0.9)
+    REWARDS = calculate_rewards(depth=6,decay=0.9,max_count=1_000_000)
 
-    agent = Agent([264, 202, 141, 80],"agents/A-2")
-
+    agent = Agent([264, 202, 141, 80],"agents/B-4")
 
     # 4 - 500 INTERVAL
     # 5 - 30 INTERVAL
 
-    target_interval = 500
-    eval_interval = 5
+    target_interval = 1000
+    eval_interval = 7
     save_interval = 10
-    max_gamma = 0.8
+    # max_gamma = 0.8
 
     random = Random()
 
@@ -34,19 +37,19 @@ if __name__ == "__main__":
       # epsilon = exponential_decay(1,epoch%target_interval,0.99)
       # gamma = exponential_decay(linear_trend(0,target_interval,1,0,epoch%target_interval),epoch,0.995,target_interval)
 
-      learning_rate = exponential_decay(1,epoch,0.99,target_interval)
-      epsilon = exponential_decay(1,epoch,0.99,target_interval)
-      gamma = linear_trend(0,target_interval,1,0,epoch%target_interval)
-      gamma = 1 - (gamma * max_gamma + (1 - max_gamma))
+      learning_rate = max(exponential_decay(0.1,epoch,0.9,target_interval),1e-6)
+      epsilon = max(exponential_decay(0.75,epoch,0.9,target_interval),0.01)
+      # gamma = linear_trend(0,target_interval,1,0,epoch%target_interval)
+      # gamma = 1 - (gamma * max_gamma + (1 - max_gamma))
 
       outputs = agent.run_cycle(
         pool=pool,
-        replay_size=10_000,
+        replay_size=10_001,
         epsilon=epsilon,
         learning_rate=learning_rate,
-        moves_min=1,
-        moves_max=30,
-        gamma=gamma,
+        moves_min=0,
+        moves_max=20,
+        gamma=0.9,
         rewards=REWARDS,
         random=random
       )
@@ -65,24 +68,3 @@ if __name__ == "__main__":
         agent.save()
 
     os.remove("./stop")
-
-
-
-    # # get the current time
-    # for i in range(100):
-    #   start_time = time.time()
-    #   mean_loss = agent.run_cycle(
-    #     pool=pool,
-    #     replay_size=10_000,
-    #     learning_rate=0.1,
-    #     moves_min=1,
-    #     moves_max=50,
-    #     epsilon=0.2,
-    #     gamma=0.5,
-    #     rewards=REWARDS
-    #   )
-    #   # get the end time
-    #   end_time = time.time()
-
-    #   # print the time taken
-    #   print(f"Runtime of the program is {end_time - start_time} with loss {mean_loss}")
