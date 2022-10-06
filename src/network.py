@@ -7,8 +7,8 @@ LAYER_SIZE_OUTPUT = 18
 
 
 class Network:
-    def __init__(self, layer_sizes: list[int], serialized=None, layers=None):
-        self.layer_sizes = layer_sizes + [LAYER_SIZE_OUTPUT]
+    def __init__(self, layer_sizes: list[int], serialized=None, layers=None, output_size=18):
+        self.layer_sizes = layer_sizes + [output_size]
         self.trainable_variables = []
         self.layers = []
 
@@ -54,10 +54,12 @@ class Network:
     def apply(self, input):
         "Input must be in the form of a tf constant"
         x = input
-        for W, b in self.layers:
-            x = tf.matmul(x, W)
-            x = tf.add(x, b)
-            x = sigmoid(x)
+        for i in range(len(self.layers)):
+            W,b = self.layers[i]
+            x = tf.matmul(x,W)
+            x = tf.add(x,b)
+            if i < len(self.layers) - 1:
+                x = sigmoid(x)
         return x
 
     def copy(self):

@@ -39,14 +39,14 @@ class Agent:
                 network_data = tf.io.read_file(os.path.join(directory, "network"))
                 target_data = tf.io.read_file(os.path.join(directory, "target"))
 
-                self.network = Network(layer_sizes, serialized=network_data)
-                self.target = Network(layer_sizes, serialized=target_data)
+                self.network = Network(layer_sizes, serialized=network_data,output_size=ACTION_COUNT)
+                self.target = Network(layer_sizes, serialized=target_data,output_size=ACTION_COUNT)
 
             except Exception as e:
                 print(f"Tried opening and failed: {str(e)}")
 
         if not self.network:
-            self.network = Network(layer_sizes)
+            self.network = Network(layer_sizes,output_size=ACTION_COUNT)
             self.update_target()
 
     def evaluate_network(self, max_moves=750, scramble_depth=100, rewards = {}, random = Random()):
