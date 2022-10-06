@@ -166,14 +166,6 @@ class Environment:
         except KeyError:
             return 0
 
-# def iter_calculate_reward(env: Environment,rewards: DictProxy, buffer: ListProxy, reward=1):
-#     hash = env.hash()
-#     if not rewards.get(hash):
-#         rewards.update({hash: reward})
-#         for action in ACTIONS:
-#             buffer.append(env.copy().apply_action(action))
-
-
 
 def calculate_rewards(depth=8,decay=0.8):
     rewards = {}
@@ -197,34 +189,3 @@ def create_scrambled_environment(depth):
     return env
 
 ACTION_COUNT = len(ACTIONS)
-
-# # Deprecating
-# def calculate_rewards(depth = 8):
-#     # Calculate the rewards
-#     discount = 0.8
-#     stack = [Environment()]
-
-#     for i in range(depth):
-#         print(f"Calculating rewards for depth {i}")
-#         t_stack = stack.copy()
-#         stack = []
-#         for item in t_stack:
-#             # compute hash of item
-#             hash = item.hash()
-#             if hash not in REWARDS:
-#                 REWARDS[hash] = 1 * (discount**i)
-#                 for action in ACTIONS:
-#                     env = item.copy()
-#                     env.apply_action(action)
-#                     stack.append(env)
-#     print(f"Calculated rewards for {len(REWARDS)} states")
-
-# # Deprecating
-# def create_scrambled_env(scramble_depth):
-#     env = Environment()
-#     env.scramble(scramble_depth)
-#     return env
-
-# # Deprecating
-# def action_from_choice(choice):
-#     return ACTIONS[choice[0]]

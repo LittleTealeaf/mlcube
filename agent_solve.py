@@ -1,7 +1,7 @@
 from src import *
 import tensorflow as tf
 
-agent = Agent([264, 202, 141, 80],"agents/1")
+agent = _Agent([264, 202, 141, 80],"agents/1")
 
 env = Environment()
 

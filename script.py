@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     REWARDS = calculate_rewards(depth=5,decay=0.9)
 
-    agent = Agent([264, 202, 141, 80],"agents/A-2")
+    agent = Agent_([264, 202, 141, 80],"agents/A-2")
 
 
     # 4 - 500 INTERVAL
@@ -65,24 +65,3 @@ if __name__ == "__main__":
         agent.save()
 
     os.remove("./stop")
-
-
-
-    # # get the current time
-    # for i in range(100):
-    #   start_time = time.time()
-    #   mean_loss = agent.run_cycle(
-    #     pool=pool,
-    #     replay_size=10_000,
-    #     learning_rate=0.1,
-    #     moves_min=1,
-    #     moves_max=50,
-    #     epsilon=0.2,
-    #     gamma=0.5,
-    #     rewards=REWARDS
-    #   )
-    #   # get the end time
-    #   end_time = time.time()
-
-    #   # print the time taken
-    #   print(f"Runtime of the program is {end_time - start_time} with loss {mean_loss}")

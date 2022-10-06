@@ -6,6 +6,11 @@ import tensorflow as tf
 import numpy as np
 from random import Random
 
+from keras import Sequential, Model
+from keras.layers import Dense
+from keras.activations import relu
+from keras.initializers.initializers_v2 import VarianceScaling
+
 from src.network import *
 from src.environment import ACTION_COUNT, REWARDS, Environment, ACTIONS, create_scrambled_environment
 
@@ -14,8 +19,44 @@ def pool_get_rewards(env,rewards: dict):
     hash = env.hash()
     return rewards.get(hash,0)
 
+def create_dense_layer(layer_size):
+    return Dense(
+        layer_size,activation= relu,kernel_initializer=VarianceScaling(
+            scale=2.0,
+            mode='fan_in',
+            distribution='truncated_normal'
+        )
+    )
 
 class Agent:
+    def __init__(self,layer_sizes: list[int], directory: str):
+        "Create a new agent, or load if it exists in the directory"
+        self.directory: str = directory
+        self.network: Model = None
+        self.target: Model = None
+        self.layer_sizes = layer_sizes
+
+        self.evaluations = []
+        self.log = []
+
+
+        # load network and target
+
+        if not self.network:
+            self.network = Sequential(
+                [create_dense_layer(size) for size in layer_sizes] + [
+                    Dense(
+                        ACTION_COUNT,
+                        activation=None,
+                        kernel_initializer=tf.keras.initializers.RandomUniform(
+                            minval=-0.03, maxval=0.03),
+                        bias_initializer=tf.keras.initializers.Constant(-0.2)
+                    )
+                ]
+            )
+
+
+class Agent_:
     def __init__(self, layer_sizes: list[int], directory: str):
         "Create a new agent"
         self.directory = directory
@@ -215,73 +256,3 @@ class Agent:
             self.epochs.append(output)
 
             return output
-
-
-
-
-
-
-
-
-
-
-
-    # def run_cycle(self,replay_size=1000,epsilon=0.2,moves_min=1,moves_max=40, learning_rate=0.1, gamma = 0.5):
-    #   "Run a cycle of training and evaluation"
-
-    #   # This is what takes up most of the time
-    #   replay = self.create_replay_deprecated(replay_size=replay_size,epsilon=epsilon,moves_min=moves_min,moves_max=moves_max)
-
-    #   loss, gradient, t_rewards = self.train_replay_deprecated(replay,gamma=gamma)
-
-    #   avg_reward = float(tf.math.reduce_mean(t_rewards).numpy())
-
-    #   loss_avg = float(tf.math.reduce_mean(loss).numpy())
-
-    #   optimizer = SGD(learning_rate=learning_rate)
-    #   optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
-
-    #   self.epochs.append({
-    #     'epoch': self.get_epoch(),
-    #     'loss': loss_avg,
-    #     'reward': avg_reward
-    #   })
-
-    #   return loss_avg, loss_avg**0.5,avg_reward
-
-
-# https://czxttkl.com/2015/09/28/python-multiprocessing-map-function-with-shared-memory-object-as-additional-parameter/
-
-
-# replay_environments = pool.map(create_scrambled_env,replay_scramble_depths)
-# tf_state_1 = tf.constant(np.array(replay_environments),dtype=tf.float32)
-# tf_state_1_output = self.network.apply(tf_state_1)
-# tf_state_1_choice = tf.argmax(tf_state_1_output,2)
-
-
-# def create_replay_deprecated(self,replay_size=1_000,epsilon=0.2,moves_min=1,moves_max=40, pool = None):
-#   "Create a replay of random moves"
-
-#   state_1 = np.zeros(shape=(replay_size,1,9*6*6),dtype=np.float32)
-#   choice = np.zeros(shape=(replay_size,1,1),dtype=np.float32)
-#   state_2 = np.zeros(shape=(replay_size,1,9*6*6),dtype=np.float32)
-#   rewards = np.zeros(shape=(replay_size,1,1),dtype=np.float32)
-
-#   random = Random()
-#   entries_per_move = int(replay_size / (moves_max - moves_min)) + 1
-#   cubes = [Environment() for _ in range(entries_per_move)]
-#   for _ in range(moves_min):
-#     for cube in cubes:
-#       cube.apply_action(random.choice(ACTIONS))
-#   for i in range(replay_size):
-#     cube = cubes[i%len(cubes)]
-#     state_1[i] = cube.to_observations_deprecated()
-#     value = self.network.apply(tf.constant(state_1[i],dtype=tf.float32))
-#     choice[i] = tf.argmax(value,axis=1).numpy() if random.random() >= epsilon else [random.randint(0,17)]
-#     cube.apply_action(ACTIONS[int(choice[i][0])])
-#     state_2[i] = cube.to_observations_deprecated()
-#     cube.apply_action(random.choice(ACTIONS))
-#     rewards[i] = cube.reward()
-
-
-#   return (state_1,choice,state_2,rewards)
