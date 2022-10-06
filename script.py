@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # 4 - 500 INTERVAL
     # 5 - 30 INTERVAL
 
-    target_interval = 1000
+    target_interval = 500
     eval_interval = 7
     save_interval = 10
     # max_gamma = 0.8
