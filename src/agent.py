@@ -14,7 +14,7 @@ from keras.activations import relu
 from keras.initializers.initializers_v2 import VarianceScaling
 
 from src.network import *
-from src.environment import HASH_COMPLETE, OUTPUT_SIZE, INPUT_SIZE, REWARDS, Environment, ACTIONS, create_scrambled_environment
+from src.environment import HASH_COMPLETE, OUTPUT_SIZE, INPUT_SIZE, REWARDS, Action, Environment, ACTIONS, create_scrambled_environment
 
 
 ACTIVATION = relu
@@ -124,6 +124,42 @@ class Agent:
             "loop": loop,
             "solved": solved
         }
+
+    def create_replay(self,size=1_000,epsilon=0.5,scramble=100,random = Random()):
+        env = Environment()
+        env.scramble(100)
+
+        np_state_1 = np.zeros(shape=(size,INPUT_SIZE))
+        np_choice = np.zeros(shape=(size,),dtype=np.int8)
+        np_state_2 = np.zeros(shape=(size,INPUT_SIZE))
+        np_hash_2 = np.zeros(shape=(size,),dtype=str)
+
+        for i in range(size):
+            np_state_1[i] = env.to_observations()
+            if random.random() < epsilon:
+                np_choice[i] = ACTIONS.index(random.choice(ACTIONS))
+            else:
+                tf_observations = tf.reshape(tf.constant(np_state_1[i]),[1,INPUT_SIZE])
+                tf_output = self.network.call(tf_observations)
+                tf_argmax = tf.argmax(tf.reshape(tf_output,[OUTPUT_SIZE]))
+                np_choice[i] = int(tf_argmax.numpy())
+
+            env.apply_action(ACTIONS[np_choice[i]])
+            np_state_2[i] = env.to_observations(save_cache=False)
+
+            np_hash_2[i] = env.hash()
+
+
+
+
+        return (
+            np_state_1,
+            np_choice,
+            np_state_2,
+            np_hash_2
+        )
+
+
 
 
 

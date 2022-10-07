@@ -1,5 +1,7 @@
 from random import Random
+from types import NoneType
 import numpy as np
+import hashlib
 
 class Action:
     def __init__(self, name: str, loops: list[list[int]], two=False, prime=False):
@@ -113,6 +115,8 @@ class Environment:
                 self.state[i//6] += observations[0][i] * (i%6)
         else:
             self.reset()
+        self.observation_cache = None
+
 
 
     def reset(self):
@@ -120,8 +124,9 @@ class Environment:
         return self
 
     def apply_action(self,action: Action):
-      self.state = action.apply(self.state)
-      return self
+        self.observation_cache = None
+        self.state = action.apply(self.state)
+        return self
 
     def is_complete(self):
       for i in range(9 * 6):
@@ -137,10 +142,15 @@ class Environment:
     #     ] for value in position
     #   ]]
 
-    def to_observations(self):
+    def to_observations(self,save_cache=True, use_cache=True):
+        if use_cache and not type(self.observation_cache) == NoneType:
+            return self.observation_cache
+
         array = np.zeros((9 * 6 * 6,),dtype=np.float32)
         for i in range(9 * 6):
-            array[i * 6 + self.state[i]]= 1
+            array[i * 6 + self.state[i]] = 1
+        if save_cache:
+            self.observation_cache = array
         return array
 
     def scramble(self,count: int = 100):
@@ -155,11 +165,9 @@ class Environment:
         return env
 
     def hash(self):
-        return int("".join([str(i) for i in self.state]),6)
+        return observation_to_hash(self.to_observations())
 
     def reward(self, rewards):
-        if len(rewards) == 0:
-            print("ERROR")
         hash = self.hash()
         try:
             return rewards[hash]
@@ -188,7 +196,23 @@ def create_scrambled_environment(depth):
     env.scramble(depth)
     return env
 
+
+INPUT_SIZE = Environment().to_observations(use_cache=False,save_cache=False).shape[0]
+
+
+def observation_to_hash(obs: np.ndarray[(INPUT_SIZE,)]):
+
+    # TODO make efficient but thorough hash function
+    obs = np.copy(obs)
+
+
+    for i in range(INPUT_SIZE - 1):
+        obs[i] *= 6
+        obs[i+1] += obs[i]
+    return obs[-1]
+
+
+
 OUTPUT_SIZE = len(ACTIONS)
-INPUT_SIZE = Environment().to_observations().shape[0]
 
 HASH_COMPLETE = Environment().hash()
