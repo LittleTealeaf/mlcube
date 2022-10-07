@@ -138,9 +138,9 @@ class Environment:
     #   ]]
 
     def to_observations(self):
-        array = np.zeros((1,9 * 6 * 6),dtype=np.float32)
+        array = np.zeros((9 * 6 * 6,),dtype=np.float32)
         for i in range(9 * 6):
-            array[0][i * 6 + self.state[i]] = 1
+            array[i * 6 + self.state[i]]= 1
         return array
 
     def scramble(self,count: int = 100):
@@ -188,4 +188,7 @@ def create_scrambled_environment(depth):
     env.scramble(depth)
     return env
 
-ACTION_COUNT = len(ACTIONS)
+OUTPUT_SIZE = len(ACTIONS)
+INPUT_SIZE = Environment().to_observations().shape[0]
+
+HASH_COMPLETE = Environment().hash()

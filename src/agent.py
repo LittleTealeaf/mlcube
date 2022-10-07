@@ -1,3 +1,4 @@
+from abc import update_abstractmethods
 import json
 import math
 from multiprocessing import Pool, pool
@@ -6,13 +7,17 @@ import tensorflow as tf
 import numpy as np
 from random import Random
 
-from keras import Sequential, Model
+from keras import Sequential, Model, Input
+from keras.models import save_model, load_model
 from keras.layers import Dense
 from keras.activations import relu
 from keras.initializers.initializers_v2 import VarianceScaling
 
 from src.network import *
-from src.environment import ACTION_COUNT, REWARDS, Environment, ACTIONS, create_scrambled_environment
+from src.environment import HASH_COMPLETE, OUTPUT_SIZE, INPUT_SIZE, REWARDS, Environment, ACTIONS, create_scrambled_environment
+
+
+ACTIVATION = relu
 
 
 def pool_get_rewards(env,rewards: dict):
@@ -21,7 +26,7 @@ def pool_get_rewards(env,rewards: dict):
 
 def create_dense_layer(layer_size):
     return Dense(
-        layer_size,activation= relu,kernel_initializer=VarianceScaling(
+        layer_size,activation= ACTIVATION,kernel_initializer=VarianceScaling(
             scale=2.0,
             mode='fan_in',
             distribution='truncated_normal'
@@ -40,20 +45,90 @@ class Agent:
         self.log = []
 
 
+        self.save_network = os.path.join(directory,"network/")
+        self.save_target = os.path.join(directory,"target/")
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        try:
+            self.network = load_model(self.save_network)
+        except:
+            print("Failed to load network")
+
+        try:
+            self.target = load_model(self.save_target)
+        except:
+            print("Failed to load target")
+
         # load network and target
 
         if not self.network:
-            self.network = Sequential(
-                [create_dense_layer(size) for size in layer_sizes] + [
-                    Dense(
-                        ACTION_COUNT,
-                        activation=None,
-                        kernel_initializer=tf.keras.initializers.RandomUniform(
-                            minval=-0.03, maxval=0.03),
-                        bias_initializer=tf.keras.initializers.Constant(-0.2)
+            self.network = Sequential()
+            self.network.add(Input(shape=(INPUT_SIZE,),sparse=True))
+
+            for layer in layer_sizes:
+                self.network.add(Dense(
+                    layer, activation=ACTIVATION,kernel_initializer=VarianceScaling(
+                        scale=2.0,
+                        mode='fan_in',
+                        distribution='truncated_normal'
                     )
-                ]
-            )
+                ))
+            self.network.add(Dense(
+                OUTPUT_SIZE,kernel_initializer=VarianceScaling(
+                    scale=2.0,
+                    mode='fan_in',
+                    distribution='truncated_normal'
+                )
+            ))
+
+        if not self.target:
+            self.update_target()
+
+    def update_target(self):
+        save_model(self.network,self.save_network)
+        self.target = load_model(self.save_network)
+        save_model(self.target,self.save_target)
+
+    def evaluate_network(self,max_moves=1_000,rewards={}):
+        env = Environment()
+        env.scramble(100)
+
+        dict_states = {}
+        moves = []
+        loop = False
+        solved = False
+
+        for i in range(max_moves):
+            observations = env.to_observations()
+            t_observations = tf.reshape(tf.constant(observations),[1,INPUT_SIZE])
+            t_output = self.network.call(t_observations)
+            t_output_reshape = tf.reshape(t_output,[OUTPUT_SIZE])
+            t_argmax = tf.argmax(t_output_reshape)
+            action = ACTIONS[t_argmax.numpy()]
+            moves.append(action.name)
+            env.apply_action(action)
+            hash = env.hash()
+            if hash in dict_states:
+                loop = True
+                break
+            dict_states[hash] = 1
+
+            if hash == HASH_COMPLETE:
+                solved = True
+                break
+
+        return {
+            "moves": moves,
+            "loop": loop,
+            "solved": solved
+        }
+
+
+
+
+
 
 
 class Agent_:
@@ -198,7 +273,7 @@ class Agent_:
             np_choices_1 = tf_choices_1.numpy()
             for i in range(0,replay_size):
                 if random.random() < epsilon:
-                    np_choices_1[i] = [random.randint(0,ACTION_COUNT - 1)]
+                    np_choices_1[i] = [random.randint(0,OUTPUT_SIZE - 1)]
 
             tf_choices_1 = tf.constant(np_choices_1, dtype=tf.int32)
 
