@@ -90,6 +90,9 @@ class Agent:
         self.target = load_model(self.save_network)
         save_model(self.target,self.save_target)
 
+    def get_epoch(self):
+        return len(self.log)
+
     def evaluate_network(self,max_moves=1_000,rewards={}):
         env = Environment()
         env.scramble(100)
@@ -152,6 +155,141 @@ class Agent:
             np_choice,
             np_state_2,
         )
+
+    def run_cycle(self,
+    pool: pool = None,
+    replay_size=10_000,
+    epsilon=0.2,
+    moves_min=1,
+    moves_max=40,
+    learning_rate=0.1,
+    gamma=0.5,
+    rewards={},
+    random=Random()):
+        with tf.GradientTape() as tape:
+            assert Pool is not None
+            assert moves_max > moves_min
+            assert len(rewards) > 0
+
+            tape.watch(self.network.trainable_variables)
+            moves_diff = moves_max - moves_min
+            replay_scramble_depths = [
+                i % moves_diff + moves_min for i in range(replay_size)
+            ]
+            ls_state_1 = pool.map(create_scrambled_environment,replay_scramble_depths)
+            del replay_scramble_depths
+
+            ls_observations_1 = pool.map(Environment.to_observations,ls_state_1)
+            tf_state_1 = tf.constant(np.array(ls_observations_1),dtype=tf.float32)
+            tf_output_1 = self.network.call(tf_state_1)
+            tf_choices_1 = tf.argmax(tf_output_1,1)
+
+            del ls_observations_1
+            np_choices_1 = tf_choices_1.numpy()
+            for i in range(0,replay_size):
+                if random.random() < epsilon:
+                    np_choices_1[i] = random.randint(0,COUNT_ACTIONS - 1)
+
+
+            tf_choices_1 = tf.constant(np_choices_1, dtype=tf.int32)
+
+            # Filtering out to the output of the chosen actions
+            tf_output_1_pruned = tf.gather(tf_output_1, tf_choices_1, batch_dims=1)
+
+            # combining the ls_state_1 and np_choices_1
+            ls_state_2 = pool.starmap(Environment.apply_action, [
+                (ls_state_1[i], ACTIONS[np_choices_1[i]]) for i in range(replay_size)
+            ])
+
+            # Pushing state_2 through the target network
+            ls_observations_2 = pool.map(Environment.to_observations, ls_state_2)
+            tf_state_2 = tf.constant(np.array(ls_observations_2), dtype=tf.float32)
+            tf_output_2 = self.target.call(tf_state_2)
+
+            del ls_observations_2
+
+            # Get Rewards
+            ls_rewards = pool.starmap(pool_get_rewards,[
+                (i,rewards) for i in ls_state_2
+            ])
+
+            del ls_state_2
+
+            # Get the max of the output of state_2
+            tf_output_2_max = tf.reduce_max(tf_output_2, 1)
+
+            tf_rewards = tf.reshape(tf.constant(np.array(ls_rewards),dtype=tf.float32),[replay_size,1])
+
+            tf_output_2_max_scaled = tf.multiply(tf_output_2_max,tf.constant(gamma,dtype=tf.float32))
+
+            tf_target = tf.add(tf_output_2_max_scaled, tf_rewards)
+
+            tf_loss = tf.square(tf.subtract(tf_target, tf_output_1_pruned))
+            tf_loss_mean = tf.reduce_mean(tf_loss)
+
+            tf_gradient = tape.gradient(tf_loss_mean,self.network.trainable_variables)
+
+            optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate)
+
+            optimizer.apply_gradients(zip(tf_gradient,self.network.trainable_variables))
+
+            tf_rewards_mean = tf.reduce_mean(tf_rewards)
+
+            output = {
+                'epoch': self.get_epoch(),
+                'loss': float(tf_loss_mean.numpy()),
+                'reward': float(tf_rewards_mean.numpy()),
+                'rate': float(learning_rate),
+                'epsilon': float(epsilon),
+                'gamma': float(gamma),
+            }
+            self.log.append(output)
+
+            return output
+
+
+
+
+#     def run_cycle(
+#         self,
+#         pool: pool=None,
+#         replay_size=10_000,
+#         epsilon=0.2,
+#         moves_min=1,
+#         moves_max=40,
+#         learning_rate=0.1,
+#         gamma=0.5,
+#         rewards={},
+#         random=Random(),
+#     ):
+#         with tf.GradientTape() as tape:
+#             assert Pool is not None
+#             assert moves_max > moves_min
+#             assert len(rewards) > 0
+
+#             tape.watch(self.network.trainable_variables)
+
+#             moves_diff = moves_max - moves_min
+#             replay_scramble_depths = [
+#                 i % moves_diff + moves_min for i in range(replay_size)
+#             ]
+#             ls_state_1 = pool.map(create_scrambled_environment, replay_scramble_depths)
+
+#             del replay_scramble_depths
+
+#             # Pushing state_1 through the network
+#             ls_observations_1 = pool.map(Environment.to_observations, ls_state_1)
+#             tf_state_1 = tf.constant(np.array(ls_observations_1), dtype=tf.float32)
+#             tf_output_1 = self.network.apply(tf_state_1)
+#             # - correct this code
+#             tf_choices_1 = tf.argmax(tf_output_1, 2)
+
+#             del ls_observations_1
+
+#             # Scrambling actions
+
+
+
 
 
 
@@ -259,100 +397,7 @@ class Agent:
 #         "Update the target network to match the current network"
 #         self.target = self.network.copy()
 
-#     def run_cycle(
-#         self,
-#         pool: pool=None,
-#         replay_size=10_000,
-#         epsilon=0.2,
-#         moves_min=1,
-#         moves_max=40,
-#         learning_rate=0.1,
-#         gamma=0.5,
-#         rewards={},
-#         random=Random(),
-#     ):
-#         with tf.GradientTape() as tape:
-#             assert Pool is not None
-#             assert moves_max > moves_min
-#             assert len(rewards) > 0
 
-#             tape.watch(self.network.trainable_variables)
-
-#             moves_diff = moves_max - moves_min
-#             replay_scramble_depths = [
-#                 i % moves_diff + moves_min for i in range(replay_size)
-#             ]
-#             ls_state_1 = pool.map(create_scrambled_environment, replay_scramble_depths)
-
-#             del replay_scramble_depths
-
-#             # Pushing state_1 through the network
-#             ls_observations_1 = pool.map(Environment.to_observations, ls_state_1)
-#             tf_state_1 = tf.constant(np.array(ls_observations_1), dtype=tf.float32)
-#             tf_output_1 = self.network.apply(tf_state_1)
-#             # - correct this code
-#             tf_choices_1 = tf.argmax(tf_output_1, 2)
-
-#             del ls_observations_1
-
-#             # Scrambling actions
-#             np_choices_1 = tf_choices_1.numpy()
-#             for i in range(0,replay_size):
-#                 if random.random() < epsilon:
-#                     np_choices_1[i] = [random.randint(0,OUTPUT_SIZE - 1)]
-
-#             tf_choices_1 = tf.constant(np_choices_1, dtype=tf.int32)
-
-#             # Filtering out to the output of the chosen actions
-#             tf_output_1_pruned = tf.gather(tf_output_1, tf_choices_1, batch_dims=2)
-
-#             # combining the ls_state_1 and np_choices_1
-#             ls_state_2 = pool.starmap(Environment.apply_action, [
-#                 (ls_state_1[i], ACTIONS[np_choices_1[i][0]]) for i in range(replay_size)
-#             ])
-
-#             # Pushing state_2 through the target network
-#             ls_observations_2 = pool.map(Environment.to_observations, ls_state_2)
-#             tf_state_2 = tf.constant(np.array(ls_observations_2), dtype=tf.float32)
-#             tf_output_2 = self.target.apply(tf_state_2)
-
-#             del ls_observations_2
-
-#             # Get Rewards
-#             ls_rewards = pool.starmap(pool_get_rewards,[
-#                 (i,rewards) for i in ls_state_2
-#             ])
-
-#             del ls_state_2
-
-#             # Get the max of the output of state_2
-#             tf_output_2_max = tf.reduce_max(tf_output_2, 2)
-
-#             tf_rewards = tf.reshape(tf.constant(np.array(ls_rewards),dtype=tf.float32),[replay_size,1])
-
-#             tf_output_2_max_scaled = tf.multiply(tf_output_2_max,tf.constant(gamma,dtype=tf.float32))
-
-#             tf_target = tf.add(tf_output_2_max_scaled, tf_rewards)
-
-#             tf_loss = tf.square(tf.subtract(tf_target, tf_output_1_pruned))
-#             tf_loss_mean = tf.reduce_mean(tf_loss)
-
-#             tf_gradient = tape.gradient(tf_loss_mean,self.network.trainable_variables)
-
-#             optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate)
-
-#             optimizer.apply_gradients(zip(tf_gradient,self.network.trainable_variables))
-
-#             tf_rewards_mean = tf.reduce_mean(tf_rewards)
-
-#             output = {
-#                 'epoch': self.get_epoch(),
-#                 'loss': float(tf_loss_mean.numpy()),
-#                 'reward': float(tf_rewards_mean.numpy()),
-#                 'rate': float(learning_rate),
-#                 'epsilon': float(epsilon),
-#                 'gamma': float(gamma),
-#             }
 
 #             self.epochs.append(output)
 

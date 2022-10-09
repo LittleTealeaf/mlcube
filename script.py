@@ -3,6 +3,7 @@ from multiprocessing import Manager, cpu_count
 import os
 from time import time
 
+random = Random()
 
 if __name__ == "__main__":
   with Pool(cpu_count() * 2) as pool:
@@ -13,10 +14,21 @@ if __name__ == "__main__":
     agent = Agent([264,202,141,80],"agents/C-Dev-1")
 
     start = time()
-    replay = agent.create_replay(10_000,epsilon=0.2)
+    result = agent.run_cycle(
+      pool=pool,
+      replay_size=10_000,
+      moves_min=1,
+      moves_max=30,
+      random=random,
+      epsilon=0.2,
+      gamma=0.6,
+      learning_rate=0.1,
+      rewards=REWARDS
+    )
     end = time()
 
     print("Elapsed: ",(end - start))
+    print(result)
 
 
 # def exponential_decay(initial, index, decay_rate, decay_interval =  1):
