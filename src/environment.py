@@ -1,7 +1,11 @@
+from multiprocessing import Pool
 from random import Random
 from types import NoneType
 import numpy as np
 import hashlib
+
+
+
 
 class Action:
     def __init__(self, name: str, loops: list[list[int]], two=False, prime=False):
@@ -175,21 +179,35 @@ class Environment:
             return 0
 
 
-def calculate_rewards(depth=8,decay=0.8):
-    rewards = {}
-    buffer = [Environment()]
-    for i in range(depth):
-        print(f"Calculating depth {i} with length {len(buffer)}")
-        tmp_buffer = []
-        for env in buffer:
-            hash = env.hash()
-            if hash not in rewards:
-                rewards[hash] = decay ** i
-                if i < depth - 1:
-                    for action in ACTIONS:
-                        tmp_buffer.append(env.copy().apply_action(action))
-        buffer = tmp_buffer
-    return rewards
+def calculate_rewards(depth=8,decay=0.8, pool: Pool=None):
+    if pool != None:
+        rewards = {}
+        buffer = [Environment()]
+        for i in range(depth):
+            print(f'Calculating depth {i} with length {len(buffer)}')
+            values = pool.map(Environment.hash,buffer)
+            for item in values:
+                rewards[item] = decay ** i
+
+        return rewards
+
+
+    else:
+        rewards = {}
+        buffer = [Environment()]
+        for i in range(depth):
+            print(f"Calculating depth {i} with length {len(buffer)}")
+            tmp_buffer = []
+            for env in buffer:
+                hash = env.hash()
+                if hash not in rewards:
+                    rewards[hash] = decay ** i
+                    if i < depth - 1:
+                        for action in ACTIONS:
+                            tmp_buffer.append(env.copy().apply_action(action))
+            buffer = tmp_buffer
+        print(f"Reward list is {len(rewards)} items long")
+        return rewards
 
 def create_scrambled_environment(depth):
     env = Environment()
@@ -197,22 +215,24 @@ def create_scrambled_environment(depth):
     return env
 
 
-INPUT_SIZE = Environment().to_observations(use_cache=False,save_cache=False).shape[0]
+LEN_STATE = Environment().state.shape[0]
+LEN_OBSERVATIONS = Environment().to_observations(use_cache=False,save_cache=False).shape[0]
 
 
-def observation_to_hash(obs: np.ndarray[(INPUT_SIZE,)]):
+def observation_to_hash(obs: np.ndarray[(LEN_OBSERVATIONS,)]):
+    # convert observations to the state
+    hashed = np.zeros((3,))
 
-    # TODO make efficient but thorough hash function
-    obs = np.copy(obs)
+    for i in range(LEN_OBSERVATIONS):
+        if obs[i] == 1:
+            index = (i//6)//18
+            hashed[index] *= 6
+            hashed[index] += i%6
+    return hashed.mean()
 
 
-    for i in range(INPUT_SIZE - 1):
-        obs[i] *= 6
-        obs[i+1] += obs[i]
-    return obs[-1]
 
 
-
-OUTPUT_SIZE = len(ACTIONS)
+COUNT_ACTIONS = len(ACTIONS)
 
 HASH_COMPLETE = Environment().hash()

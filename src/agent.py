@@ -1,7 +1,5 @@
-from abc import update_abstractmethods
-import json
-import math
 from multiprocessing import Pool, pool
+from operator import truediv
 import os
 import tensorflow as tf
 import numpy as np
@@ -14,7 +12,7 @@ from keras.activations import relu
 from keras.initializers.initializers_v2 import VarianceScaling
 
 from src.network import *
-from src.environment import HASH_COMPLETE, OUTPUT_SIZE, INPUT_SIZE, REWARDS, Action, Environment, ACTIONS, create_scrambled_environment
+from src.environment import HASH_COMPLETE, COUNT_ACTIONS, LEN_OBSERVATIONS, REWARDS, Action, Environment, ACTIONS, create_scrambled_environment
 
 
 ACTIVATION = relu
@@ -65,7 +63,7 @@ class Agent:
 
         if not self.network:
             self.network = Sequential()
-            self.network.add(Input(shape=(INPUT_SIZE,),sparse=True))
+            self.network.add(Input(shape=(LEN_OBSERVATIONS,),sparse=True))
 
             for layer in layer_sizes:
                 self.network.add(Dense(
@@ -76,7 +74,7 @@ class Agent:
                     )
                 ))
             self.network.add(Dense(
-                OUTPUT_SIZE,kernel_initializer=VarianceScaling(
+                COUNT_ACTIONS,kernel_initializer=VarianceScaling(
                     scale=2.0,
                     mode='fan_in',
                     distribution='truncated_normal'
@@ -102,9 +100,9 @@ class Agent:
 
         for i in range(max_moves):
             observations = env.to_observations()
-            t_observations = tf.reshape(tf.constant(observations),[1,INPUT_SIZE])
+            t_observations = tf.reshape(tf.constant(observations),[1,LEN_OBSERVATIONS])
             t_output = self.network.call(t_observations)
-            t_output_reshape = tf.reshape(t_output,[OUTPUT_SIZE])
+            t_output_reshape = tf.reshape(t_output,[COUNT_ACTIONS])
             t_argmax = tf.argmax(t_output_reshape)
             action = ACTIONS[t_argmax.numpy()]
             moves.append(action.name)
@@ -125,38 +123,43 @@ class Agent:
             "solved": solved
         }
 
-    def create_replay(self,size=1_000,epsilon=0.5,scramble=100,random = Random()):
+    def create_replay(self,size=1_000,epsilon=0.5,scramble=100,random = Random(), pool: Pool = pool):
         env = Environment()
-        env.scramble(100)
+        env.scramble(scramble)
 
-        np_state_1 = np.zeros(shape=(size,INPUT_SIZE))
+        np_state_1 = np.zeros(shape=(size,LEN_OBSERVATIONS))
         np_choice = np.zeros(shape=(size,),dtype=np.int8)
-        np_state_2 = np.zeros(shape=(size,INPUT_SIZE))
-        np_hash_2 = np.zeros(shape=(size,),dtype=str)
+        np_state_2 = np.zeros(shape=(size,LEN_OBSERVATIONS))
+        # np_hash_2 = np.zeros(shape=(size,),dtype=str)
 
         for i in range(size):
             np_state_1[i] = env.to_observations()
             if random.random() < epsilon:
                 np_choice[i] = ACTIONS.index(random.choice(ACTIONS))
             else:
-                tf_observations = tf.reshape(tf.constant(np_state_1[i]),[1,INPUT_SIZE])
+                # cloned = False
+                # for j in range(i):
+                #     if np.array_equal(np_state_1[i],np_state_1[j]):
+                #         np_choice[i] = np_choice[j]
+                #         cloned = True
+                #         break
+
+                # if cloned:
+                #     continue
+
+
+                tf_observations = tf.reshape(tf.constant(np_state_1[i]),[1,LEN_OBSERVATIONS])
                 tf_output = self.network.call(tf_observations)
-                tf_argmax = tf.argmax(tf.reshape(tf_output,[OUTPUT_SIZE]))
+                tf_argmax = tf.argmax(tf.reshape(tf_output,[COUNT_ACTIONS]))
                 np_choice[i] = int(tf_argmax.numpy())
 
             env.apply_action(ACTIONS[np_choice[i]])
             np_state_2[i] = env.to_observations(save_cache=False)
 
-            np_hash_2[i] = env.hash()
-
-
-
-
         return (
             np_state_1,
             np_choice,
             np_state_2,
-            np_hash_2
         )
 
 
@@ -296,7 +299,7 @@ class Agent:
 #             ls_observations_1 = pool.map(Environment.to_observations, ls_state_1)
 #             tf_state_1 = tf.constant(np.array(ls_observations_1), dtype=tf.float32)
 #             tf_output_1 = self.network.apply(tf_state_1)
-#             # TODO - correct this code
+#             # - correct this code
 #             tf_choices_1 = tf.argmax(tf_output_1, 2)
 
 #             del ls_observations_1

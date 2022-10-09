@@ -13,7 +13,7 @@ if __name__ == "__main__":
     agent = Agent([264,202,141,80],"agents/C-1")
 
     start = time.time()
-    state_1,choice,state_2,reward = agent.create_replay(1_000,epsilon=0.2)
+    state_1,choice,state_2 = agent.create_replay(1_000,epsilon=0.2)
     end = time.time()
 
     print("Elapsed: ",(end - start))
