@@ -10,6 +10,8 @@ local_branch = local_repo.active_branch.name
 # - Switch to a legitimate reinforced method that builds a replay that it trains on (from a single solved cube). -> this may fix the whole "repeating the same move" over and over because it's training on what it actually ends up doing (well, also epsilon but start epsilon at 0.75 and it'll be significant towards completion)
 # I need to look up how it ends up building the replay
 
+
+
 def exponential_decay(initial, index, decay_rate, decay_interval =  1):
     return initial * (decay_rate ** (index // decay_interval))
 
