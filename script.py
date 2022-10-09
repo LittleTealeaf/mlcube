@@ -1,8 +1,7 @@
 from src import *
 from multiprocessing import Manager, cpu_count
 import os
-import time
-
+from time import time
 
 
 if __name__ == "__main__":
@@ -13,9 +12,9 @@ if __name__ == "__main__":
 
     agent = Agent([264,202,141,80],"agents/C-Dev-1")
 
-    start = time.time()
-    state_1,choice,state_2 = agent.create_replay(10_000,epsilon=0.2)
-    end = time.time()
+    start = time()
+    replay = agent.create_replay(10_000,epsilon=0.2)
+    end = time()
 
     print("Elapsed: ",(end - start))
 

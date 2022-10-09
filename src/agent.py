@@ -128,9 +128,6 @@ class Agent:
         env = Environment()
         env.scramble(scramble)
 
-        total_time = 0
-        total_count = 0
-
         np_state_1 = np.zeros(shape=(size,LEN_OBSERVATIONS))
         np_choice = np.zeros(shape=(size,),dtype=np.int8)
         np_state_2 = np.zeros(shape=(size,LEN_OBSERVATIONS))
@@ -141,20 +138,14 @@ class Agent:
             if random.random() < epsilon:
                 np_choice[i] = ACTIONS.index(random.choice(ACTIONS))
             else:
-                start = time()
                 tf_observations = tf.reshape(tf.constant(np_state_1[i]),[1,LEN_OBSERVATIONS])
                 tf_output = self.network.call(tf_observations)
                 tf_argmax = tf.argmax(tf.reshape(tf_output,[COUNT_ACTIONS]))
                 np_choice[i] = tf_argmax.numpy()
-                end = time()
-                total_time += end - start
-                total_count += 1
 
 
             env.apply_action(ACTIONS[np_choice[i]])
             np_state_2[i] = env.to_observations(save_cache=False)
-
-        print(f'Total Time: {total_time} over {total_count} runs, yields a {total_time / total_count} average')
 
         return (
             np_state_1,
