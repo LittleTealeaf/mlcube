@@ -1,5 +1,7 @@
 from random import Random
 from types import NoneType
+import tensorflow as tf
+
 import numpy as np
 import hashlib
 
@@ -21,6 +23,10 @@ class Action:
 
         if prime:
             self.matrix = self.matrix @ self.matrix @ self.matrix
+
+
+
+        self.tensor = tf.constant(self.matrix, dtype=tf.int32)
 
     def apply(self,state):
       return state @ self.matrix
@@ -108,71 +114,98 @@ REWARDS = {}
 
 
 class Environment:
-    def __init__(self, observations: list[list[int]] = None):
+    def __init__(self, observations=None):
+        np_state = None
         if observations:
-            self.state = np.array([0] * (9 * 6),dtype=np.int8)
+            np_state = np.array([0] * (9 * 6),dtype=np.int32)
             for i in range(len(observations[0])):
-                self.state[i//6] += observations[0][i] * (i%6)
+                np_state[i//6] += observations[0][i] * (i%6)
         else:
-            self.reset()
-        self.observation_cache = None
-
-
+            np_state = np.array([i // 9 for i in range(9 * 6)],dtype=np.int32)
+        self.tensor = tf.constant(np_state)
 
     def reset(self):
-        self.state = np.array([i // 9 for i in range(9 * 6)],dtype=np.int8)
-        return self
-
+        ...
     def apply_action(self,action: Action):
-        self.observation_cache = None
-        self.state = action.apply(self.state)
+        self.tensor = self.tensor * action.tensor
         return self
 
     def is_complete(self):
-      for i in range(9 * 6):
-        if self.state[i] != i // 9:
-          return False
-      return True
-
-    # def to_observations_deprecated(self):
-    #   # I think this works
-    #   return [[
-    #     value for position in [
-    #       create_observation_set(i) for i in self.state
-    #     ] for value in position
-    #   ]]
-
-    def to_observations(self,save_cache=True, use_cache=True):
-        if use_cache and not type(self.observation_cache) == NoneType:
-            return self.observation_cache
-
-        array = np.zeros((9 * 6 * 6,),dtype=np.float32)
+        np_state = self.tensor.numpy()
         for i in range(9 * 6):
-            array[i * 6 + self.state[i]] = 1
-        if save_cache:
-            self.observation_cache = array
+          if np_state[i] != i // 9:
+            return False
+        return True
+    def to_observations(self):
+        array = np.zeros((9 * 6 * 6,),dtype=np.float32)
+        np_state = self.tensor.numpy()
+        for i in range(9 * 6):
+            array[i * 6 + np_state[i]] = 1
         return array
-
-    def scramble(self,count: int = 100):
-        random = Random()
-        for _ in range(count):
-            self.apply_action(random.choice(ACTIONS))
-        return self
-
-    def copy(self):
-        env = Environment()
-        env.state = np.copy(self.state)
-        return env
-
     def hash(self):
         return observation_to_hash(self.to_observations())
+    def copy(self):
+        return Environment()
+    def scramble(self,length=100,random=Random()):
+        for _ in range(length):
+            self.apply_action(random.choice(ACTIONS))
+    # def __init__(self, observations: list[list[int]] = None):
+    #     if observations:
 
-    def reward(self, rewards):
-        hash = self.hash()
-        try:
-            return rewards[hash]
-        except KeyError:
-            return 0
+    #     else:
+    #         self.reset()
+    #     self.observation_cache = None
+
+    #     self.tf_state = tf.constant(self.state)
+
+
+
+    # def reset(self):
+        # self.state =
+    #     return self
+
+    # def apply_action(self,action: Action):
+    #     self.observation_cache = None
+    #     self.state = action.apply(self.state)
+    #     return self
+
+    # def is_complete(self):
+
+
+    # # def to_observations_deprecated(self):
+    # #   # I think this works
+    # #   return [[
+    # #     value for position in [
+    # #       create_observation_set(i) for i in self.state
+    # #     ] for value in position
+    # #   ]]
+
+    # def to_observations(self,save_cache=True, use_cache=True):
+    #     if use_cache and not type(self.observation_cache) == NoneType:
+    #         return self.observation_cache
+
+
+
+    # def scramble(self,count: int = 100):
+    #     random = Random()
+    #     for _ in range(count):
+    #         self.apply_action(random.choice(ACTIONS))
+    #     return self
+
+    # def copy(self):
+    #     env = Environment()
+    #     env.state = np.copy(self.state)
+    #     return env
+
+    # def hash(self):
+    #     return observation_to_hash(self.to_observations())
+
+    # def reward(self, rewards):
+    #     hash = self.hash()
+    #     try:
+    #         return rewards[hash]
+    #     except KeyError:
+    #         return 0
 
 
 def calculate_rewards(depth=8,decay=0.8):
@@ -197,7 +230,7 @@ def create_scrambled_environment(depth):
     return env
 
 
-INPUT_SIZE = Environment().to_observations(use_cache=False,save_cache=False).shape[0]
+INPUT_SIZE = Environment().to_observations().shape[0]
 
 
 def observation_to_hash(obs: np.ndarray[(INPUT_SIZE,)]):

@@ -145,7 +145,7 @@ class Agent:
                 np_choice[i] = int(tf_argmax.numpy())
 
             env.apply_action(ACTIONS[np_choice[i]])
-            np_state_2[i] = env.to_observations(save_cache=False)
+            np_state_2[i] = env.to_observations()
 
             np_hash_2[i] = env.hash()
 
