@@ -1,19 +1,20 @@
 from src import *
-from multiprocessing import Manager
+from multiprocessing import Manager, cpu_count
 import os
 import time
 
 
 
 if __name__ == "__main__":
-  with Pool(24) as pool:
+  with Pool(cpu_count() * 2) as pool:
     thread_manager = Manager()
+
     REWARDS = calculate_rewards(depth=5,decay=0.9)
 
-    agent = Agent([264,202,141,80],"agents/C-1")
+    agent = Agent([264,202,141,80],"agents/C-Dev-1")
 
     start = time.time()
-    state_1,choice,state_2 = agent.create_replay(1_000,epsilon=0.2)
+    state_1,choice,state_2 = agent.create_replay(10_000,epsilon=0.2)
     end = time.time()
 
     print("Elapsed: ",(end - start))
