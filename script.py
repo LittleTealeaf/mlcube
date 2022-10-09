@@ -1,6 +1,10 @@
 from src import *
+from git import Repo
 from multiprocessing import Manager, Pool
 import os
+
+local_repo = Repo(path='.')
+local_branch = local_repo.active_branch.name
 
 # THOUGHTS
 # - Switch to a legitimate reinforced method that builds a replay that it trains on (from a single solved cube). -> this may fix the whole "repeating the same move" over and over because it's training on what it actually ends up doing (well, also epsilon but start epsilon at 0.75 and it'll be significant towards completion)
@@ -19,7 +23,7 @@ if __name__ == "__main__":
 
     REWARDS = calculate_rewards(depth=6,decay=0.9,max_count=1_000_000)
 
-    agent = Agent([264, 202, 141, 80],"agents/B-5")
+    agent = Agent([264, 202, 141, 80],f"agents/{local_branch}-0")
 
     # 4 - 500 INTERVAL
     # 5 - 30 INTERVAL
@@ -49,7 +53,7 @@ if __name__ == "__main__":
         learning_rate=learning_rate,
         moves_min=0,
         moves_max=20,
-        gamma=0.9,
+        gamma=0.7,
         rewards=REWARDS,
         random=random
       )

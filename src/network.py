@@ -1,5 +1,7 @@
 import tensorflow as tf
-from keras.activations import sigmoid
+from keras.activations import relu
+from keras.initializers.initializers_v2 import VarianceScaling
+
 import numpy as np
 
 LAYER_SIZE_INPUT = 9 * 6 * 6
@@ -37,13 +39,21 @@ class Network:
                 length_prev = self.layer_sizes[i - 1] if i > 0 else LAYER_SIZE_INPUT
                 length_cur = self.layer_sizes[i]
 
-                W = tf.Variable(
-                    tf.random.normal([length_prev, length_cur], stddev=0.03),
-                    dtype=tf.float32,
+                # W = tf.Variable(
+
+                #     # tf.random.normal([length_prev, length_cur], stddev=0.03),
+                #     dtype=tf.float32,
+                # )
+                initializer = VarianceScaling(
+                    scale=2.0,
+                    mode='fan_in',
+                    distribution='truncated_normal'
                 )
-                b = tf.Variable(
-                    tf.random.normal([length_cur], stddev=0.03), dtype=tf.float32
-                )
+                W = tf.Variable(initializer(shape=(length_prev,length_cur),dtype=tf.float32))
+                # b = tf.Variable(
+                #     tf.random.normal([length_cur], stddev=0.03), dtype=tf.float32
+                # )
+                b = tf.Variable(initializer(shape=(length_cur,),dtype=tf.float32))
 
                 self.layers.append((W, b))
 
@@ -59,7 +69,7 @@ class Network:
             x = tf.matmul(x,W)
             x = tf.add(x,b)
             if i < len(self.layers) - 1:
-                x = sigmoid(x)
+                x = relu(x)
         return x
 
     def copy(self):
