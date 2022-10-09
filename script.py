@@ -46,7 +46,7 @@ if __name__ == "__main__":
         learning_rate=learning_rate,
         moves_min=0,
         moves_max=20,
-        gamma=0.5,
+        gamma=0.8,
         rewards=REWARDS,
         random=random
       )
