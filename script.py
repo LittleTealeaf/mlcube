@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     REWARDS = calculate_rewards(depth=6,decay=0.9,max_count=1_000_000)
 
-    agent = Agent([264, 202, 141, 80],f"agents/{local_branch}-0")
+    agent = Agent([264, 202, 141, 80],f"agents/{local_branch}-1")
 
     # 4 - 500 INTERVAL
     # 5 - 30 INTERVAL
@@ -31,29 +31,22 @@ if __name__ == "__main__":
     target_interval = 500
     eval_interval = 7
     save_interval = 10
-    # max_gamma = 0.8
 
     random = Random()
 
     while not os.path.exists("./stop"):
       epoch = agent.get_epoch()
-      # learning_rate = exponential_decay(exponential_decay(1,epoch%target_interval,0.99),epoch,0.94,target_interval)
-      # epsilon = exponential_decay(1,epoch%target_interval,0.99)
-      # gamma = exponential_decay(linear_trend(0,target_interval,1,0,epoch%target_interval),epoch,0.995,target_interval)
-
-      learning_rate = max(exponential_decay(0.1,epoch,0.9,target_interval),1e-6)
-      epsilon = max(exponential_decay(0.75,epoch,0.9,target_interval),0.01)
-      # gamma = linear_trend(0,target_interval,1,0,epoch%target_interval)
-      # gamma = 1 - (gamma * max_gamma + (1 - max_gamma))
+      epsilon = exponential_decay(0.75,epoch,0.8,target_interval)
+      learning_rate = exponential_decay(exponential_decay(0.1,epoch%target_interval,0.99),0.95,target_interval)
 
       outputs = agent.run_cycle(
         pool=pool,
-        replay_size=10_001,
+        replay_size=10_000,
         epsilon=epsilon,
         learning_rate=learning_rate,
         moves_min=0,
         moves_max=20,
-        gamma=0.7,
+        gamma=0.5,
         rewards=REWARDS,
         random=random
       )
