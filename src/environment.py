@@ -20,6 +20,14 @@ class Action:
         if prime:
             self.matrix = self.matrix @ self.matrix @ self.matrix
 
+        self.observation_matrix = np.zeros((9*6*6,9*6*6))
+
+        for x in range(9 * 6):
+            for y in range(9 * 6):
+                if self.matrix[y,x] == 1:
+                    for i in range(6):
+                        self.observation_matrix[y * 6 + i, x * 6 + i] = 1
+
     def apply(self,state):
       return state @ self.matrix
 
