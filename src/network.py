@@ -44,16 +44,20 @@ class Network:
                 #     # tf.random.normal([length_prev, length_cur], stddev=0.03),
                 #     dtype=tf.float32,
                 # )
-                initializer = VarianceScaling(
+                W = tf.Variable(VarianceScaling(
                     scale=2.0,
                     mode='fan_in',
                     distribution='truncated_normal'
-                )
-                W = tf.Variable(initializer(shape=(length_prev,length_cur),dtype=tf.float32))
+                )(shape=(length_prev,length_cur),dtype=tf.float32))
                 # b = tf.Variable(
                 #     tf.random.normal([length_cur], stddev=0.03), dtype=tf.float32
                 # )
-                b = tf.Variable(initializer(shape=(length_cur,),dtype=tf.float32))
+
+                b = tf.Variable(VarianceScaling(
+                    scale=2.0,
+                    mode='fan_in',
+                    distribution='truncated_normal'
+                )(shape=(length_cur,),dtype=tf.float32))
 
                 self.layers.append((W, b))
 
