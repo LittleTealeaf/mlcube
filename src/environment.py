@@ -191,6 +191,7 @@ def create_environment():
 
 def hash_environment(env):
     ...
+    # TODO hash a sparse array
 
 
 
