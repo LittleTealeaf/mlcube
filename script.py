@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     REWARDS = calculate_rewards(depth=6,decay=0.9,max_count=1_000_000)
 
-    agent = Agent([264, 202, 141, 80],f"agents/relu-3")
+    agent = Agent([264, 202, 141, 80],f"agents/{local_branch}-1")
 
     # 4 - 500 INTERVAL
     # 5 - 30 INTERVAL
