@@ -1,3 +1,4 @@
+#!/home/tealeaf/anaconda3/envs/directml/bin/python
 from src import *
 from git import Repo
 from multiprocessing import Manager, Pool
@@ -38,7 +39,7 @@ if __name__ == "__main__":
 
     while not os.path.exists("./stop"):
       epoch = agent.get_epoch()
-      epsilon = max(exponential_decay(0.75,epoch,0.95,target_interval),0.2)
+      epsilon = max(exponential_decay(0.75,epoch,0.95,target_interval),0.1)
       learning_rate = exponential_decay(exponential_decay(0.1,epoch%target_interval,0.99),0.95,target_interval)
 
       outputs = agent.run_cycle(
