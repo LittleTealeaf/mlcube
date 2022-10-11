@@ -185,14 +185,6 @@ ACTIONS = [
 #     def hash(self):
 
 def create_environment(scramble_length=0):
-    # variable = tf.constant(np.array([
-    #     1 if i // (6*9) == i % 6 else 0
-    #     for i in range(9*6*6)
-    # ]),dtype=tf.float32)
-    # random = Random()
-    # for i in range(scramble_length):
-    #     variable = tf.matmul(variable,tf.constant)
-    # return variable
     state = np.array([
         1 if i // (6 * 9) == i % 6 else 0
         for i in range(9*6*6)

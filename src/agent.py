@@ -3,6 +3,7 @@ import json
 import math
 from multiprocessing import Pool, pool
 import os
+from time import time
 import tensorflow as tf
 import numpy as np
 from random import Random
@@ -82,6 +83,7 @@ class Agent:
         total_loss = tf.constant(0,dtype=tf.float32)
 
         for _ in range(replay_length):
+            env = tf.reshape(env,[1,324])
             output_1 = self.network.apply(env)
             choice_1 = tf.argmax(output_1,1)
             move_matrix = tf.gather_nd(ACTIONS_TENSOR,choice_1)
@@ -93,18 +95,7 @@ class Agent:
             hash_2 = hash_environment(env)
             reward_2 = rewards.lookup(hash_2)
 
-            total_loss = total_loss + value_1 - tf.multiply(value_2,gamma) + reward_2
 
-        total_loss = tf.divide(total_loss,replay_length)
-        tf.print(total_loss)
+            total_loss = total_loss + tf.divide(tf.square(value_1 - tf.multiply(value_2,gamma) + reward_2),replay_length)
 
-
-
-
-
-
-
-            # output = self.network.apply(env)
-            # choice = tf.argmax(output,1)
-            # action_matrix = tf.gather_nd(ACTIONS_TENSOR,choice)
-            # env = tf.matmul(tf.reshape(env,[1,324]),action_matrix)
+        return total_loss

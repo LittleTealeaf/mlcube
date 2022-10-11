@@ -3,6 +3,7 @@ from src import *
 from git import Repo
 from multiprocessing import Manager, Pool
 import os
+from time import time
 
 
 local_repo = Repo(path='.')
@@ -13,11 +14,41 @@ agent = Agent([264,202,141,80],f'agents/{local_branch}-1')
 
 rewards = calculate_rewards(depth=3)
 
+start = time()
 agent.run_cycle(
   env=create_environment(100),
-  replay_length=100,
+  replay_length=1_000,
   rewards=rewards
+
 )
+
+end = time()
+print(f"took {end - start}")
+
+for _ in range(100):
+  start = time()
+
+  with tf.GradientTape() as tape:
+
+    tape.watch(agent.network.trainable_variables)
+
+    loss = agent.run_cycle(
+      env=create_environment(100),
+      replay_length=100,
+      rewards=rewards
+    )
+
+    tf_gradient = tape.gradient(loss,agent.network.trainable_variables)
+
+    optimizer = tf.optimizers.SGD(learning_rate=0.1)
+    optimizer.apply_gradients(zip(tf_gradient,agent.network.trainable_variables))
+    tf.print(loss)
+
+
+  end = time()
+
+  print(f"took {end - start}")
+
 
 
 
