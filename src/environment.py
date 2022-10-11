@@ -211,6 +211,9 @@ def hash_environment(env):
     # TODO hash a sparse array
 
 
+ACTIONS_TENSOR = tf.constant(np.array([
+    action.matrix for action in ACTIONS
+]),dtype=tf.float32)
 
 
 

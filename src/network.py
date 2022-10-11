@@ -69,7 +69,6 @@ class Network:
     def apply(self, input):
         "Input must be in the form of a tf constant"
         x = tf.reshape(input,[1,324])
-        print("load")
         for i in range(len(self.layers)):
             W,b = self.layers[i]
             x = tf.matmul(x,W)

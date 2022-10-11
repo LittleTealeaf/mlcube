@@ -11,8 +11,10 @@ local_branch = local_repo.active_branch.name
 
 agent = Agent([264,202,141,80],f'agents/{local_branch}-1')
 
-for i in range(10):
-  print(agent.network.apply(create_environment(i)))
+agent.run_cycle(
+  env=create_environment(100),
+  replay_length=10
+)
 
 
 

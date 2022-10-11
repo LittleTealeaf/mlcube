@@ -1,3 +1,4 @@
+from asyncio import constants
 import json
 import math
 from multiprocessing import Pool, pool
@@ -7,7 +8,7 @@ import numpy as np
 from random import Random
 
 from src.network import *
-from src.environment import ACTION_COUNT, ACTIONS
+from src.environment import ACTION_COUNT, ACTIONS, ACTIONS_TENSOR, create_environment
 
 
 class Agent:
@@ -68,5 +69,18 @@ class Agent:
 
 
     @tf.function
-    def run_cycle(self):
-        ...
+    def run_cycle(
+        self,
+        env = create_environment(100),
+        replay_length = tf.constant(10_000,dtype=tf.int64),
+        gamma = tf.constant(0.7, dtype=tf.float64)
+        ):
+
+        loss = tf.constant(0,dtype=tf.float32)
+
+        for _ in range(replay_length):
+            output = self.network.apply(env)
+            choice = tf.argmax(output,1)
+            action_matrix = tf.gather_nd(ACTIONS_TENSOR,choice)
+            env = tf.matmul(tf.reshape(env,[1,324]),action_matrix)
+            tf.print(choice)
