@@ -44,6 +44,9 @@ for _ in range(100):
     optimizer.apply_gradients(zip(tf_gradient,agent.network.trainable_variables))
     tf.print(loss)
 
+  # TODO rewrite the graph to be more robust and usable.
+  # maybe include "GRAPHS" as parameters for the neural network? maybe that will work? Testing? hm?
+
 
   end = time()
 
