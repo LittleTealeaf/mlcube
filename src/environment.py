@@ -185,13 +185,18 @@ ACTIONS = [
 
 def create_environment():
     return tf.constant(np.array([
-        1 if i // 6 == i % 6 else 0
+        1 if i // (6*9) == i % 6 else 0
         for i in range(9*6*6)
     ]))
 
+@tf.function
 def hash_environment(env):
-    ...
+    tf_string_tensor = tf.strings.as_string(env)
+    tf_string_concatenated = tf.strings.join(tf_string_tensor)
+    return tf_string_concatenated
     # TODO hash a sparse array
+
+
 
 
 
