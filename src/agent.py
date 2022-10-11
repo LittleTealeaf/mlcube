@@ -7,7 +7,7 @@ import numpy as np
 from random import Random
 
 from src.network import *
-from src.environment import ACTION_COUNT, Environment, ACTIONS, create_scrambled_environment
+from src.environment import ACTION_COUNT, ACTIONS
 
 
 class Agent:
@@ -65,3 +65,8 @@ class Agent:
 
         with open(os.path.join(self.directory, "evaluations.json"), "w") as file:
             file.write(json.dumps(self.evaluations))
+
+
+    @tf.function
+    def run_cycle(self):
+        ...

@@ -4,8 +4,17 @@ from git import Repo
 from multiprocessing import Manager, Pool
 import os
 
-# local_repo = Repo(path='.')
-# local_branch = local_repo.active_branch.name
+
+local_repo = Repo(path='.')
+local_branch = local_repo.active_branch.name
+
+
+agent = Agent([264,202,141,80],f'agents/{local_branch}-1')
+
+for i in range(10):
+  print(agent.network.apply(create_environment(i)))
+
+
 
 # # THOUGHTS
 # # - Switch to a legitimate reinforced method that builds a replay that it trains on (from a single solved cube). -> this may fix the whole "repeating the same move" over and over because it's training on what it actually ends up doing (well, also epsilon but start epsilon at 0.75 and it'll be significant towards completion)

@@ -5,12 +5,12 @@ import tensorflow as tf
 class Action:
     def __init__(self, name: str, loops: list[list[int]], two=False, prime=False):
         self.name = name
-        matrix = np.identity(9 * 6,dtype=np.int8)
+        matrix = np.identity(9 * 6,dtype=np.float32)
 
         for loop in loops:
-          initial = np.copy(self.matrix[loop[0]])
+          initial = np.copy(matrix[loop[0]])
           for i in range(len(loop) - 1):
-            matrix[loop[i]] = self.matrix[loop[i+1]]
+            matrix[loop[i]] = matrix[loop[i+1]]
           matrix[loop[-1]] = initial
 
         del initial
@@ -28,6 +28,7 @@ class Action:
                 if matrix[y,x] == 1:
                     for i in range(6):
                         self.matrix[y * 6 + i, x * 6 + i] = 1
+
 
 def create_moves(name: str, loops: list[list[int]]):
     return [
@@ -183,11 +184,24 @@ ACTIONS = [
 
 #     def hash(self):
 
-def create_environment():
-    return tf.constant(np.array([
-        1 if i // (6*9) == i % 6 else 0
+def create_environment(scramble_length=0):
+    # variable = tf.constant(np.array([
+    #     1 if i // (6*9) == i % 6 else 0
+    #     for i in range(9*6*6)
+    # ]),dtype=tf.float32)
+    # random = Random()
+    # for i in range(scramble_length):
+    #     variable = tf.matmul(variable,tf.constant)
+    # return variable
+    state = np.array([
+        1 if i // (6 * 9) == i % 6 else 0
         for i in range(9*6*6)
-    ]))
+    ])
+    random = Random()
+    for _ in range(scramble_length):
+        state = state @ random.choice(ACTIONS).matrix
+    return tf.constant(state,dtype=tf.float32)
+
 
 @tf.function
 def hash_environment(env):

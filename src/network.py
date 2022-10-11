@@ -65,9 +65,11 @@ class Network:
             self.trainable_variables.append(W)
             self.trainable_variables.append(b)
 
+    @tf.function
     def apply(self, input):
         "Input must be in the form of a tf constant"
-        x = input
+        x = tf.reshape(input,[1,324])
+        print("load")
         for i in range(len(self.layers)):
             W,b = self.layers[i]
             x = tf.matmul(x,W)
