@@ -1,35 +1,33 @@
 from random import Random
 import numpy as np
+import tensorflow as tf
 
 class Action:
     def __init__(self, name: str, loops: list[list[int]], two=False, prime=False):
         self.name = name
-        self.matrix = np.identity(9 * 6,dtype=np.int8)
+        matrix = np.identity(9 * 6,dtype=np.int8)
 
         for loop in loops:
           initial = np.copy(self.matrix[loop[0]])
           for i in range(len(loop) - 1):
-            self.matrix[loop[i]] = self.matrix[loop[i+1]]
-          self.matrix[loop[-1]] = initial
+            matrix[loop[i]] = self.matrix[loop[i+1]]
+          matrix[loop[-1]] = initial
 
         del initial
 
         if two:
-            self.matrix = self.matrix @ self.matrix
+            matrix = matrix @ matrix
 
         if prime:
-            self.matrix = self.matrix @ self.matrix @ self.matrix
+            matrix = matrix @ matrix @ matrix
 
-        self.observation_matrix = np.zeros((9*6*6,9*6*6))
+        self.matrix = np.zeros((9*6*6,9*6*6))
 
         for x in range(9 * 6):
             for y in range(9 * 6):
-                if self.matrix[y,x] == 1:
+                if matrix[y,x] == 1:
                     for i in range(6):
-                        self.observation_matrix[y * 6 + i, x * 6 + i] = 1
-
-    def apply(self,state):
-      return state @ self.matrix
+                        self.matrix[y * 6 + i, x * 6 + i] = 1
 
 def create_moves(name: str, loops: list[list[int]]):
     return [
@@ -106,85 +104,121 @@ ACTIONS = [
 ]
 
 
-class Environment:
-    def __init__(self, observations: list[list[int]] = None):
-        if observations:
-            self.state = np.array([0] * (9 * 6),dtype=np.int8)
-            for i in range(len(observations[0])):
-                self.state[i//6] += observations[0][i] * (i%6)
-        else:
-            self.reset()
+# class Environment:
+#     def __init__(self, observations: list[list[int]] = None):
+#         if observations:
+#             self.state = np.array([0] * (9 * 6),dtype=np.int8)
+#             for i in range(len(observations[0])):
+#                 self.state[i//6] += observations[0][i] * (i%6)
+#         else:
+#             self.reset()
 
 
-    def reset(self):
-        self.state = np.array([i // 9 for i in range(9 * 6)],dtype=np.int8)
-        return self
+#     def reset(self):
+#         self.state = np.array([i // 9 for i in range(9 * 6)],dtype=np.int8)
+#         return self
 
-    def apply_action(self,action: Action):
-      self.state = action.apply(self.state)
-      return self
+#     def apply_action(self,action: Action):
+#       self.state = action.apply(self.state)
+#       return self
 
-    def is_complete(self):
-      for i in range(9 * 6):
-        if self.state[i] != i // 9:
-          return False
-      return True
+#     def is_complete(self):
+#       for i in range(9 * 6):
+#         if self.state[i] != i // 9:
+#           return False
+#       return True
 
-    def to_observations(self):
-        array = np.zeros((1,9 * 6 * 6),dtype=np.float32)
-        for i in range(9 * 6):
-            array[0][i * 6 + self.state[i]] = 1
-        return array
+#     def to_observations(self):
+#         array = np.zeros((1,9 * 6 * 6),dtype=np.float32)
+#         for i in range(9 * 6):
+#             array[0][i * 6 + self.state[i]] = 1
+#         return array
 
-    def scramble(self,count: int = 100):
-        random = Random()
-        for _ in range(count):
-            self.apply_action(random.choice(ACTIONS))
-        return self
+#     def scramble(self,count: int = 100):
+#         random = Random()
+#         for _ in range(count):
+#             self.apply_action(random.choice(ACTIONS))
+#         return self
 
-    def copy(self):
-        env = Environment()
-        env.state = np.copy(self.state)
-        return env
+#     def copy(self):
+#         env = Environment()
+#         env.state = np.copy(self.state)
+#         return env
 
-    def hash(self):
-        return int("".join([str(i) for i in self.state]),6)
+#     def hash(self):
+#         return int("".join([str(i) for i in self.state]),6)
 
-    def reward(self, rewards):
-        if len(rewards) == 0:
-            print("ERROR")
-        hash = self.hash()
-        try:
-            return rewards[hash]
-        except KeyError:
-            return 0
+#     def reward(self, rewards):
+#         if len(rewards) == 0:
+#             print("ERROR")
+#         hash = self.hash()
+#         try:
+#             return rewards[hash]
+#         except KeyError:
+#             return 0
+
+# class Environment:
+#     def __init__(self,state = None):
+#         if state:
+#             self.state = state
+#         else:
+#             # So I'm either going crazy and this doesn't work, or I'm going crazy and this does work
+#             self.state = np.array([
+#                 1
+#                 if (i // 6) == i % 6
+#                 else 0
+#                 for i in range(9*6*6)
+#             ])
+
+#     def getTensor(self,overwrite=False):
+#         if not self.tensor or overwrite:
+#             self.tensor = tf.constant(self.state)
+
+#         return self.tensor
+
+#     def getState(self,overwrite=False):
+#         if overwrite and self.tensor:
+#             self.state = self.getTensor(False)
+#         return self.state
+
+#     def hash(self):
+
+def create_environment():
+    return tf.constant(np.array([
+        1 if i // 6 == i % 6 else 0
+        for i in range(9*6*6)
+    ]))
+
+def hash_environment(env):
+    ...
 
 
-def calculate_rewards(depth=8,decay=0.8,max_count=1_000_000):
-    rewards = {}
-    count = 0
-    buffer = [Environment()]
-    for i in range(depth):
-        print(f"Calculating depth {i} with length {len(buffer)}")
-        tmp_buffer = []
-        for env in buffer:
-            hash = env.hash()
-            if hash not in rewards:
-                rewards[hash] = decay ** i
-                count = count + 1
-                if count >= max_count:
-                    print("Hit maximum reward length")
-                    return rewards
 
-                if i < depth - 1:
-                    for action in ACTIONS:
-                        tmp_buffer.append(env.copy().apply_action(action))
-        buffer = tmp_buffer
-    return rewards
+# def calculate_rewards(depth=8,decay=0.8,max_count=1_000_000):
+#     rewards = {}
+#     count = 0
+#     buffer = [Environment()]
+#     for i in range(depth):
+#         print(f"Calculating depth {i} with length {len(buffer)}")
+#         tmp_buffer = []
+#         for env in buffer:
+#             hash = env.hash()
+#             if hash not in rewards:
+#                 rewards[hash] = decay ** i
+#                 count = count + 1
+#                 if count >= max_count:
+#                     print("Hit maximum reward length")
+#                     return rewards
 
-def create_scrambled_environment(depth):
-    env = Environment()
-    env.scramble(depth)
-    return env
+#                 if i < depth - 1:
+#                     for action in ACTIONS:
+#                         tmp_buffer.append(env.copy().apply_action(action))
+#         buffer = tmp_buffer
+#     return rewards
+
+# def create_scrambled_environment(depth):
+#     env = Environment()
+#     env.scramble(depth)
+#     return env
 
 ACTION_COUNT = len(ACTIONS)
