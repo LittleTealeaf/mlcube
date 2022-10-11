@@ -7,7 +7,7 @@ import numpy as np
 from random import Random
 
 from src.network import *
-from src.environment import ACTION_COUNT, REWARDS, Environment, ACTIONS, create_scrambled_environment
+from src.environment import ACTION_COUNT, Environment, ACTIONS, create_scrambled_environment
 
 
 def pool_get_rewards(env,rewards: dict):
