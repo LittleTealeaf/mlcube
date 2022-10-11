@@ -206,7 +206,7 @@ def create_environment(scramble_length=0):
 @tf.function
 def hash_environment(env):
     tf_string_tensor = tf.strings.as_string(env)
-    tf_string_concatenated = tf.strings.join(tf_string_tensor)
+    tf_string_concatenated = tf.strings.reduce_join(tf_string_tensor)
     return tf_string_concatenated
     # TODO hash a sparse array
 
@@ -214,6 +214,35 @@ def hash_environment(env):
 ACTIONS_TENSOR = tf.constant(np.array([
     action.matrix for action in ACTIONS
 ]),dtype=tf.float32)
+
+def calculate_rewards(depth = 5, decay = 0.8):
+    rewards = {}
+    count = 0
+    buffer = [create_environment()]
+
+    for i in range(depth):
+        print(f"Calculating depth {i} with length {len(buffer)}")
+        tmp_buffer = []
+        for env in buffer:
+            hash = hash_environment(env).numpy()
+            if hash not in rewards:
+                rewards[hash] = decay ** i
+                count = count + 1
+                if i < depth - 1:
+                    for action in ACTIONS:
+                        tmp_buffer.append(tf.constant(env.numpy() @ action.matrix))
+        buffer = tmp_buffer
+
+    keys_tensor = tf.constant(list(rewards.keys()))
+    values_tensor = tf.constant(list(rewards.values()))
+
+    table = tf.lookup.StaticHashTable(
+        tf.lookup.KeyValueTensorInitializer(keys_tensor,values_tensor),default_value=0
+    )
+    return table
+
+
+
 
 
 

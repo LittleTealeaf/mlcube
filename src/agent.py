@@ -8,7 +8,7 @@ import numpy as np
 from random import Random
 
 from src.network import *
-from src.environment import ACTION_COUNT, ACTIONS, ACTIONS_TENSOR, create_environment
+from src.environment import ACTION_COUNT, ACTIONS, ACTIONS_TENSOR, create_environment, hash_environment
 
 
 class Agent:
@@ -73,14 +73,38 @@ class Agent:
         self,
         env = create_environment(100),
         replay_length = tf.constant(10_000,dtype=tf.int64),
-        gamma = tf.constant(0.7, dtype=tf.float64)
+        gamma = tf.constant(0.7, dtype=tf.float32),
+        rewards: tf.lookup.StaticHashTable = None
         ):
 
-        loss = tf.constant(0,dtype=tf.float32)
+        env = tf.reshape(env,[1,324])
+
+        total_loss = tf.constant(0,dtype=tf.float32)
 
         for _ in range(replay_length):
-            output = self.network.apply(env)
-            choice = tf.argmax(output,1)
-            action_matrix = tf.gather_nd(ACTIONS_TENSOR,choice)
-            env = tf.matmul(tf.reshape(env,[1,324]),action_matrix)
-            tf.print(choice)
+            output_1 = self.network.apply(env)
+            choice_1 = tf.argmax(output_1,1)
+            move_matrix = tf.gather_nd(ACTIONS_TENSOR,choice_1)
+            env = tf.matmul(env,move_matrix)
+            value_1 = tf.reduce_max(output_1)
+
+            output_2 = self.network.apply(env)
+            value_2 = tf.reduce_max(output_2)
+            hash_2 = hash_environment(env)
+            reward_2 = rewards.lookup(hash_2)
+
+            total_loss = total_loss + value_1 - tf.multiply(value_2,gamma) + reward_2
+
+        total_loss = tf.divide(total_loss,replay_length)
+        tf.print(total_loss)
+
+
+
+
+
+
+
+            # output = self.network.apply(env)
+            # choice = tf.argmax(output,1)
+            # action_matrix = tf.gather_nd(ACTIONS_TENSOR,choice)
+            # env = tf.matmul(tf.reshape(env,[1,324]),action_matrix)
