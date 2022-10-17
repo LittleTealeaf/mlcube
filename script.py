@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     REWARDS = calculate_rewards(depth=6,decay=0.9,max_count=1_000_000)
 
-    agent = Agent([264, 202, 141, 80],f"agents/{local_branch}-1")
+    agent = Agent([300, 300, 300, 300, 300, 300, 300, 300],f"agents/{local_branch}")
 
     # 4 - 500 INTERVAL
     # 5 - 30 INTERVAL
@@ -39,8 +39,8 @@ if __name__ == "__main__":
 
     while not os.path.exists("./stop"):
       epoch = agent.get_epoch()
-      epsilon = max(exponential_decay(0.75,epoch,0.95,target_interval),0.1)
-      learning_rate = exponential_decay(exponential_decay(0.1,epoch%target_interval,0.99),0.95,target_interval)
+      epsilon = exponential_decay(0.75,epoch,0.93,target_interval)
+      learning_rate = exponential_decay(exponential_decay(0.1,epoch%target_interval,0.99),epoch,0.99,target_interval)
 
       outputs = agent.run_cycle(
         pool=pool,
@@ -48,8 +48,8 @@ if __name__ == "__main__":
         epsilon=epsilon,
         learning_rate=learning_rate,
         moves_min=0,
-        moves_max=20,
-        gamma=0.75,
+        moves_max=30,
+        gamma=0.8,
         rewards=REWARDS,
         random=random
       )

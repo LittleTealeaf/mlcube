@@ -152,7 +152,7 @@ class Environment:
             return 0
 
 
-def calculate_rewards(depth=8,decay=0.8,max_count=1_000_000):
+def calculate_rewards(depth=8,decay=0.8, base = 1,max_count=1_000_000):
     rewards = {}
     count = 0
     buffer = [Environment()]
@@ -162,7 +162,7 @@ def calculate_rewards(depth=8,decay=0.8,max_count=1_000_000):
         for env in buffer:
             hash = env.hash()
             if hash not in rewards:
-                rewards[hash] = decay ** i
+                rewards[hash] = base * (decay ** i)
                 count = count + 1
                 if count >= max_count:
                     print("Hit maximum reward length")
