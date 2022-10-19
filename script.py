@@ -10,14 +10,14 @@ local_repo = Repo(path='.')
 local_branch = local_repo.active_branch.name
 
 
-agent = Agent([264,202,141,80],f'agents/{local_branch}-1')
+agent = Agent([264,202,141,80],f'agents/{local_branch}-2')
 
 rewards = calculate_rewards(depth=3)
 
 start = time()
 agent.run_cycle(
   env=create_environment(100),
-  replay_length=1_000,
+  replay_length=10,
   rewards=rewards
 
 )
@@ -34,7 +34,7 @@ for _ in range(100):
 
     loss = agent.run_cycle(
       env=create_environment(100),
-      replay_length=100,
+      replay_length=10,
       rewards=rewards
     )
 
