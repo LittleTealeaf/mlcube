@@ -38,20 +38,11 @@ class Network:
             for i in range(len(self.layer_sizes)):
                 length_prev = self.layer_sizes[i - 1] if i > 0 else LAYER_SIZE_INPUT
                 length_cur = self.layer_sizes[i]
-
-                # W = tf.Variable(
-
-                #     # tf.random.normal([length_prev, length_cur], stddev=0.03),
-                #     dtype=tf.float32,
-                # )
                 W = tf.Variable(VarianceScaling(
                     scale=2.0,
                     mode='fan_in',
                     distribution='truncated_normal'
                 )(shape=(length_prev,length_cur),dtype=tf.float32))
-                # b = tf.Variable(
-                #     tf.random.normal([length_cur], stddev=0.03), dtype=tf.float32
-                # )
 
                 b = tf.Variable(VarianceScaling(
                     scale=2.0,
@@ -67,7 +58,10 @@ class Network:
 
     def apply(self, input):
         "Input must be in the form of a tf constant"
-        x = input
+        if len(input.shape) == 1:
+            x = tf.reshape(input,(1,9*6*6))
+        else:
+            x = input
         for i in range(len(self.layers)):
             W,b = self.layers[i]
             x = tf.matmul(x,W)
