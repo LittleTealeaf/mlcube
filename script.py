@@ -8,8 +8,11 @@ from tf_agents.replay_buffers import tf_uniform_replay_buffer
 local_repo = Repo(path=".")
 branch = local_repo.active_branch.name
 
+random=Random()
+
 
 BATCH_SIZE = 32
+REPLAY_BATCH_SIZE = 512
 MAX_BUFFER_LENGTH = 1000
 
 
@@ -32,10 +35,27 @@ if __name__ == "__main__":
 
         agent = Agent([264, 202, 141, 80],f"agents/{branch}")
 
-        for _ in range(100):
-            replay_buffer.add_batch(agent.create_replay_batch(BATCH_SIZE))
+        while not os.path.exists("./stop"):
+            replay_buffer.add_batch(agent.create_replay_batch(
+                batch_size = BATCH_SIZE,
+                epsilon=0.5,
+                scramble_depth=40,
+                random=random
+            ))
+            replay = replay_buffer.get_next(sample_batch_size=REPLAY_BATCH_SIZE)
+            
 
-        print(replay_buffer.get_next(sample_batch_size=5))
+        os.remove('./stop')
+
+        # for _ in range(100):
+        #     replay_buffer.add_batch(agent.create_replay_batch(
+        #         batch_size=BATCH_SIZE,
+        #         epsilon=0,
+        #         scramble_depth=100,
+        #         random=random
+        #     ))
+
+        # print(replay_buffer.get_next(sample_batch_size=5))
 
 
 
