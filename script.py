@@ -24,7 +24,7 @@ if __name__ == "__main__":
   with Pool(24) as pool:
     thread_manager = Manager()
 
-    REWARDS = calculate_rewards(depth=6,decay=0.9,max_count=1_000_000)
+    REWARDS = calculate_rewards(depth=6,decay=0.95,max_count=1_000_000)
 
     agent = Agent([300, 300, 300, 300, 300, 300, 300, 300],f"agents/{local_branch}")
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     while not os.path.exists("./stop"):
       epoch = agent.get_epoch()
-      epsilon = exponential_decay(0.75,epoch,0.93,target_interval)
+      epsilon = exponential_decay(0.5,epoch,0.95,target_interval)
       learning_rate = exponential_decay(exponential_decay(0.1,epoch%target_interval,0.99),epoch,0.99,target_interval)
 
       outputs = agent.run_cycle(
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         learning_rate=learning_rate,
         moves_min=0,
         moves_max=30,
-        gamma=0.8,
+        gamma=0.99,
         rewards=REWARDS,
         random=random
       )

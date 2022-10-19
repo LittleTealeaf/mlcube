@@ -1,6 +1,6 @@
 import json
 import math
-from multiprocessing import Pool, pool
+from multiprocessing import Pool
 import os
 import tensorflow as tf
 import numpy as np
@@ -120,7 +120,7 @@ class Agent:
 
     def run_cycle(
         self,
-        pool: pool=None,
+        pool: Pool=None,
         replay_size=10_000,
         epsilon=0.2,
         moves_min=1,
