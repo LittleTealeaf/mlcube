@@ -86,53 +86,6 @@ class Agent:
 
         return result
 
-    # def evaluate_network(self, max_moves=750, scramble_depth=100, rewards = {}, random = Random()):
-    #     env = Environment()
-    #     for _ in range(scramble_depth):
-    #         env.apply_action(random.choice(ACTIONS))
-
-    #     count = 0
-    #     reward_max = env.reward(rewards)
-    #     moves = []
-    #     visited_states: list[int] = []
-
-    #     while (not env.is_complete()) and count < max_moves and env.hash() not in visited_states:
-    #         visited_states.append(env.hash())
-    #         count = count + 1
-    #         values = self.network.apply(
-    #             tf.constant(env.to_observations(),dtype=tf.float32)
-    #         )
-    #         values_reshaped = tf.reshape(values,(18,))
-    #         move_index = tf.argmax(values_reshaped).numpy()
-    #         move = ACTIONS[move_index]
-    #         env.apply_action(move)
-
-    #         moves.append(move.name)
-    #         # if move.name not in moves:
-    #         #     moves[move.name] = 1
-    #         # else:
-    #         #     moves[move.name] = moves[move.name] + 1
-
-    #         reward_max = max(reward_max,env.reward(rewards))
-
-
-    #     solved = env.is_complete()
-    #     reward_final = env.reward(rewards)
-
-    #     result = {
-    #         'epoch': self.get_epoch(),
-    #         'solved': solved,
-    #         'count': count,
-    #         'moves': moves,
-    #         'reward_max': reward_max,
-    #         'reward_final': reward_final
-    #     }
-
-    #     self.evaluations.append(result)
-
-    #     return result
-
-
     def get_epoch(self):
         "Get the current epoch"
         return len(self.epochs)
@@ -218,6 +171,7 @@ class Agent:
             values = {
                 'epoch': self.get_epoch(),
                 'average_loss': float(loss_mean.numpy()),
+                'average_reward': float(tf.reduce_mean(tf.reshape(reward_2,(reward_2.shape[0],))))
             }
 
             self.epochs.append(values)
