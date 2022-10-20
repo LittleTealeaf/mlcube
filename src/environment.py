@@ -128,35 +128,36 @@ def env_to_observations(environment):
 def env_to_obs_tf(env):
     return tf.constant(env_to_observations(env),dtype=tf.float32)
 
+def hash_env(env):
+    return hash(env.tostring())
 
-# def calculate_rewards(depth=8,decay=0.8,max_count=1_000_000):
-#     rewards = {}
-#     count = 0
-#     buffer = [Environment()]
-#     for i in range(depth):
-#         print(f"Calculating depth {i} with length {len(buffer)}")
-#         tmp_buffer = []
-#         for env in buffer:
-#             hash = env.hash()
-#             if hash not in rewards:
-#                 rewards[hash] = decay ** i
-#                 count = count + 1
-#                 if count >= max_count:
-#                     print("Hit maximum reward length")
-#                     return rewards
 
-#                 if i < depth - 1:
-#                     for action in ACTIONS:
-#                         tmp_buffer.append(env.copy().apply_action(action))
-#         buffer = tmp_buffer
-#     return rewards
+def calculate_rewards(depth=8,decay=0.9,base = 1):
+    rewards = {}
+    buffer = [create_environment()]
+    for i in range(depth):
+        print(f'Calculating depth {i} with length {len(buffer)}')
+        tmp_buffer = []
+        for env in buffer:
+            ehash = hash_env(env)
+            if ehash not in rewards:
+                rewards[ehash] = base * decay ** i
+                if i < depth - 1:
+                    for action in ACTIONS:
+                        tmp_buffer.append(action.apply(env))
+        buffer = tmp_buffer
+    return rewards
 
-# def create_scrambled_environment(depth):
-#     env = Environment()
-#     env.scramble(depth)
-#     return env
+def get_reward(env,rewards={}):
+    ehash = hash_env(env)
+    return rewards[ehash] if ehash in rewards else 0
 
-# ACTION_COUNT = len(ACTIONS)
+def env_is_complete(env):
+    for i in range(9 * 6):
+        if env[i] != i // 9:
+            return False
+    return True
+
 
 
 COUNT_ACTIONS = len(ACTIONS)

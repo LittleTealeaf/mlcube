@@ -7,7 +7,7 @@ import numpy as np
 from random import Random
 
 from src.network import *
-from src.environment import ACTIONS, create_environment, env_to_obs_tf, env_to_observations, COUNT_ACTIONS
+from src.environment import ACTIONS, create_environment, env_is_complete, env_to_obs_tf, env_to_observations, COUNT_ACTIONS, get_reward, hash_env
 
 
 def pool_get_rewards(env,rewards: dict):
@@ -48,6 +48,43 @@ class Agent:
         if not self.network:
             self.network = Network(layer_sizes,output_size=COUNT_ACTIONS)
             self.update_target()
+
+    def evaluate_network(self,max_moves=1_000,scramble_depth=100,rewards={},random=Random()):
+        env = create_environment(scramble_depth=scramble_depth,random=random)
+
+        count = 0
+        reward_max = get_reward(env,rewards=rewards)
+        moves = []
+        visited_states = []
+
+        while not env_is_complete(env) and count < max_moves and hash_env(env) not in visited_states:
+            visited_states.append(hash_env(env))
+            count = count + 1
+            values = self.network.apply(env_to_obs_tf(env))
+            values_reshaped = tf.reshape(values,(18,))
+            move_index = tf.argmax(values_reshaped).numpy()
+            move = ACTIONS[move_index]
+            env = move.apply(env)
+
+            moves.append(move.name)
+
+            reward_max = max(reward_max,get_reward(env))
+
+        solved = env_is_complete(env)
+        reward_final = get_reward(env)
+
+        result = {
+            'epoch': self.get_epoch(),
+            'solved': solved,
+            'count': count,
+            'moves': moves,
+            'reward_max': reward_max,
+            'reward_final': reward_final
+        }
+
+        self.evaluations.append(result)
+
+        return result
 
     # def evaluate_network(self, max_moves=750, scramble_depth=100, rewards = {}, random = Random()):
     #     env = Environment()
@@ -118,12 +155,13 @@ class Agent:
         "Update the target network to match the current network"
         self.target = self.network.copy()
 
-    def create_replay_batch(self,batch_size=32,epsilon=0.5,scramble_depth=30,random=Random()):
+    def create_replay_batch(self,batch_size=32,epsilon=0.5,scramble_depth=30,random=Random(),rewards={}):
         env = create_environment(scramble_depth=scramble_depth,random=random)
 
         state_1 = np.empty((batch_size,),dtype=tf.Tensor)
         choice_1 = np.zeros((batch_size,1),dtype=np.int32)
         state_2 = np.empty((batch_size,),dtype=tf.Tensor)
+        reward_2 = np.zeros((batch_size,1),dtype=np.float32)
 
         for i in range(batch_size):
             if i == 0:
@@ -137,6 +175,9 @@ class Agent:
 
             env = ACTIONS[choice_1[i][0]].apply(env)
             state_2[i] = env_to_obs_tf(env)
+            env_hash = hash_env(env)
+
+            reward_2[i][0] = rewards[env_hash] if env_hash in rewards else 0
 
             if i < batch_size - 1:
                 state_1[i+1] = state_2[i]
@@ -144,5 +185,41 @@ class Agent:
         return (
             tf.stack(state_1),
             tf.constant(choice_1,dtype=tf.int32),
-            tf.stack(state_2)
+            tf.stack(state_2),
+            tf.constant(reward_2,dtype=tf.float32)
         )
+
+    def train_batch(self,batch,gamma=0.99,learning_rate=0.1):
+        state_1,choice_1,state_2,reward_2 = batch
+
+        with tf.GradientTape() as tape:
+
+            tape.watch(self.network.trainable_variables)
+
+            output_1 = self.network.apply(state_1)
+            output_1_gathered = tf.gather(output_1,choice_1,batch_dims=1)
+            output_2 = self.target.apply(state_2)
+            output_2_gathered = tf.reduce_max(output_2,axis=1)
+
+            output_2_gathered_scaled = tf.multiply(output_2_gathered,gamma)
+
+            loss_raw = tf.reshape(output_2_gathered_scaled,(output_2_gathered_scaled.shape[0],1)) - output_1_gathered - reward_2
+
+            loss = tf.math.square(loss_raw)
+
+            loss_mean = tf.reduce_mean(loss)
+
+            gradient = tape.gradient(loss_mean,self.network.trainable_variables)
+
+            optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate)
+
+            optimizer.apply_gradients(zip(gradient,self.network.trainable_variables))
+
+            values = {
+                'epoch': self.get_epoch(),
+                'average_loss': float(loss_mean.numpy()),
+            }
+
+            self.epochs.append(values)
+
+            return values
