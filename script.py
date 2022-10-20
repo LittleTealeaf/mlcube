@@ -26,7 +26,7 @@ if __name__ == "__main__":
     with Pool(24) as pool:
 
         rewards = calculate_rewards(
-            depth=7,base=10,
+            depth=7,base=1,
         )
 
         # CALCULATE REWARDS
@@ -42,7 +42,7 @@ if __name__ == "__main__":
             data_spec, batch_size=BATCH_SIZE, max_length=MAX_BUFFER_LENGTH
         )
 
-        agent = Agent([400, 400, 400, 400, 400,400, 400, 400], f"agents/{branch}")
+        agent = Agent([4], f"agents/{branch}")
 
         while not os.path.exists("./stop"):
 
