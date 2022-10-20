@@ -14,12 +14,12 @@ def exponential_decay(initial, index, decay_rate, decay_interval=1):
     return initial * (decay_rate ** (index // decay_interval))
 
 
-BATCH_SIZE = 512
-REPLAY_BATCH_SIZE = 10_000
-MAX_BUFFER_LENGTH = 1_000
-TARGET_INTERVAL = 500
 EVALUATE_INTERVAL = 10
 SAVE_INTERVAL = 10
+TARGET_INTERVAL = 500
+BATCH_SIZE = 1024
+REPLAY_BATCH_SIZE = 10_000
+MAX_BUFFER_LENGTH = 1000
 
 
 if __name__ == "__main__":
@@ -42,7 +42,22 @@ if __name__ == "__main__":
             data_spec, batch_size=BATCH_SIZE, max_length=MAX_BUFFER_LENGTH
         )
 
-        agent = Agent([4], f"agents/{branch}")
+        agent = Agent([300,300,300,300], f"agents/{branch}")
+
+        # Pre-fill the replay data
+        prefill_iterations = REPLAY_BATCH_SIZE // BATCH_SIZE
+
+        for i in range(prefill_iterations):
+            print(f"Prefilling Batch Data: {i+1}/{prefill_iterations}")
+            replay_buffer.add_batch(
+                agent.create_replay_batch(
+                    batch_size=BATCH_SIZE,
+                    epsilon=1,
+                    scramble_depth=random.randint(0,100),
+                    random=random,
+                    rewards=rewards,
+                )
+            )
 
         while not os.path.exists("./stop"):
 
@@ -51,13 +66,13 @@ if __name__ == "__main__":
             learning_rate = exponential_decay(
                 exponential_decay(0.1, epoch, 0.99, TARGET_INTERVAL), epoch,0.99
             )
-            epsilon = exponential_decay(0.5, epoch, 0.95, TARGET_INTERVAL)
+            epsilon = exponential_decay(1, epoch, 0.95, TARGET_INTERVAL)
 
             replay_buffer.add_batch(
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=epsilon,
-                    scramble_depth=40,
+                    scramble_depth=random.randint(0,100),
                     random=random,
                     rewards=rewards,
                 )
@@ -74,7 +89,7 @@ if __name__ == "__main__":
                     max_moves = 1_000,
                     scramble_depth=100,
                     rewards=rewards,
-                    random=random
+                    random=Random(branch)
                 ))
 
             if epoch % SAVE_INTERVAL == 0:
