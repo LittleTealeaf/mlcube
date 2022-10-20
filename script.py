@@ -42,7 +42,7 @@ if __name__ == "__main__":
             data_spec, batch_size=BATCH_SIZE, max_length=MAX_BUFFER_LENGTH
         )
 
-        agent = Agent([650,650,400,400,300], f"agents/{branch}")
+        agent = Agent([600,500,400,300], f"agents/{branch}")
 
         # Pre-fill the replay data
         prefill_iterations = REPLAY_BATCH_SIZE // BATCH_SIZE

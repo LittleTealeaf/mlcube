@@ -56,8 +56,10 @@ class Network:
             self.trainable_variables.append(W)
             self.trainable_variables.append(b)
 
+    @tf.function
     def apply(self, input):
         "Input must be in the form of a tf constant"
+        print(f"Tracing apply function with input {input.shape}")
         if len(input.shape) == 1:
             x = tf.reshape(input,(1,9*6*6))
         else:
