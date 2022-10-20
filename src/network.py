@@ -39,13 +39,13 @@ class Network:
                 length_prev = self.layer_sizes[i - 1] if i > 0 else LAYER_SIZE_INPUT
                 length_cur = self.layer_sizes[i]
                 W = tf.Variable(VarianceScaling(
-                    scale=2.0,
+                    scale=1.0,
                     mode='fan_in',
                     distribution='truncated_normal'
                 )(shape=(length_prev,length_cur),dtype=tf.float32))
 
                 b = tf.Variable(VarianceScaling(
-                    scale=2.0,
+                    scale=1.0,
                     mode='fan_in',
                     distribution='truncated_normal'
                 )(shape=(length_cur,),dtype=tf.float32))

@@ -18,7 +18,7 @@ EVALUATE_INTERVAL = 10
 SAVE_INTERVAL = 10
 TARGET_INTERVAL = 500
 BATCH_SIZE = 1024
-REPLAY_BATCH_SIZE = 1024
+REPLAY_BATCH_SIZE = 10_000
 MAX_BUFFER_LENGTH = 1000
 
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     with Pool(24) as pool:
 
         rewards = calculate_rewards(
-            depth=7,base=1,
+            depth=7,base=10,
         )
 
         # CALCULATE REWARDS
@@ -42,7 +42,7 @@ if __name__ == "__main__":
             data_spec, batch_size=BATCH_SIZE, max_length=MAX_BUFFER_LENGTH
         )
 
-        agent = Agent([600,500,400,300], f"agents/{branch}")
+        agent = Agent([600,600,600,600,600], f"agents/{branch}")
 
         # Pre-fill the replay data
         prefill_iterations = REPLAY_BATCH_SIZE // BATCH_SIZE
@@ -53,7 +53,7 @@ if __name__ == "__main__":
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=1,
-                    scramble_depth=50,
+                    scramble_depth=100,
                     random=random,
                     rewards=rewards,
                 )
@@ -66,13 +66,13 @@ if __name__ == "__main__":
             learning_rate = exponential_decay(
                 exponential_decay(0.1, epoch, 0.99, TARGET_INTERVAL), epoch,0.99
             )
-            epsilon = exponential_decay(0.75, epoch, 0.9, TARGET_INTERVAL)
+            epsilon = exponential_decay(1, epoch, 0.9, TARGET_INTERVAL)
 
             replay_buffer.add_batch(
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=epsilon,
-                    scramble_depth=50,
+                    scramble_depth=random.randint(10,100),
                     random=random,
                     rewards=rewards,
                 )
