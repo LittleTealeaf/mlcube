@@ -42,7 +42,7 @@ if __name__ == "__main__":
             data_spec, batch_size=BATCH_SIZE, max_length=MAX_BUFFER_LENGTH
         )
 
-        agent = Agent([300,300,300,300], f"agents/{branch}")
+        agent = Agent([650,650,400,400,300], f"agents/{branch}")
 
         # Pre-fill the replay data
         prefill_iterations = REPLAY_BATCH_SIZE // BATCH_SIZE
@@ -53,7 +53,7 @@ if __name__ == "__main__":
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=1,
-                    scramble_depth=random.randint(0,100),
+                    scramble_depth=50,
                     random=random,
                     rewards=rewards,
                 )
@@ -66,13 +66,13 @@ if __name__ == "__main__":
             learning_rate = exponential_decay(
                 exponential_decay(0.1, epoch, 0.99, TARGET_INTERVAL), epoch,0.99
             )
-            epsilon = exponential_decay(1, epoch, 0.95, TARGET_INTERVAL)
+            epsilon = exponential_decay(0.75, epoch, 0.9, TARGET_INTERVAL)
 
             replay_buffer.add_batch(
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=epsilon,
-                    scramble_depth=random.randint(0,100),
+                    scramble_depth=50,
                     random=random,
                     rewards=rewards,
                 )
