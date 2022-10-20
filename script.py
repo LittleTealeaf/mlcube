@@ -42,7 +42,7 @@ if __name__ == "__main__":
             data_spec, batch_size=BATCH_SIZE, max_length=MAX_BUFFER_LENGTH
         )
 
-        agent = Agent([4], f"agents/{branch}")
+        agent = Agent([400,300,200,100], f"agents/{branch}")
 
         while not os.path.exists("./stop"):
 
