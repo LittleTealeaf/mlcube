@@ -53,7 +53,7 @@ if __name__ == "__main__":
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=1,
-                    scramble_depth=30,
+                    scramble_depth=25,
                     random=random,
                     rewards=rewards,
                 )
@@ -72,7 +72,7 @@ if __name__ == "__main__":
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=epsilon,
-                    scramble_depth=30,
+                    scramble_depth=20,
                     random=random,
                     rewards=rewards,
                 )
