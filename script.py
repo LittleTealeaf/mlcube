@@ -20,6 +20,7 @@ TARGET_INTERVAL = 100
 BATCH_SIZE = 1024
 REPLAY_BATCH_SIZE = 10_000
 MAX_BUFFER_LENGTH = 1000
+SCRAMBLE_DEPTH = 20
 
 
 if __name__ == "__main__":
@@ -52,8 +53,8 @@ if __name__ == "__main__":
             replay_buffer.add_batch(
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
-                    epsilon=1,
-                    scramble_depth=25,
+                    epsilon=0,
+                    scramble_depth=SCRAMBLE_DEPTH,
                     random=random,
                     rewards=rewards,
                 )
@@ -66,13 +67,13 @@ if __name__ == "__main__":
             learning_rate = exponential_decay(
                 exponential_decay(0.1, epoch, 0.99, TARGET_INTERVAL), epoch,0.99
             )
-            epsilon = exponential_decay(0.5, epoch, 0.9, TARGET_INTERVAL)
+            epsilon = exponential_decay(0.5, epoch, 0.95, TARGET_INTERVAL)
 
             replay_buffer.add_batch(
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=epsilon,
-                    scramble_depth=20,
+                    scramble_depth=SCRAMBLE_DEPTH,
                     random=random,
                     rewards=rewards,
                 )
