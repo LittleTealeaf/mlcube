@@ -7,12 +7,17 @@ import numpy as np
 LAYER_SIZE_INPUT = 9 * 6 * 6
 LAYER_SIZE_OUTPUT = 18
 
+class NetworkBase:
+    def __init__(self):
+        self.layers: list[tuple[tf.Variable,tf.Variable]] = []
+        self.trainable_variables: list[tf.Variable] = []
 
-class Network:
+
+class Network(NetworkBase):
     def __init__(self, layer_sizes: list[int], serialized=None, layers=None, output_size=18):
         self.layer_sizes = layer_sizes + [output_size]
-        self.trainable_variables = []
-        self.layers = []
+        self.trainable_variables: list[tf.Variable] = []
+        self.layers: list[tuple[tf.Variable,tf.Variable]] = []
 
         if layers:
             self.layers = layers
@@ -91,3 +96,11 @@ class Network:
                 bytes_list=tf.train.BytesList(value=[tf.io.serialize_tensor(b).numpy()])
             )
         return tf.train.Example(features=tf.train.Features(feature=features)).SerializeToString()
+
+    def set(self,other: NetworkBase):
+        if type(other) == Network:
+            for i in range(len(self.layers)):
+                W,b = self.layers[i]
+                Wp, bp = other.layers[i]
+                W.assign(Wp.numpy())
+                b.assign(bp.numpy())

@@ -21,8 +21,11 @@ BATCH_SIZE = 1024
 REPLAY_BATCH_SIZE = 10_000
 MAX_BUFFER_LENGTH = 1000
 SCRAMBLE_DEPTH = 20
-SCRAMLBE_DEPTH_MIN = 10
-SCRAMBLE_DEPTH_MAX = 30
+SCRAMBLE_DEPTH_MIN = 15
+SCRAMBLE_DEPTH_MAX = 25
+SCRAMBLE_WITH_RANGE = True
+PREFILL_DATA = False
+
 
 
 if __name__ == "__main__":
@@ -48,19 +51,20 @@ if __name__ == "__main__":
         agent = Agent([700, 600, 500, 343, 200], f"agents/{branch}")
 
         # Pre-fill the replay data
-        prefill_iterations = REPLAY_BATCH_SIZE // BATCH_SIZE
+        if PREFILL_DATA:
+            prefill_iterations = REPLAY_BATCH_SIZE // BATCH_SIZE
 
-        for i in range(prefill_iterations):
-            print(f"Prefilling Batch Data: {i+1}/{prefill_iterations}")
-            replay_buffer.add_batch(
-                agent.create_replay_batch(
-                    batch_size=BATCH_SIZE,
-                    epsilon=0,
-                    scramble_depth=random.randint(SCRAMLBE_DEPTH_MIN,SCRAMBLE_DEPTH_MAX),
-                    random=random,
-                    rewards=rewards,
+            for i in range(prefill_iterations):
+                print(f"Prefilling Batch Data: {i+1}/{prefill_iterations}")
+                replay_buffer.add_batch(
+                    agent.create_replay_batch(
+                        batch_size=BATCH_SIZE,
+                        epsilon=0,
+                        scramble_depth=random.randint(SCRAMBLE_DEPTH_MIN,SCRAMBLE_DEPTH_MAX) if SCRAMBLE_WITH_RANGE else SCRAMBLE_DEPTH,
+                        random=random,
+                        rewards=rewards,
+                    )
                 )
-            )
 
         while not os.path.exists("./stop"):
 
@@ -75,7 +79,7 @@ if __name__ == "__main__":
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=epsilon,
-                    scramble_depth=random.randint(SCRAMLBE_DEPTH_MIN,SCRAMBLE_DEPTH_MAX),
+                    scramble_depth=random.randint(SCRAMBLE_DEPTH_MIN,SCRAMBLE_DEPTH_MAX) if SCRAMBLE_WITH_RANGE else SCRAMBLE_DEPTH,
                     random=random,
                     rewards=rewards,
                 )

@@ -106,7 +106,10 @@ class Agent:
 
     def update_target(self):
         "Update the target network to match the current network"
-        self.target = self.network.copy()
+        if not self.target:
+            self.target = self.network.copy()
+        else:
+            self.target.set(self.network)
 
     def create_replay_batch(self,batch_size=32,epsilon=0.5,scramble_depth=30,random=Random(),rewards={}):
         env = create_environment(scramble_depth=scramble_depth,random=random)
