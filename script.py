@@ -16,7 +16,7 @@ def exponential_decay(initial, index, decay_rate, decay_interval=1):
 
 EVALUATE_INTERVAL = 10
 SAVE_INTERVAL = 10
-TARGET_INTERVAL = 500
+TARGET_INTERVAL = 100
 BATCH_SIZE = 1024
 REPLAY_BATCH_SIZE = 10_000
 MAX_BUFFER_LENGTH = 1000
