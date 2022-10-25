@@ -16,11 +16,13 @@ def exponential_decay(initial, index, decay_rate, decay_interval=1):
 
 EVALUATE_INTERVAL = 10
 SAVE_INTERVAL = 10
-TARGET_INTERVAL = 100
+TARGET_INTERVAL = 250
 BATCH_SIZE = 1024
 REPLAY_BATCH_SIZE = 10_000
 MAX_BUFFER_LENGTH = 1000
 SCRAMBLE_DEPTH = 20
+SCRAMLBE_DEPTH_MIN = 10
+SCRAMBLE_DEPTH_MAX = 30
 
 
 if __name__ == "__main__":
@@ -54,7 +56,7 @@ if __name__ == "__main__":
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=0,
-                    scramble_depth=SCRAMBLE_DEPTH,
+                    scramble_depth=random.randint(SCRAMLBE_DEPTH_MIN,SCRAMBLE_DEPTH_MAX),
                     random=random,
                     rewards=rewards,
                 )
@@ -73,7 +75,7 @@ if __name__ == "__main__":
                 agent.create_replay_batch(
                     batch_size=BATCH_SIZE,
                     epsilon=epsilon,
-                    scramble_depth=SCRAMBLE_DEPTH,
+                    scramble_depth=random.randint(SCRAMLBE_DEPTH_MIN,SCRAMBLE_DEPTH_MAX),
                     random=random,
                     rewards=rewards,
                 )
