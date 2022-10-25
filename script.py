@@ -40,6 +40,7 @@ if __name__ == "__main__":
         rewards = calculate_rewards(
             depth=7,
             base=10,
+            decay=0.9
         )
 
         data_spec = (
