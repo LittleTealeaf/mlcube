@@ -98,9 +98,8 @@ class Network(NetworkBase):
         return tf.train.Example(features=tf.train.Features(feature=features)).SerializeToString()
 
     def set(self,other: NetworkBase):
-        if type(other) == Network:
-            for i in range(len(self.layers)):
-                W,b = self.layers[i]
-                Wp, bp = other.layers[i]
-                W.assign(Wp.numpy())
-                b.assign(bp.numpy())
+        for i in range(len(self.layers)):
+            W,b = self.layers[i]
+            Wp, bp = other.layers[i]
+            W.assign(Wp.numpy())
+            b.assign(bp.numpy())
