@@ -16,7 +16,7 @@ def exponential_decay(initial, index, decay_rate, decay_interval=1):
 
 EVALUATE_INTERVAL = 10
 SAVE_INTERVAL = 10
-TARGET_INTERVAL = 500
+TARGET_INTERVAL = 250
 GAMMA=0.99
 
 BATCH_SIZE = 1000
