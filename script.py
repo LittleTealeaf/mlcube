@@ -17,6 +17,7 @@ def exponential_decay(initial, index, decay_rate, decay_interval=1):
 EVALUATE_INTERVAL = 10
 SAVE_INTERVAL = 10
 TARGET_INTERVAL = 500
+GAMMA=0.99
 
 BATCH_SIZE = 1000
 REPLAY_BATCH_SIZE = 10_000
@@ -25,7 +26,7 @@ MAX_BUFFER_LENGTH = 1000
 
 SCRAMBLE_DEPTH = 20
 SCRAMBLE_DEPTH_MIN = 5
-SCRAMBLE_DEPTH_MAX = 100
+SCRAMBLE_DEPTH_MAX = 500
 SCRAMBLE_WITH_RANGE = True
 
 PREFILL_DATA = True
@@ -84,9 +85,9 @@ if __name__ == "__main__":
             epoch = agent.get_epoch()
 
             learning_rate = exponential_decay(
-                exponential_decay(0.1, epoch, 0.99, TARGET_INTERVAL), epoch, 0.99
+                exponential_decay(0.1, epoch, 0.99, TARGET_INTERVAL), epoch, 0.95
             )
-            epsilon = exponential_decay(0.5, epoch, 0.95, TARGET_INTERVAL)
+            epsilon = exponential_decay(0.5, epoch, 0.92, TARGET_INTERVAL)
 
             replay_buffer.add_batch(
                 agent.create_replay_batch(
@@ -103,7 +104,7 @@ if __name__ == "__main__":
             )
             replay = replay_buffer.get_next(sample_batch_size=REPLAY_BATCH_SIZE)[0]
             training = agent.train_batch(
-                replay, learning_rate=learning_rate, gamma=0.99
+                replay, learning_rate=learning_rate, gamma=GAMMA
             )
             print(training)
 
