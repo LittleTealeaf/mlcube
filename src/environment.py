@@ -168,6 +168,3 @@ class RubiksCubeEnvironment(py_environment.PyEnvironment):
       return ts.termination(observations, reward)
     else:
       return ts.transition(observations,reward=0.0, discount=1.0)
-
-environment = RubiksCubeEnvironment()
-utils.validate_py_environment(environment,episodes = 5)
