@@ -1,20 +1,6 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import abc
-import tensorflow as tf
+from random import Random
 import numpy as np
-
-from tf_agents.environments import py_environment
-from tf_agents.environments import tf_environment
-from tf_agents.environments import tf_py_environment
-from tf_agents.environments import utils
-from tf_agents.specs import array_spec
-from tf_agents.environments import wrappers
-from tf_agents.environments import suite_gym
-from tf_agents.trajectories import time_step as ts
-
+import tensorflow as tf
 
 class Action:
     def __init__(self, name: str, loops: list[list[int]], two=False, prime=False):
@@ -114,60 +100,64 @@ ACTIONS = [
     for move in moves
 ]
 
-class RubiksCubeEnvironment(py_environment.PyEnvironment):
-  def __init__(self, episode_max_moves = 1000):
-    self._action_spec = array_spec.BoundedArraySpec(
-      shape=(), dtype=np.int32, minimum=0, maximum=len(ACTIONS) - 1, name='action'
-    )
-    self._observation_spec = array_spec.BoundedArraySpec(
-      shape = (9*6*6,),dtype=np.int32, minimum=0, maximum=1, name = 'observations'
-    )
-    self._state = np.fromfunction(lambda i: i // 9, (9*6,))
-    self._moves = 0
-    self._episode_ended = False
-    self._episode_max_moves = episode_max_moves
 
+# def create_environment(scramble_depth=None):
+#     if not scramble_depth:
+#       return np.fromfunction(lambda i: i // 9,(9*6,))
+#     else:
+#       return scramble(create_environment(),)
 
-  def action_spec(self):
-    return self._action_spec
+# def scramble(environment, count = 100, random = Random()):
+#   for _ in range(count):
+#     environment = random.choice(ACTIONS).apply(environment)
+#   return environment
 
-  def observation_spec(self):
-    return self._observation_spec
+def create_environment(scramble_depth=0,random=Random()):
+  env = np.fromfunction(lambda i: i // 9, (9*6,))
+  for _ in range(scramble_depth):
+    env = random.choice(ACTIONS).apply(env)
+  return env
 
-  def is_solved(self):
-    for i in range(9 * 6):
-        if self._state[i] != i // 9:
-            return False
-    return True
-
-  def get_observations(self):
-    obs = np.zeros((9*6*6),dtype=np.int32)
+def env_to_observations(environment):
+    obs = np.zeros((9*6*6),dtype=np.float32)
     for i in range(9*6):
-        index = int(self._state[i])
+        index = int(environment[i])
         obs[i * 6 + index] = 1
     return obs
 
-  def _reset(self):
-    self._moves = 0
-    self._state = np.fromfunction(lambda i: i // 9, (9*6,))
-    self._episode_ended = False
-    return ts.restart(self.get_observations())
+def env_to_obs_tf(env):
+    return tf.constant(env_to_observations(env),dtype=tf.float32)
 
-  def _step(self,action):
-    self._moves += 1
-    self._state = ACTIONS[int(action)].apply(self._state)
+def hash_env(env):
+    return hash(env.tostring())
 
-    if self.is_solved():
-      self._episode_ended = True
 
-    observations = self.get_observations()
+def calculate_rewards(depth=8,decay=0.9,base = 1):
+    rewards = {}
+    buffer = [create_environment()]
+    for i in range(depth):
+        print(f'Calculating depth {i} with length {len(buffer)}')
+        tmp_buffer = []
+        for env in buffer:
+            ehash = hash_env(env)
+            if ehash not in rewards:
+                rewards[ehash] = base * decay ** i
+                if i < depth - 1:
+                    for action in ACTIONS:
+                        tmp_buffer.append(action.apply(env))
+        buffer = tmp_buffer
+    return rewards
 
-    if self._episode_ended or self._moves >= self._episode_max_moves:
-      # calculate reward
-      reward = 0
-      return ts.termination(observations, reward)
-    else:
-      return ts.transition(observations,reward=0.0, discount=1.0)
+def get_reward(env,rewards={}):
+    ehash = hash_env(env)
+    return rewards[ehash] if ehash in rewards else 0
 
-environment = RubiksCubeEnvironment()
-utils.validate_py_environment(environment,episodes = 5)
+def env_is_complete(env):
+    for i in range(9 * 6):
+        if env[i] != i // 9:
+            return False
+    return True
+
+
+
+COUNT_ACTIONS = len(ACTIONS)
