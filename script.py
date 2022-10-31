@@ -102,7 +102,13 @@ if __name__ == "__main__":
                     rewards=rewards,
                 )
             )
-            replay = replay_buffer.get_next(sample_batch_size=REPLAY_BATCH_SIZE)[0]
+            # replay = replay_buffer.get_next(sample_batch_size=REPLAY_BATCH_SIZE)[0]
+            replay = replay_buffer.as_dataset(sample_batch_size=REPLAY_BATCH_SIZE)
+            
+
+
+            print("hi")
+
             training = agent.train_batch(
                 replay, learning_rate=learning_rate, gamma=GAMMA
             )
