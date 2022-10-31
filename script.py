@@ -29,7 +29,7 @@ SCRAMBLE_DEPTH_MIN = 5
 SCRAMBLE_DEPTH_MAX = 500
 SCRAMBLE_WITH_RANGE = True
 
-PREFILL_DATA = True
+PREFILL_DATA = False
 PREFILL_VALUE = None
 PREFILL_EPSILON = 0
 PREFILL_MAX = 100
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     with Pool(24) as pool:
 
         rewards = calculate_rewards(
-            depth=7,
+            depth=3,
             base=10,
             decay=0.9
         )
@@ -104,10 +104,6 @@ if __name__ == "__main__":
             )
             # replay = replay_buffer.get_next(sample_batch_size=REPLAY_BATCH_SIZE)[0]
             replay = replay_buffer.as_dataset(sample_batch_size=REPLAY_BATCH_SIZE)
-            
-
-
-            print("hi")
 
             training = agent.train_batch(
                 replay, learning_rate=learning_rate, gamma=GAMMA

@@ -146,7 +146,9 @@ class Agent:
         )
 
     def train_batch(self,batch,gamma=0.99,learning_rate=0.1):
-        state_1,choice_1,state_2,reward_2 = batch
+        # state_1,choice_1,state_2,reward_2 = batch
+
+
 
         with tf.GradientTape() as tape:
 
