@@ -155,6 +155,7 @@ class RubiksCubeEnvironment(py_environment.PyEnvironment):
     return reward_total / (9 * 6)
 
   def _reset(self):
+    # TODO add scrambled moves to reset
     self._moves = 0
     self._state = np.fromfunction(lambda i: i // 9, (9*6,))
     self._episode_ended = False
