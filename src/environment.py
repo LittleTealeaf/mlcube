@@ -147,6 +147,13 @@ class RubiksCubeEnvironment(py_environment.PyEnvironment):
         obs[i * 6 + index] = 1
     return obs
 
+  def get_reward(self):
+    reward_total = 0.0
+    for i in range(9*6):
+      if self._state[i] == i // 9:
+        reward_total += 1
+    return reward_total / (9 * 6)
+
   def _reset(self):
     self._moves = 0
     self._state = np.fromfunction(lambda i: i // 9, (9*6,))
@@ -162,9 +169,11 @@ class RubiksCubeEnvironment(py_environment.PyEnvironment):
 
     observations = self.get_observations()
 
+
     if self._episode_ended or self._moves >= self._episode_max_moves:
       # calculate reward
-      reward = 0
+
+      reward = self.get_reward()
       return ts.termination(observations, reward)
     else:
       return ts.transition(observations,reward=0.0, discount=1.0)
