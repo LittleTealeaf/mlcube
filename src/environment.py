@@ -5,6 +5,7 @@ from __future__ import print_function
 import abc
 import tensorflow as tf
 import numpy as np
+from random import Random
 
 from tf_agents.environments import py_environment
 from tf_agents.environments import tf_environment
@@ -158,6 +159,9 @@ class RubiksCubeEnvironment(py_environment.PyEnvironment):
     # TODO add scrambled moves to reset
     self._moves = 0
     self._state = np.fromfunction(lambda i: i // 9, (9*6,))
+    random = Random()
+    for _ in range(100):
+      self._state = random.choice(ACTIONS).apply(self._state)
     self._episode_ended = False
     return ts.restart(self.get_observations())
 
