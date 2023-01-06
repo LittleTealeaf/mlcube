@@ -165,7 +165,11 @@ def create_environment(scramble_depth: int = 0, random=Random()):
         A new environment created using the specified parameters. This will be in the form of a numpy array
 
     """
+    # Creates an empty environment numpy array, initializing the colors using the lambda function
+    # The lambda function indicates that the colors should be incrementally set every 9 values 
     env = np.fromfunction(lambda i: i // 9, (9*6,))
+    # Scrambles the cube using random.choice() to apply to the environment
     for _ in range(scramble_depth):
         env = random.choice(ACTIONS).apply(env)
+
     return env
