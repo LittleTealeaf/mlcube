@@ -5,7 +5,9 @@ class Action:
     "Represents an action that a state of the cube can transform through"
     def __init__(self, name: str, loops: list[list[int]], two: bool = False, prime: bool = False) -> None:
         self.name = name
+        "The displayable name of the action"
         self.matrix = np.identity(9 * 6, dtype=np.int8)
+        "The transformation matrix that the move applies to the state"
 
         for loop in loops:
             initial = np.copy(self.matrix[loop[0]])
