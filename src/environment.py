@@ -1,8 +1,10 @@
 import numpy as np
+from random import Random
 
 
 class Action:
     "Represents an action that a state of the cube can transform through"
+
     def __init__(self, name: str, loops: list[list[int]], two: bool = False, prime: bool = False) -> None:
         self.name = name
         "The displayable name of the action"
@@ -30,7 +32,23 @@ class Action:
 
 
 def create_moves(name: str, loop: list[list[int]]):
-    "Creates a set of moves, including the provided move, the move performed twice, and the move performed three times (aka. reverse)"
+    """
+    Creates a set of moves from a base name and its loop.
+
+    Parameters
+    ----------
+    name: str
+        The base name of the move. For example, for a right-side move, this will be "R". This is then used to build the x2 move ("R2") and the reverse move ("RP")
+    
+    loop: list[list[int]]
+        The loop to use for the base move. This is structured as a list of individual loops within the move. The loops should track the movement of each individual tile on the cube during that move.
+    
+    Returns
+    -------
+    list[Action, Action, Action]
+        Returns a list of actions. The first action is the core action, the second action is the action's 2x version, and the last action is that action's reverse action.
+
+    """
     return [
         Action(name, loop),
         Action(f"{name}P", loop, prime=True),
@@ -109,3 +127,29 @@ ACTIONS = [
 
 ACTION_COUNT = len(ACTIONS)
 "The number of possible moves"
+
+
+def create_environment(scramble_depth: int = 0, random=Random()):
+    """
+    Creates a new environment with optional scrambling
+
+    Parameters
+    ----------
+    scrabmle_depth: int = 0
+        The depth that the cube should be scrambled to. The moves used to scramble the cube is randomized using the random function. (default is 0, which returns a cube in the solved state)       
+
+    random: Random = Random()
+        The object used to randomly choose scrambling moves. This allows making identical scrambled instances by making multiple environments using the same seeded random object. (default to a new Random instance)
+
+    Returns
+    -------
+    environment
+        A new environment created using the specified parameters. This will be in the form of a numpy array
+
+    """
+    env = np.fromfunction(lambda i: i // 9, (9*6,))
+    for _ in range(scramble_depth):
+        env = random.choice(ACTIONS).apply(env)
+    return env
+
+
