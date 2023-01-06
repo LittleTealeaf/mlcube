@@ -3,7 +3,21 @@ from random import Random
 
 
 class Action:
-    "Represents an action that a state of the cube can transform through"
+    """
+    A class representing an action performed on the cube
+
+    Attributes
+    ----------
+    name: str
+        The displayable name representing the action on the cube
+    matrix: NDArray[int8]
+        The transformation matrix that is applied to a state when the action is performed
+
+    Methods
+    -------
+    apply(environment)
+        Applies the transformation matrix to the environment, returning a new environment state
+    """
 
     def __init__(self, name: str, loops: list[list[int]], two: bool = False, prime: bool = False) -> None:
         """
@@ -49,17 +63,17 @@ class Action:
         return state @ self.matrix
 
 
-def create_moves(name: str, loop: list[list[int]]):
+def create_actions(name: str, loop: list[list[int]]):
     """
-    Creates a set of moves from a base name and its loop.
+    Creates a set of actions from a base name and its loop.
 
     Parameters
     ----------
     name: str
-        The base name of the move. For example, for a right-side move, this will be "R". This is then used to build the x2 move ("R2") and the reverse move ("RP")
+        The base name of the action. For example, for a right-side move, this will be "R". This is then used to build the x2 move ("R2") and the reverse move ("RP")
 
     loop: list[list[int]]
-        The loop to use for the base move. This is structured as a list of individual loops within the move. The loops should track the movement of each individual tile on the cube during that move.
+        The loop to use for the base action. This is structured as a list of individual loops within the move. The loops should track the movement of each individual tile on the cube during that action.
 
     Returns
     -------
@@ -77,7 +91,7 @@ def create_moves(name: str, loop: list[list[int]]):
 ACTIONS = [
     move
     for moves in [
-        create_moves(
+        create_actions(
             "R",
             [
                 [20, 2, 42, 47],
@@ -87,7 +101,7 @@ ACTIONS = [
                 [28, 32, 34, 30],
             ],
         ),
-        create_moves(
+        create_actions(
             "U",
             [
                 [20, 11, 38, 29],
@@ -97,7 +111,7 @@ ACTIONS = [
                 [7, 3, 1, 5],
             ],
         ),
-        create_moves(
+        create_actions(
             "L",
             [
                 [18, 45, 44, 0],
@@ -107,7 +121,7 @@ ACTIONS = [
                 [14, 16, 12, 10],
             ],
         ),
-        create_moves(
+        create_actions(
             "D",
             [
                 [24, 33, 42, 15],
@@ -117,7 +131,7 @@ ACTIONS = [
                 [46, 50, 52, 48],
             ],
         ),
-        create_moves(
+        create_actions(
             "F",
             [
                 [6, 27, 47, 17],
@@ -127,7 +141,7 @@ ACTIONS = [
                 [19, 23, 25, 21],
             ],
         ),
-        create_moves(
+        create_actions(
             "B",
             [
                 [36, 38, 44, 42],
@@ -173,3 +187,5 @@ def create_environment(scramble_depth: int = 0, random=Random()):
         env = random.choice(ACTIONS).apply(env)
 
     return env
+
+
