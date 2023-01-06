@@ -6,6 +6,24 @@ class Action:
     "Represents an action that a state of the cube can transform through"
 
     def __init__(self, name: str, loops: list[list[int]], two: bool = False, prime: bool = False) -> None:
+        """
+        Creates an Action.
+
+        Parameters
+        ----------
+        name: str
+            The name of the Action. This is used when printing out solutions, or serializing move sequences
+
+        loops: list[list[int]]
+            The loop to use for the base move. This is structured as a list of individual loops within the move. The loops should track the movement of each individual tile on the cube during that move.
+
+        two: bool = False
+            If true, indicates that the action should be transformed to the 2x version, or the resulting action if the provided base action was taken twice
+
+        prime: bool = False
+            If true, indicates that the action should be transformed to the prime version, or the resulting action if the provided base action was taken three times.
+
+        """
         self.name = name
         "The displayable name of the action"
         self.matrix = np.identity(9 * 6, dtype=np.int8)
@@ -39,10 +57,10 @@ def create_moves(name: str, loop: list[list[int]]):
     ----------
     name: str
         The base name of the move. For example, for a right-side move, this will be "R". This is then used to build the x2 move ("R2") and the reverse move ("RP")
-    
+
     loop: list[list[int]]
         The loop to use for the base move. This is structured as a list of individual loops within the move. The loops should track the movement of each individual tile on the cube during that move.
-    
+
     Returns
     -------
     list[Action, Action, Action]
@@ -151,5 +169,3 @@ def create_environment(scramble_depth: int = 0, random=Random()):
     for _ in range(scramble_depth):
         env = random.choice(ACTIONS).apply(env)
     return env
-
-
