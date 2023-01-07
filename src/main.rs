@@ -1,3 +1,5 @@
+mod environment;
+
 use std::error::Error;
 
 use tensorflow::{Graph, SessionOptions, Session, expr::{Compiler, Placeholder}, Tensor, SessionRunArgs};
@@ -29,7 +31,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let output_tensor = step.fetch::<f32>(output_token)?;
 
     dbg!(output_tensor);
-
 
 
     Ok(())
