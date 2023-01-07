@@ -63,7 +63,7 @@ class Action:
         return state @ self.matrix
 
 
-def create_actions(name: str, loop: list[list[int]]):
+def create_actions(name: str, loop: list[list[int]]) -> list[Action]:
     """
     Creates a set of actions from a base name and its loop.
 
@@ -181,11 +181,10 @@ def create_environment(scramble_depth: int = 0, random=Random()):
     """
     # Creates an empty environment numpy array, initializing the colors using the lambda function
     # The lambda function indicates that the colors should be incrementally set every 9 values 
-    env = np.fromfunction(lambda i: i // 9, (9*6,))
+    env: np.ndarray = np.fromfunction(lambda i: i // 9, (9*6,))
     # Scrambles the cube using random.choice() to apply to the environment
     for _ in range(scramble_depth):
         env = random.choice(ACTIONS).apply(env)
 
     return env
-
 
