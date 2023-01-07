@@ -14,13 +14,30 @@ class NetworkType:
 
 
 class Network(NetworkType):
-    def __init__(self, layer_sizes: list[int], serialized=None, layers=None, output_size=18):
+    def __init__(self, layer_sizes: list[int], serialized=None, layers: list[tuple[tf.Variable, tf.Variable]] | None = None, output_size=18):
+        """
+        Creates a new network
+
+        Parameters
+        ----------
+        layer_sizes: list[int]
+            A list containing the sizes that each of the internal layer should be. The input and output layer should not be included, as those will be automatically generated.
+
+        serialized = None
+            The serialized version of the network. Used when deserializing a serialized network
+
+        layers: list[tuple[tf.Variable, tf.Variable]] | None = None
+            A predefined list of layers to use as the network. This is primarily used when cloning a network
+
+        output_size: int = 18
+            The number of output variables that the network should output
+        """
         self.layer_sizes = layer_sizes + [output_size]
         self.trainable_variables: list[tf.Variable] = []
         self.layers: list[tuple[tf.Variable,tf.Variable]] = []
 
         if layers:
-            self.layers = layers
+            self.layers: list[tuple[tf.Variable, tf.Variable]] = layers
         elif serialized:
             features = {}
             for i in range(len(layer_sizes) + 1):
@@ -80,9 +97,9 @@ class Network(NetworkType):
     def copy(self):
         return Network(layer_sizes=self.layer_sizes,layers=[
             (
-                tf.Variable(np.copy(W.numpy()),dtype=tf.float32),
+                tf.Variable(np.copy(W.numpy())),dtype=tf.float32),
                 tf.Variable(np.copy(b.numpy()),dtype=tf.float32),
-            ) for W,b in self.layers
+            ) for (W,b) in self.layers
         ])
 
     def serialize(self):

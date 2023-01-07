@@ -13,8 +13,6 @@ class Action:
             self.matrix[loop[i]] = self.matrix[loop[i+1]]
           self.matrix[loop[-1]] = initial
 
-        del initial
-
         if two:
             self.matrix = self.matrix @ self.matrix
 

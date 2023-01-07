@@ -19,8 +19,8 @@ class Agent:
     def __init__(self, layer_sizes: list[int], directory: str):
         "Create a new agent"
         self.directory = directory
-        self.network: Network = None
-        self.target: Network = None
+        self.network: Network | None = None
+        self.target: Network | None = None
         self.layer_sizes = layer_sizes
         self.epochs = []
         self.evaluations = []
@@ -50,6 +50,7 @@ class Agent:
             self.update_target()
 
     def evaluate_network(self,max_moves=1_000,scramble_depth=100,rewards={},random=Random()):
+        assert self.network is not None
         env = create_environment(scramble_depth=scramble_depth,random=random)
 
         count = 0
@@ -92,6 +93,9 @@ class Agent:
 
     def save(self):
         "Save the network and target to disk"
+        assert self.network is not None
+        assert self.target is not None
+
         serialized_network = self.network.serialize()
         serialized_target = self.target.serialize()
 
@@ -106,12 +110,15 @@ class Agent:
 
     def update_target(self):
         "Update the target network to match the current network"
+        assert self.network is not None
         if not self.target:
             self.target = self.network.copy()
         else:
             self.target.set(self.network)
 
     def create_replay_batch(self,batch_size=32,epsilon=0.5,scramble_depth=30,random=Random(),rewards={}):
+        assert self.network is not None
+
         env = create_environment(scramble_depth=scramble_depth,random=random)
 
         state_1 = np.empty((batch_size,),dtype=tf.Tensor)
@@ -146,6 +153,8 @@ class Agent:
         )
 
     def train_batch(self,batch,gamma=0.99,learning_rate=0.1):
+        assert self.network is not None
+        assert self.target is not None
         state_1,choice_1,state_2,reward_2 = batch
 
         with tf.GradientTape() as tape:
