@@ -52,17 +52,57 @@ const PERMS_B: [[usize; 4]; 5] = [
     [35, 2, 9, 51],
 ];
 
+/// Represents a face side of the cube.  
+///
+/// When used for state, the Face represents that the tile has the same color as the specified face.
+///
+/// When used for actions, the Face represents the specific side that is being turned. It's direction is specified in the [`Move`]
 #[derive(Clone, Copy)]
 pub enum Face {
+    /// The right side of the cube
     R,
+    /// The top (up) side of the cube
     U,
+    /// The front side of the cube
     F,
+    /// The left side of the cube
     L,
+    /// The bottom (down) side of the cube
     D,
+    /// The back side of the cube
     B,
 }
 
 impl Face {
+    /// Gets a face based on the index. The order is as follows:
+    ///
+    /// # Key
+    ///
+    /// | Index | Face |
+    /// |-------|------|
+    /// | 0     | [`Face::R`] |
+    /// | 1     | [`Face::L`] |
+    /// | 2     | [`Face::F`] |
+    /// | 3     | [`Face::R`] |
+    /// | 4     | [`Face::B`] |
+    /// | 5     | [`Face::D`] |
+    ///
+    /// # Parameters
+    /// index: (usize) The index of faces that you want to get. This should be a number between 0 and 5, inclusive
+    ///
+    /// # Returns
+    /// Returns a result object with the Face, if the index is within valid bounds
+    ///
+    /// # Errors
+    /// Throws an err if the index is larger than 5
+    ///
+    /// # Examples
+    /// ```
+    /// if let Ok(face) = Face::from_index(3) {
+    ///     assert!(match!(face, Face::R));
+    /// }
+    /// ```
+    ///
     fn from_index(index: usize) -> Result<Face, &'static str> {
         match index {
             0 => Ok(Face::U),
@@ -209,7 +249,7 @@ impl Cube {
     fn apply_move(&mut self, action: Move) {
         match action {
             Move::Normal(face) => {
-                for row in face.get_perms()  {
+                for row in face.get_perms() {
                     let aside = self.state[row[row.len() - 1]];
                     let len = row.len();
                     for i in 0..(len - 1) {
@@ -222,14 +262,14 @@ impl Cube {
                 for row in face.get_perms() {
                     let aside = self.state[row[0]];
                     for i in 0..(row.len() - 1) {
-                        self.state[row[i]] = self.state[row[i+1]];
+                        self.state[row[i]] = self.state[row[i + 1]];
                     }
                     self.state[row[row.len() - 1]] = aside;
                 }
             }
             Move::Two(face) => {
                 for row in face.get_perms() {
-                    for i in [0,1] {
+                    for i in [0, 1] {
                         let aside = self.state[row[i]];
                         self.state[row[i]] = self.state[row[i + 2]];
                         self.state[row[i + 2]] = aside;
