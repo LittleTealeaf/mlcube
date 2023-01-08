@@ -55,6 +55,16 @@ pub enum MoveType {
     Two,
 }
 
+impl MoveType {
+    fn from_index(index: usize) -> MoveType {
+        match index {
+            1 => MoveType::Prime,
+            2 => MoveType::Two,
+            _ => MoveType::Normal,
+        }
+    }
+}
+
 impl PartialEq for MoveType {
     fn eq(&self, other: &Self) -> bool {
         match self {
@@ -78,15 +88,6 @@ impl PartialEq for MoveType {
     }
 }
 
-impl MoveType {
-    fn from_index(index: usize) -> MoveType {
-        match index {
-            1 => MoveType::Prime,
-            2 => MoveType::Two,
-            _ => MoveType::Normal,
-        }
-    }
-}
 
 pub enum Move {
     R(MoveType),
@@ -218,16 +219,19 @@ impl Cube {
         }
     }
 
-    pub fn scramble(&mut self) {}
+    pub fn scramble(&mut self, scramble_count: usize) {
+
+    }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
     mod move_enum {
         use std::matches;
 
-        use super::super::{Move, MoveType};
+        use super::super::*;
 
         #[test]
         fn from_index_returns_all_moves() {
@@ -308,11 +312,27 @@ mod tests {
 
     mod cube {
 
-        use super::super::Cube;
+        use super::super::*;
 
         #[test]
         fn new_cube_is_solved() {
             let env = Cube::new();
+            assert!(env.is_solved());
+        }
+
+        #[test]
+        fn applying_move_makes_cube_not_solved() {
+            let mut env = Cube::new();
+            env.apply(Move::R(MoveType::Normal));
+            assert!(!env.is_solved());
+        }
+
+
+        #[test]
+        fn prime_is_inverse_of_normal() {
+            let mut env = Cube::new();
+            env.apply(Move::U(MoveType::Normal));
+            env.apply(Move::U(MoveType::Prime));
             assert!(env.is_solved());
         }
     }
