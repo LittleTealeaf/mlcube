@@ -261,18 +261,15 @@ mod tests {
             }
         }
 
+
         #[test]
-        fn same_moves_are_equal() {
+        fn same_types_are_equal() {
             assert!(Move::R(MoveType::Normal).eq(&Move::R(MoveType::Normal)));
-            assert!(!Move::R(MoveType::Normal).ne(&Move::R(MoveType::Normal)));
         }
 
         #[test]
-        fn different_moves_are_not_equal() {
-            assert!(!Move::R(MoveType::Normal).eq(&Move::L(MoveType::Normal)));
-            assert!(!Move::R(MoveType::Normal).eq(&Move::R(MoveType::Two)));
-            assert!(Move::R(MoveType::Normal).ne(&Move::L(MoveType::Normal)));
-            assert!(Move::R(MoveType::Normal).ne(&Move::R(MoveType::Two)));
+        fn different_moves_are_not_eq() {
+            assert!(Move::R(MoveType::Normal).eq(&Move::L(MoveType::Normal)));
         }
     }
 
@@ -293,17 +290,27 @@ mod tests {
             assert!(values.contains(&MoveType::Prime));
         }
 
+
         #[test]
         fn same_types_are_equal() {
             assert!(MoveType::Normal.eq(&MoveType::Normal));
-            assert!(!MoveType::Normal.ne(&MoveType::Normal));
         }
 
         #[test]
         fn different_types_are_not_equal() {
             assert!(!MoveType::Normal.eq(&MoveType::Two));
+        }
+
+        #[test]
+        fn same_types_are_not_inequal() {
+            assert!(!MoveType::Normal.ne(&MoveType::Normal));
+        }
+
+        #[test]
+        fn different_types_are_inequal() {
             assert!(MoveType::Normal.ne(&MoveType::Two));
         }
+
     }
 
     mod cube {
