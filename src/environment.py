@@ -1,41 +1,34 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import abc
-import tensorflow as tf
 import numpy as np
+from numpy._typing import NDArray
+import tensorflow as tf
+from tensorflow.python.framework.dtypes import Type
+from tf_agents.trajectories import time_step
+from tf_agents.environments.py_environment import PyEnvironment
+from tf_agents.specs.array_spec import BoundedArraySpec
+from tf_agents.trajectories import TimeStep
+from tf_agents.typing.types import NestedArray, NestedArraySpec
 from random import Random
-
-from tf_agents.environments import py_environment
-from tf_agents.environments import tf_environment
-from tf_agents.environments import tf_py_environment
-from tf_agents.environments import utils
-from tf_agents.specs import array_spec
-from tf_agents.environments import wrappers
-from tf_agents.environments import suite_gym
-from tf_agents.trajectories import time_step as ts
 
 
 class Action:
     def __init__(self, name: str, loops: list[list[int]], two=False, prime=False):
-        self.name = name
-        self.matrix = np.identity(9 * 6, dtype=np.int8)
+        self._name = name
+        self._matrix: NDArray[np.int8] = np.identity(9*6, dtype=np.int8)
 
         for loop in loops:
-            initial = np.copy(self.matrix[loop[0]])
+            initial = np.copy(self._matrix[loop[0]])
             for i in range(len(loop) - 1):
-                self.matrix[loop[i]] = self.matrix[loop[i+1]]
-            self.matrix[loop[-1]] = initial
+                self._matrix[loop[i]] = self._matrix[loop[i+1]]
+            self._matrix[loop[-1]] = initial
 
         if two:
-            self.matrix = self.matrix @ self.matrix
+            self._matrix: NDArray[np.int8] = self._matrix @ self._matrix
 
         if prime:
-            self.matrix = self.matrix @ self.matrix @ self.matrix
+            self._matrix: NDArray[np.int8] = self._matrix @ self._matrix @ self._matrix
 
-    def apply(self, state):
-        return state @ self.matrix
+    def apply(self, state: NDArray[np.int8]) -> NDArray[np.int8]:
+        return state @ self._matrix
 
 
 def create_moves(name: str, loops: list[list[int]]):
@@ -114,33 +107,42 @@ ACTIONS = [
 ]
 
 
-class RubiksCubeEnvironment(py_environment.PyEnvironment):
-    def __init__(self, episode_max_moves=1000):
-        self._action_spec = array_spec.BoundedArraySpec(
-            shape=(), dtype=np.int32, minimum=0, maximum=len(ACTIONS) - 1, name='action'
-        )
-        self._observation_spec = array_spec.BoundedArraySpec(
-            shape=(9*6*6,), dtype=np.int32, minimum=0, maximum=1, name='observations'
-        )
-        self._state = np.fromfunction(lambda i: i // 9, (9*6,))
-        self._moves = 0
-        self._episode_ended = False
-        self._episode_max_moves = episode_max_moves
+class CubeEnvironment(PyEnvironment):
+    def __init__(self, seed=Random().random(), moves_max: int = 1000):
 
-    def action_spec(self):
+        self._seed = seed
+        self._moves_max = moves_max
+        self._moves = 0
+
+        self._action_spec = BoundedArraySpec(
+            shape=(), dtype=np.int32, minimum=0, maximum=18, name='action')
+        """The specs of the actions space. States that there is one action choice, and it has a minimum of 0 and maximum of 18. If the system returns 18, then it indicates that it is done and ready to evaluate"""
+        self._observation_spec = BoundedArraySpec(
+            shape=(9 * 6 * 6,), dtype=np.int32, name='observation', minimum=0, maximum=1)
+        """The specs of the observation space. States that there is an array of 9 * 6 * 6 entries, each one between 0 and 1 (either 0 or 1)"""
+        self._state: NDArray[np.int8] = np.fromfunction(
+            lambda i: i // 9, (56,))
+        """The state of the cube. It's basically a numpy array of 56 values"""
+        self._episode_ended = False
+        """Whether the episode has already ended"""
+
+    def action_spec(self) -> NestedArraySpec:
         return self._action_spec
 
-    def observation_spec(self):
+    def observation_spec(self) -> NestedArraySpec:
         return self._observation_spec
 
-    def is_solved(self):
-        for i in range(9 * 6):
-            if self._state[i] != i // 9:
-                return False
-        return True
+    def _reset(self) -> TimeStep:
+        self._state = np.fromfunction(lambda i: i // 9, (9*6,))
+
+        random = Random(self.seed)
+        for _ in range(100):
+            self._state = random.choice(ACTIONS).apply(self._state)
+        self._episode_ended = False
+        return time_step.restart(self.get_observations())
 
     def get_observations(self):
-        obs = np.zeros((9*6*6), dtype=np.int32)
+        obs = np.zeros((9*6*6,), dtype=np.int32)
         for i in range(9*6):
             index = int(self._state[i])
             obs[i * 6 + index] = 1
@@ -153,29 +155,27 @@ class RubiksCubeEnvironment(py_environment.PyEnvironment):
                 reward_total += 1
         return reward_total / (9 * 6)
 
-    def _reset(self):
-        # TODO add scrambled moves to reset
-        self._moves = 0
-        self._state = np.fromfunction(lambda i: i // 9, (9*6,))
-        random = Random()
-        for _ in range(100):
-            self._state = random.choice(ACTIONS).apply(self._state)
-        self._episode_ended = False
-        return ts.restart(self.get_observations())
+    def is_solved(self) -> bool:
+        for i in range(9*6):
+            if self._state[i] != i // 9:
+                return False
+        return True
 
-    def _step(self, action):
-        self._moves += 1
-        self._state = ACTIONS[int(action)].apply(self._state)
+    def _step(self, action: int) -> TimeStep:
+        if self._episode_ended:
+            return self.reset()
 
-        if self.is_solved():
+        if self._moves_max <= self._moves or action == 18:
             self._episode_ended = True
+        else:
+            self._state = ACTIONS[action].apply(self._state)
 
         observations = self.get_observations()
 
-        if self._episode_ended or self._moves >= self._episode_max_moves:
-            # calculate reward
-
+        if self._episode_ended:
             reward = self.get_reward()
-            return ts.termination(observations, reward)
+            return time_step.termination(observations, reward)
         else:
-            return ts.transition(observations, reward=0.0, discount=1.0)
+            return time_step.transition(observations, reward=0.0)
+
+        
