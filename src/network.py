@@ -97,7 +97,7 @@ class Network(NetworkType):
     def copy(self):
         return Network(layer_sizes=self.layer_sizes,layers=[
             (
-                tf.Variable(np.copy(W.numpy())),dtype=tf.float32),
+                tf.Variable(np.copy(W.numpy()),dtype=tf.float32),
                 tf.Variable(np.copy(b.numpy()),dtype=tf.float32),
             ) for (W,b) in self.layers
         ])
