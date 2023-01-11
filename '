@@ -1,0 +1,202 @@
+/// Represents a face side of the cube.
+///
+/// When used for representing state, this is used in place of the color that the given side would have. This makes it simpler and more memory efficient to calculate
+#[derive(Clone, Copy)]
+pub enum Face {
+    /// The right side of the cube
+    R,
+    /// The top (up) side of the cube
+    U,
+    /// The front side of the cube
+    F,
+    /// The left side of the cube
+    L,
+    /// The bottom (down) side of the cube
+    D,
+    /// The back side of the cube
+    B,
+}
+
+impl Face {
+    /// Returns the face found at the given index.
+    ///
+    /// # Key
+    ///
+    /// | Index | Face |
+    /// |-------|------|
+    /// | 0     | [`Face::U`] |
+    /// | 1     | [`Face::L`] |
+    /// | 2     | [`Face::F`] |
+    /// | 3     | [`Face::R`] |
+    /// | 4     | [`Face::B`] |
+    /// | 5     | [`Face::D`] |
+    ///
+    /// # Parameters
+    /// index: (i32)
+    ///     The index of the face to get, according to the table. This number should be between 0 and 5, inclusive.
+    ///
+    /// # Returns
+    /// Returns the Face at that index. Returns an Err if the index is not within bounds
+    ///
+    /// # Errors
+    /// Returns an Err if the index is larger than 5
+    ///
+    /// # Examples
+    /// ```
+    /// if let Ok(face) = Face::from_index(3) {
+    ///    assert!(match~(face, Face::R))
+    /// }
+    /// ```
+    pub fn from_index(index: i32) -> Result<Face, &'static str> {
+        match index {
+            0 => Ok(Face::U),
+            1 => Ok(Face::L),
+            2 => Ok(Face::F),
+            3 => Ok(Face::R),
+            4 => Ok(Face::B),
+            5 => Ok(Face::D),
+            _ => Err("Index Out of Bounds"),
+        }
+    }
+
+    pub fn get_permutations(&self) -> [[usize; 4]; 5] {
+        match self {
+            Face::R => [
+                [20, 2, 42, 47],
+                [23, 5, 39, 50],
+                [26, 8, 36, 53],
+                [27, 29, 35, 33],
+                [28, 32, 34, 30],
+            ],
+            Face::U => [
+                [20, 11, 38, 29],
+                [19, 10, 37, 28],
+                [18, 9, 36, 27],
+                [8, 6, 0, 2],
+                [7, 3, 1, 5],
+            ],
+            Face::F => [
+                [6, 27, 47, 17],
+                [7, 30, 46, 14],
+                [8, 33, 45, 11],
+                [18, 20, 26, 24],
+                [19, 23, 25, 21],
+            ],
+            Face::L => [
+                [18, 45, 44, 0],
+                [21, 48, 41, 3],
+                [24, 51, 38, 6],
+                [11, 17, 15, 9],
+                [14, 16, 12, 10],
+            ],
+            Face::D => [
+                [24, 33, 42, 15],
+                [25, 34, 43, 16],
+                [26, 35, 44, 17],
+                [45, 47, 53, 51],
+                [46, 50, 52, 48],
+            ],
+            Face::B => [
+                [36, 38, 44, 42],
+                [37, 41, 43, 39],
+                [29, 0, 15, 53],
+                [32, 1, 12, 52],
+                [35, 2, 9, 51],
+            ],
+        }
+    }
+}
+
+impl PartialEq for Face {
+    fn eq(&self, other: &Self) -> bool {
+        match self {
+            Face::R => match other {
+                Face::R => true,
+                _ => false,
+            },
+            Face::U => match other {
+                Face::U => true,
+                _ => false,
+            },
+            Face::F => match other {
+                Face::F => true,
+                _ => false,
+            },
+            Face::L => match other {
+                Face::L => true,
+                _ => false,
+            },
+            Face::D => match other {
+                Face::D => true,
+                _ => false,
+            },
+            Face::B => match other {
+                Face::B => true,
+                _ => false,
+            },
+        }
+    }
+}
+
+impl ToString for Face {
+    fn to_string(&self) -> String {
+        match self {
+            Face::R => String::from("R"),
+            Face::U => String::from("U"),
+            Face::F => String::from("F"),
+            Face::L => String::from("L"),
+            Face::D => String::from("D"),
+            Face::B => String::from("B"),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn same_faces_are_equal() {
+        assert!(
+            Face::R.eq(&Face::R),
+            "The same face should be equal to itself"
+        );
+    }
+
+    #[test]
+    fn different_faces_are_not_equal() {
+        assert!(!Face::F.eq(&Face::L), "Different faces should not be equal");
+    }
+
+    #[test]
+    fn from_index_invalid_returns_err() {
+        assert!(match Face::from_index(-1) {
+            Ok(_) => false,
+            Err(_) => true
+        });
+        assert!(match Face::from_index(6) {
+            Ok(_) => false,
+            Err(_) => true
+        });
+    }
+
+
+
+    #[test]
+    fn from_index_returns_correct_face() {
+        let vals = [
+            (0,Face::U),
+            (1, Face::L),
+            (2, Face::F),
+            (3, Face::R),
+            (4, Face::B),
+            (5, Face::D),
+        ];
+
+        for (index, expected) in vals {
+            expect!(match Face::from_index(index) {
+
+            })
+        }
+    }
+}

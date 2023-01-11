@@ -1,3 +1,5 @@
+use rand::Rng;
+
 /// Represents a face side of the cube.  
 ///
 /// When used for state, the Face represents that the tile has the same color as the specified face.
@@ -26,7 +28,7 @@ impl Face {
     ///
     /// | Index | Face |
     /// |-------|------|
-    /// | 0     | [`Face::R`] |
+    /// | 0     | [`Face::U`] |
     /// | 1     | [`Face::L`] |
     /// | 2     | [`Face::F`] |
     /// | 3     | [`Face::R`] |
@@ -49,7 +51,7 @@ impl Face {
     /// }
     /// ```
     ///
-    fn from_index(index: usize) -> Result<Face, &'static str> {
+    pub fn from_index(index: usize) -> Result<Face, &'static str> {
         match index {
             0 => Ok(Face::U),
             1 => Ok(Face::L),
@@ -61,6 +63,7 @@ impl Face {
         }
     }
 
+    /// Returns permutations that the state goes through when the move is applied to it
     fn get_perms(&self) -> [[usize; 4]; 5] {
         match self {
             Face::R => [
@@ -257,6 +260,16 @@ impl Cube {
                         self.state[row[i + 2]] = aside;
                     }
                 }
+            }
+        }
+    }
+
+
+    fn scramble(&mut self, scramble_count: usize) {
+        let mut rng = rand::thread_rng();
+        for _ in 0..scramble_count {
+            if let Ok(action) = Move::from_index(rng.gen_range(0..18)) {
+                self.apply_move(action);
             }
         }
     }
