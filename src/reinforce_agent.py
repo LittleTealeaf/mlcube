@@ -23,10 +23,10 @@ num_iterations = 1000  # @param {type: "integer"}
 collect_episodes_per_iteration = 100  # @param {type: "integer"}
 replay_buffer_capacity = 10000  # @param {type: "integer"}
 
-fc_layer_params = (500,300,)
+fc_layer_params = (300, 300, 300,)
 
 learning_rate = 1e-3  # @param {type: "number"}
-log_interval = 25  # @param {type: "integer"}
+log_interval = 5  # @param {type: "integer"}
 num_eval_episodes = 10  # @param {type: "integer"}
 eval_interval = 100  # @param {type: "integer"}
 
@@ -141,7 +141,6 @@ avg_return = compute_avg_return(eval_env, tf_agent.policy, num_eval_episodes)
 returns = [avg_return]
 
 
-
 py_env = TimeLimit(CubeEnvironment(seed=seed), env_timeout)
 
 collect_driver = PyDriver(
@@ -161,7 +160,7 @@ time_step = py_env.reset()
 print("Starting iterations")
 for _ in range(num_iterations):
 
-    time_step, _ = collect_driver.run(time_step) 
+    time_step, _ = collect_driver.run(time_step)
 
     trajectories, _ = next(iterator)
     train_loss = tf_agent.train(experience=trajectories)
