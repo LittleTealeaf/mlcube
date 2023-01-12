@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from numpy._typing import NDArray
+from tf_agents import specs
 from tf_agents.environments import TFEnvironment
 
 
@@ -106,6 +107,8 @@ ACTIONS = [
 class CubeEnvironment(TFEnvironment):
     def __init__(self, seed: float | None = None, moves_max: int = 500, print_steps: bool = False, batch_size: int = 1):
 
-        
+        self._seed: float | None = seed
+
+
 
         super(CubeEnvironment, self).__init__()
