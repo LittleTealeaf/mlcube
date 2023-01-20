@@ -1,9 +1,7 @@
 import reverb
 from random import Random
 from keras.optimizers import Adam
-from tensorflow import Variable, train
-from tensorflow._api.v2.data import Dataset
-from tensorflow._api.v2.data import Iterator
+from tensorflow import Variable
 from tf_agents import trajectories
 from tf_agents.drivers.py_driver import PyDriver
 from tf_agents.agents.reinforce.reinforce_agent import ReinforceAgent
@@ -14,7 +12,7 @@ from tf_agents.policies import py_tf_eager_policy
 from tf_agents.specs import tensor_spec
 from tf_agents.utils import common
 from environment import CubeEnvironment
-from tf_agents.replay_buffers import ReverbReplayBuffer, reverb_utils, reverb_replay_buffer
+from tf_agents.replay_buffers import ReverbReplayBuffer, reverb_utils 
 from matplotlib import pyplot as plt
 
 
