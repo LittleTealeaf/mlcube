@@ -22,7 +22,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mut x = <Tensor<f32>>::new(&[2]);
     x[0] = 2.0;
-    x[1] = 3.0;
+    x[1] = 10.0;
     let mut step = SessionRunArgs::new();
     step.add_feed(&x_node, 0, &x);
     let output_token = step.request_fetch(&y_node, 0);

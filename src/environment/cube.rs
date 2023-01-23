@@ -76,13 +76,11 @@ impl Cube {
     }
 
     fn observations(&self) -> [u8; 56 * 6] {
-
         let mut obs = [0; 56 * 6];
 
         for i in 0..56 {
             obs[i * 6 + self.state[i].to_index()] = 1;
         }
-
 
         obs
     }
