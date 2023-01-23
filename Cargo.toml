@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8.5"
-tensorflow = {version = "0.19.1", features = ["tensorflow_gpu", "tensorflow_unstable"]}
+tensorflow = {version = "0.19.1", features = ["tensorflow_unstable"]}
