@@ -8,7 +8,7 @@ pub struct Cube {
 }
 
 impl Cube {
-    fn new() -> Cube {
+    pub fn new() -> Cube {
         let mut state = [Face::U; 9 * 6];
         for i in 1..6 {
             for j in 0..9 {
@@ -19,7 +19,7 @@ impl Cube {
         Cube { state }
     }
 
-    fn is_solved(&self) -> bool {
+    pub fn is_solved(&self) -> bool {
         for i in 0..54 {
             let face = self.state[i];
             if i / 9 != face.to_index() {
@@ -29,13 +29,13 @@ impl Cube {
         true
     }
 
-    fn reset(&mut self) {
+    pub fn reset(&mut self) {
         for i in 0..54 {
             self.state[i] = Face::from_index(i / 9).unwrap();
         }
     }
 
-    fn apply_move(&mut self, action: &Action) {
+    pub fn apply_move(&mut self, action: &Action) {
         match action {
             Action::Normal(face) => {
                 for row in get_permutations(face) {
@@ -67,7 +67,7 @@ impl Cube {
         }
     }
 
-    fn scramble(&mut self, count: u32) {
+    pub fn scramble(&mut self, count: u32) {
         let mut rng = rand::thread_rng();
         for _ in 0..count {
             let action = Action::from_value(rng.gen_range(0..18)).unwrap();
@@ -75,7 +75,7 @@ impl Cube {
         }
     }
 
-    fn observations(&self) -> [u8; 56 * 6] {
+    pub fn observations(&self) -> [u8; 56 * 6] {
         let mut obs = [0; 56 * 6];
 
         for i in 0..56 {

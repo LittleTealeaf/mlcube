@@ -7,6 +7,8 @@ use tensorflow::{
     Graph, Session, SessionOptions, SessionRunArgs, Tensor,
 };
 
+use crate::environment::{cube::Cube, action::Action, face::Face};
+
 fn main() -> Result<(), Box<dyn Error>> {
     let mut g = Graph::new();
 
@@ -31,6 +33,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let output_tensor = step.fetch::<f32>(output_token)?;
 
     dbg!(output_tensor);
+
+
+    let mut cube = Cube::new();
+
+    cube.apply_move(&Action::Normal(Face::U));
 
     Ok(())
 }

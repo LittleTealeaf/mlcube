@@ -1,3 +1,3 @@
-mod action;
-mod cube;
-mod face;
+pub mod action;
+pub mod cube;
+pub mod face;
