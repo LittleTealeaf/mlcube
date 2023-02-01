@@ -58,6 +58,7 @@ impl Face {
         [Face::U, Face::L, Face::F, Face::R, Face::B, Face::D]
     }
 
+    /// Returns the ordinal index of the face
     pub fn to_index(&self) -> usize {
         match self {
             Face::U => 0,

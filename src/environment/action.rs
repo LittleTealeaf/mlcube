@@ -5,8 +5,11 @@ use super::face::Face;
 #[repr(u8)]
 #[derive(Clone, Copy, Hash)]
 pub enum Action {
+    /// An action that moves a face of the cube clockwise
     Normal(Face),
+    /// An action that moves a face of the cube counter-clockwise
     Prime(Face),
+    /// An action that moves a face of the cube clockwise twice (or counter-clockwise, both directions result in the same state)
     Two(Face),
 }
 
