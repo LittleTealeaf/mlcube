@@ -2,13 +2,14 @@ mod environment;
 
 use std::error::Error;
 
-use tensorflow::{Graph, SessionOptions, Session, expr::{Compiler, Placeholder}, Tensor, SessionRunArgs};
-
+use tensorflow::{
+    expr::{Compiler, Placeholder},
+    Graph, Session, SessionOptions, SessionRunArgs, Tensor,
+};
 
 fn main() -> Result<(), Box<dyn Error>> {
-
     let mut g = Graph::new();
-    
+
     let y_node = {
         let mut compiler = Compiler::new(&mut g);
         let x_expr = <Placeholder<f32>>::new_expr(&vec![2], "x");
@@ -18,7 +19,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let options = SessionOptions::new();
     let session = Session::new(&options, &g)?;
-    
 
     let mut x = <Tensor<f32>>::new(&[2]);
     x[0] = 2.0;
@@ -32,7 +32,5 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     dbg!(output_tensor);
 
-
     Ok(())
 }
-
