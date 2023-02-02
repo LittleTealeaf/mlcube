@@ -1,0 +1,6 @@
+numpy
+tensorflow-gpu
+tensorflow
+pandas
+keras
+pyodbc
