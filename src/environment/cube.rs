@@ -86,6 +86,12 @@ impl Cube {
     }
 }
 
+impl Default for Cube {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PartialEq for Cube {
     fn eq(&self, other: &Self) -> bool {
         for i in 0..54 {
