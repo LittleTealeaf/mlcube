@@ -13,6 +13,9 @@ class Action:
                 for items in [[loop[::2], loop[1::2]] for loop in loops]
                 for item in items
             ]
+
+
+
         self._permutations = loops
 
 
