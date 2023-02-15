@@ -1,6 +1,4 @@
-__pycache__/
-agent/
-agents/
+**/__pycache__/
 .pytest_cache/
 **/*.log
 .env
