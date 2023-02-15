@@ -1,5 +1,4 @@
 import numpy as np
-import tensorflow as tf
 
 
 class Action:
@@ -92,8 +91,6 @@ ACTIONS = [
     for move in moves
 ]
 
-for action in ACTIONS:
-    print(action._name, action._permutations)
 
 
 class Environment:
@@ -112,3 +109,8 @@ class Environment:
 # print(arr)
 
 # # %%
+
+
+if __name__=='__main__':
+    for action in ACTIONS:
+        print(action._name, action._permutations)
