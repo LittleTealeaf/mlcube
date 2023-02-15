@@ -2,3 +2,5 @@ __pycache__/
 agent/
 agents/
 .pytest_cache/
+**/*.log
+.env
