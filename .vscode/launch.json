@@ -11,7 +11,10 @@
       "program": "${file}",
       "console": "integratedTerminal",
       "justMyCode": true,
-      "cwd": "${workspaceFolder}/model"
+      "cwd": "${workspaceFolder}/model",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/environment/target/release"
+      }
     }
   ]
 }

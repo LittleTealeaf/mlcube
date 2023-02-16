@@ -10,7 +10,7 @@ py_module_initializer!(libenvironment, |py, m| {
         "sum_as_string",
         py_fn!(py, sum_as_string_py(a: i64, b: i64)),
     )?;
-    
+
     Ok(())
 });
 

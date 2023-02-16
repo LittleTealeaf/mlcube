@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class Action:
     def __init__(self, name, loops: list[list[int]], two=False, prime=False):
         self._name = name
@@ -117,3 +116,7 @@ class Environment:
 if __name__=='__main__':
     for action in ACTIONS:
         print(action._name, action._permutations)
+
+from libenvironment import sum_as_string
+
+print(sum_as_string(10,5))
