@@ -116,7 +116,3 @@ class Environment:
 if __name__=='__main__':
     for action in ACTIONS:
         print(action._name, action._permutations)
-
-from libenvironment import sum_as_string
-
-print(sum_as_string(10,5))
