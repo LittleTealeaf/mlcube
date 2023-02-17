@@ -27,4 +27,8 @@ py_class!(class PyCube |py| {
             None => Err(PyErr::new::<exc::IndexError, _>(py, "Action Index Out of Bounds"))
         }
     }
+
+    def get_observations(&self) -> PyResult<Vec<u8>> {
+        Ok(Vec::from(self.cube(py).borrow().get_observations()))
+    }
 });

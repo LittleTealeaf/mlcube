@@ -20,4 +20,15 @@ impl Face {
             _ => None,
         }
     }
+
+    pub fn to_index(&self) -> usize {
+        match self {
+            Self::U => 0,
+            Self::L => 1,
+            Self::F => 2,
+            Self::R => 3,
+            Self::B => 4,
+            Self::D => 5,
+        }
+    }
 }

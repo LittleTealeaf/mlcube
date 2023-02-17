@@ -104,6 +104,16 @@ impl Cube {
 
         Some(())
     }
+
+    pub fn get_observations(&self) -> [u8; 54 * 6] {
+        let mut values = [0; 54 * 6];
+
+        for i in 0..54 {
+            values[i * 6 + self.state[i].to_index()] = 1;
+        }
+
+        values
+    }
 }
 
 fn get_permutations(face: &Face) -> [[usize; 4]; 5] {
