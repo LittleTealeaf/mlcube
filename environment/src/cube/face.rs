@@ -1,4 +1,4 @@
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Face {
     R,
     U,
@@ -29,6 +29,23 @@ impl Face {
             Self::R => 3,
             Self::B => 4,
             Self::D => 5,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn all_index_match_up() {
+        for face in [Face::U, Face::L, Face::F, Face::R, Face::B, Face::D] {
+            let index = face.to_index();
+            let resolved = Face::from_index(index);
+            assert!(match resolved {
+                Some(resolved_face) => resolved_face.eq(&face),
+                None => false,
+            });
         }
     }
 }
