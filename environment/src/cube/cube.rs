@@ -1,5 +1,4 @@
 use super::{face::Face, Action};
-
 pub struct Cube {
     state: [Face; 9 * 6],
 }
