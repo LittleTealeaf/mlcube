@@ -1,7 +1,6 @@
-use std::cell::RefCell;
-
-use cpython::{exc, PyErr, PyResult};
+use cpython::{exc, PyErr, PyNone, PyResult};
 use cube::Cube;
+use std::cell::RefCell;
 
 mod cube;
 
@@ -21,14 +20,19 @@ py_class!(class PyCube |py| {
         PyCube::create_instance(py, RefCell::new(Cube::new()))
     }
 
-    def apply_action(&self, action: usize) -> PyResult<usize> {
+    def apply_action(&self, action: usize) -> PyResult<PyNone> {
         match self.cube(py).borrow_mut().apply_action(action) {
-            Some(_) => Ok(action),
+            Some(_) => Ok(PyNone),
             None => Err(PyErr::new::<exc::IndexError, _>(py, "Action Index Out of Bounds"))
         }
     }
 
     def get_observations(&self) -> PyResult<Vec<u8>> {
         Ok(Vec::from(self.cube(py).borrow().get_observations()))
+    }
+
+    def reset(&self) -> PyResult<PyNone> {
+        self.cube(py).borrow_mut().reset();
+        Ok(PyNone)
     }
 });

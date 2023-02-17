@@ -59,6 +59,10 @@ impl Cube {
 
         values
     }
+
+    pub fn reset(&mut self) {
+        self.state = get_initial_state();
+    }
 }
 
 fn get_permutations(face: &Face) -> [[usize; 4]; 5] {
