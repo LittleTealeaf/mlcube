@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Face {
     R,
     U,
@@ -38,14 +38,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn all_index_match_up() {
-        for face in [Face::U, Face::L, Face::F, Face::R, Face::B, Face::D] {
-            let index = face.to_index();
-            let resolved = Face::from_index(index);
-            assert!(match resolved {
-                Some(resolved_face) => resolved_face.eq(&face),
-                None => false,
-            });
-        }
+    fn from_index() {
+        assert_eq!(Face::from_index(0).unwrap(), Face::U);
+        assert_eq!(Face::from_index(1).unwrap(), Face::L);
+        assert_eq!(Face::from_index(2).unwrap(), Face::F);
+        assert_eq!(Face::from_index(3).unwrap(), Face::R);
+        assert_eq!(Face::from_index(4).unwrap(), Face::B);
+        assert_eq!(Face::from_index(5).unwrap(), Face::D);
+        assert_eq!(Face::from_index(6), None);
+    }
+
+    #[test]
+    fn to_index() {
+        assert_eq!(Face::U.to_index(), 0);
+        assert_eq!(Face::L.to_index(), 1);
+        assert_eq!(Face::F.to_index(), 2);
+        assert_eq!(Face::R.to_index(), 3);
+        assert_eq!(Face::B.to_index(), 4);
+        assert_eq!(Face::D.to_index(), 5);
     }
 }
