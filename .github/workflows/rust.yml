@@ -16,11 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Navigate to rust module
-      run: cd environment
     - name: Build
-      run: cargo build --verbose
+      run: cd environment && cargo build --verbose
     - name: Run tests
-      run: cargo test --verbose
+      run: cd environment && cargo test --verbose
     - name: Build Release
-      run: cargo build --release
+      run: cd environment && cargo build --release
