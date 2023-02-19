@@ -15,10 +15,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: cd environment && cargo build --verbose
-    - name: Run tests
-      run: cd environment && cargo test --verbose
-    - name: Build Release
-      run: cd environment && cargo build --release
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            environment/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build
+        run: cd environment && cargo build --verbose
+      - name: Run tests
+        run: cd environment && cargo test --verbose
+      - name: Build Release
+        run: cd environment && cargo build --release
