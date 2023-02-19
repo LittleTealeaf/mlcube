@@ -1,4 +1,5 @@
-use super::{face::Face, Action};
+use super::{Action, face::Face};
+
 pub struct Cube {
     state: [Face; 9 * 6],
 }
@@ -168,4 +169,41 @@ fn get_initial_state() -> [Face; 54] {
         Face::D,
         Face::D,
     ]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_initial_state() {
+        // Set up counters
+        let mut counters = [0; 6];
+
+        // Get values
+        let values = get_initial_state();
+
+        // Increment Counters
+        for face in values {
+            counters[face.to_index()] += 1;
+        }
+
+        // Assert that each face has 9 instances
+        for i in 0..6 {
+            assert_eq!(counters[i], 9);
+        }
+    }
+
+    #[test]
+    fn valid_permutation_indices() {
+        for face in [Face::U, Face::B, Face::R, Face::L, Face::D, Face::F] {
+            let permutations = get_permutations(&face);
+
+            for row in permutations {
+                for index in row {
+                    assert!(index < 54, "Found permutation index {}, expected values less than 54", index);
+                }
+            }
+        }
+    }
 }
