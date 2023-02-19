@@ -1,10 +1,10 @@
+import json
+from os import getenv, path
+
+import pymssql
 from dotenv import load_dotenv
 
 load_dotenv()
-import json
-import pymssql
-
-from os import getenv, path
 
 connection = pymssql.connect(
     host=getenv("SQL_HOST"),
@@ -62,31 +62,32 @@ for model_name in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
                    'main-5', 'main-6', 'relu-1', 'relu-2', 'trial-1']:
     print(f'Loading {model_name}')
     # data = load_json()
-    with open(path.join(base_path,model_name, 'epochs.json')) as f:
+    with open(path.join(base_path, model_name, 'epochs.json')) as f:
         data = json.load(f)
         print(f'Converting {model_name} to Epoch objects')
         epochs = [
             Epoch(row['epoch'], row['loss'], row['reward'])
             for row in data
         ]
-        print(f"Pushing {model_name} to database" )
+        print(f"Pushing {model_name} to database")
         load_historical_data(f'hist-{model_name}', epochs)
         del epochs
         del data
 
 # %%
 
-for model_name in ['sequential-2', 'sequential-3', 'sequential-4', 'sequential-5', 'sequential-6', 'sequential-7', 'sequential-8']:
+for model_name in ['sequential-2', 'sequential-3', 'sequential-4', 'sequential-5', 'sequential-6', 'sequential-7',
+                   'sequential-8']:
     print(f'Loading {model_name}')
     # data = load_json()
-    with open(path.join(base_path,model_name, 'epochs.json')) as f:
+    with open(path.join(base_path, model_name, 'epochs.json')) as f:
         data = json.load(f)
         print(f'Converting {model_name} to Epoch objects')
         epochs = [
             Epoch(row['epoch'], row['average_loss'], row['average_reward'])
             for row in data
         ]
-        print(f"Pushing {model_name} to database" )
+        print(f"Pushing {model_name} to database")
         load_historical_data(f'hist-{model_name}', epochs)
         del epochs
         del data
