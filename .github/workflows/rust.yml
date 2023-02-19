@@ -11,12 +11,14 @@ env:
 
 jobs:
   build:
-
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+        name: Checkout Repository
       - uses: actions/cache@v3
+        name: Cache
         with:
           path: |
             ~/.cargo/bin/
@@ -30,4 +32,4 @@ jobs:
       - name: Run tests
         run: cd environment && cargo test --verbose
       - name: Build Release
-        run: cd environment && cargo build --release
+        run: cd environment && cargo build --release --verbose
