@@ -23,7 +23,7 @@ py_class!(class PyCube |py| {
     def apply_action(&self, action: usize) -> PyResult<PyNone> {
         match self.cube(py).borrow_mut().apply_action(action) {
             Some(_) => Ok(PyNone),
-            None => Err(PyErr::new::<exc::IndexError, _>(py, "Action Index Out of Bounds"))
+            None => Err(PyErr::new::<exc::IndexError, _>(py, "Action Index Out of Bounds. Actions must be in the range [0,18]"))
         }
     }
 
