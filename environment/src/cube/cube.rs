@@ -63,6 +63,16 @@ impl Cube {
     pub fn reset(&mut self) {
         self.state = get_initial_state();
     }
+
+    pub fn is_solved(&self) -> bool {
+        for i in 0..54 {
+            if self.state[i].to_index() != i / 9 {
+                return false;
+            }
+        }
+
+        true
+    }
 }
 
 fn get_permutations(face: &Face) -> [[usize; 4]; 5] {
@@ -204,6 +214,32 @@ mod tests {
                     assert!(index < 54, "Found permutation index {}, expected values less than 54", index);
                 }
             }
+        }
+    }
+
+    #[test]
+    fn new_cube_is_solved() {
+        assert!(Cube::new().is_solved());
+    }
+
+    #[test]
+    fn move_makes_cube_unsolved() {
+        for i in 0..18 {
+            let mut cube = Cube::new();
+            cube.apply_action(i);
+            assert!(!cube.is_solved());
+        }
+    }
+
+    #[test]
+    fn repeat_move_4_times_returns_solved() {
+        for i in 0..18 {
+            let mut cube = Cube::new();
+            cube.apply_action(i);
+            cube.apply_action(i);
+            cube.apply_action(i);
+            cube.apply_action(i);
+            assert!(cube.is_solved());
         }
     }
 }
