@@ -242,4 +242,12 @@ mod tests {
             assert!(cube.is_solved());
         }
     }
+
+    #[test]
+    fn reset_returns_to_solved_state() {
+        let mut cube = Cube::new();
+        cube.apply_action(12);
+        cube.reset();
+        assert!(cube.is_solved());
+    }
 }
