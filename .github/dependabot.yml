@@ -9,6 +9,10 @@ updates:
     directory: "/environment/" # Location of package manifests
     schedule:
       interval: "daily"
+  - package-ecosystem: "cargo" # See documentation for possible values
+    directory: "/rust/" # Location of package manifests
+    schedule:
+      interval: "daily"
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
