@@ -16,7 +16,11 @@ def create_database_connection() -> pymssql._pymssql.Connection:
     )
 
 
-def get_model_id(name: str, connection=create_database_connection(), create_missing=True) -> int:
+def get_model_id(name: str, connection=None, create_missing=True) -> int:
+    created_connection = not connection
+    if created_connection:
+        connection = create_database_connection()
+
     cursor = connection.cursor(as_dict=True)
 
     cursor.execute(f'SELECT ModelId FROM Models WHERE ModelName = \'{name}\'')
@@ -28,9 +32,15 @@ def get_model_id(name: str, connection=create_database_connection(), create_miss
             cursor.execute(f'INSERT INTO Models (ModelName) OUTPUT Inserted.ModelId VALUES (\'{name}\')')
             row = cursor.fetchone()
         else:
+            if created_connection:
+                connection.close()
             return -1
 
     cursor.close()
     connection.commit()
+
+    if created_connection:
+        connection.close()
+
 
     return row['ModelId']
