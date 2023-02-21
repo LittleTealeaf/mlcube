@@ -1,7 +1,0 @@
-numpy
-tensorflow
-pandas
-keras
-pyodbc
-pymssql
-python-dotenv
