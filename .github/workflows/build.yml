@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  rust:
+  environment_rust:
     name: Rust
     runs-on: ubuntu-latest
 
@@ -33,3 +33,26 @@ jobs:
         run: cd environment && cargo test --verbose
       - name: Build Release
         run: cd environment && cargo build --release --verbose
+  environment_python:
+    name: Rust Integration Tests
+    runs-on: ubuntu-22.04
+    needs: [environment_rust]
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout Repository
+      - uses: actions/cache@v3
+        name: Rust Cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            environment/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Install pip modules
+        run: pip install -r requirements.txt
+      - name: Build Module Release
+        run: cd environment && cargo build --release
+      - name: Run Pytest
+        run: pytest
