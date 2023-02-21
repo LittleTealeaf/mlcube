@@ -11,7 +11,7 @@ env:
 
 jobs:
   environment_rust:
-    name: Rust
+    name: Environment Rust
     runs-on: ubuntu-latest
 
     steps:
@@ -34,7 +34,7 @@ jobs:
       - name: Build Release
         run: cd environment && cargo build --release --verbose
   environment_python:
-    name: Rust Integration Tests
+    name: Environment Integration Tests
     runs-on: ubuntu-22.04
     needs: [environment_rust]
     steps:
