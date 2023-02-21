@@ -5,8 +5,8 @@ edition = "2021"
 
 [lib]
 name = "rust"
+crate-type = ["cdylib"]
 
-create-type = ["cdylib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies.cpython]
