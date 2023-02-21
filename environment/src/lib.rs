@@ -1,4 +1,4 @@
-use cpython::{exc, PyBool, PyErr, PyNone, PyResult};
+use cpython::{exc, PyErr, PyNone, PyResult};
 use cube::Cube;
 use std::cell::RefCell;
 
