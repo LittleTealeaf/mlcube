@@ -1,4 +1,4 @@
-use cpython::{exc, PyErr, PyNone, PyResult};
+use cpython::{exc, PyBool, PyErr, PyNone, PyResult};
 use cube::Cube;
 use std::cell::RefCell;
 
@@ -34,5 +34,9 @@ py_class!(class PyCube |py| {
     def reset(&self) -> PyResult<PyNone> {
         self.cube(py).borrow_mut().reset();
         Ok(PyNone)
+    }
+
+    def is_solved(&self) -> PyResult<bool> {
+        Ok(self.cube(py).borrow().is_solved())
     }
 });
