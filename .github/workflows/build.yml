@@ -40,6 +40,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         name: Checkout Repository
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - uses: actions/cache@v3
+        name: Environment Pytest Cache
+        with:
+          path: |
+            environment/.pytest_cache/
+            environment/integration/__pycache__/
+          key: ${{runner.os}}-pytest-${{hashFiles('**/requirements.txt')}}
       - uses: actions/cache@v3
         name: Rust Cache
         with:
@@ -50,9 +62,9 @@ jobs:
             ~/.cargo/git/db/
             environment/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Install pip modules
+      - name: Install Python Libraries
         run: pip install -r requirements.txt
-      - name: Build Module Release
+      - name: Build Environment Release
         run: cd environment && cargo build --release
       - name: Run Pytest
         run: pytest
