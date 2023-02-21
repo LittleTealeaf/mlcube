@@ -121,7 +121,7 @@ for model_name in ['sequential-2', 'sequential-3', 'sequential-4', 'sequential-5
 class Evaluation:
     def __init__(self, object):
         self.epoch = object['epoch']
-        self.solved = (1 if object['solved'] else 0) if 'solved' in object else 'NULL'
+        self.solved = (1 if object['solved'] else 0) if 'solved' in object else 0
         self.move_count = object['count'] if 'count' in object else object['moves'] if 'moves' in object else 'NULL'
         self.max_reward = object['reward_max'] if 'reward_max' in object else 'NULL'
         self.final_reward = object['reward_final'] if 'reward_final' in object else 'NULL'
