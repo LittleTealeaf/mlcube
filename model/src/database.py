@@ -32,15 +32,12 @@ def get_model_id(name: str, connection=None, create_missing=True) -> int:
             cursor.execute(f'INSERT INTO Models (ModelName) OUTPUT Inserted.ModelId VALUES (\'{name}\')')
             row = cursor.fetchone()
         else:
-            if created_connection:
-                connection.close()
-            return -1
+            row = {'ModelId': -1}
 
     cursor.close()
     connection.commit()
 
     if created_connection:
         connection.close()
-
 
     return row['ModelId']
