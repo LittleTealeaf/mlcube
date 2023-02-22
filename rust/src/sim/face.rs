@@ -54,3 +54,33 @@ impl FromStr for Face {
         }
     }
 }
+
+pub struct InvalidFaceIndex;
+
+impl TryFrom<usize> for Face {
+    type Error = InvalidFaceIndex;
+    fn try_from(value: usize) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::U),
+            1 => Ok(Self::L),
+            2 => Ok(Self::F),
+            3 => Ok(Self::R),
+            4 => Ok(Self::B),
+            5 => Ok(Self::D),
+            _ => Err(InvalidFaceIndex),
+        }
+    }
+}
+
+impl Into<usize> for Face {
+    fn into(self) -> usize {
+        match self {
+            Self::U => 0,
+            Self::L => 1,
+            Self::F => 2,
+            Self::R => 3,
+            Self::B => 4,
+            Self::D => 5,
+        }
+    }
+}

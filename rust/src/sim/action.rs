@@ -2,11 +2,11 @@ use std::str::FromStr;
 
 use crate::traits::Indexable;
 
-use super::{Face, ParseFaceError, Rotation};
+use super::{Face, ParseFaceError, Rotation, InvalidFaceIndex, InvalidRotationIndex};
 
 pub struct Action {
-    face: Face,
-    rotation: Rotation,
+    pub face: Face,
+    pub rotation: Rotation,
 }
 
 impl Indexable<usize, Action> for Action {
@@ -50,5 +50,30 @@ impl FromStr for Action {
         }?;
 
         Ok(Self { face, rotation })
+    }
+}
+
+pub struct ActionInvalidIndexError;
+
+impl From<InvalidFaceIndex> for ActionInvalidIndexError {
+    fn from(_: InvalidFaceIndex) -> Self {
+        ActionInvalidIndexError
+    }
+}
+
+impl From<InvalidRotationIndex> for ActionInvalidIndexError {
+    fn from(_: InvalidRotationIndex) -> Self {
+        ActionInvalidIndexError
+    }
+}
+
+impl TryFrom<usize> for Action {
+    type Error = ActionInvalidIndexError;
+
+    fn try_from(value: usize) -> Result<Self, Self::Error> {
+        Ok(Action {
+            face: Face::try_from(value / 3)?,
+            rotation: Rotation::try_from(value % 3)?,
+        })
     }
 }
