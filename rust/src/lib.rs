@@ -1,3 +1,5 @@
+use cpython::PyResult;
+
 mod sim;
 
 #[macro_use]

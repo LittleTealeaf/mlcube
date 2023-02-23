@@ -14,7 +14,7 @@ impl Action {
     &self.rotation
   }
 
-  
+
 }
 
 pub struct InvalidActionIndex;
