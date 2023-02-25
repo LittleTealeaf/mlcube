@@ -129,3 +129,33 @@ fn get_initial_state() -> [Face; 54] {
         Face::D,
     ]
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn get_initial_state_has_even_distribution() {
+        let mut count = [0; 6];
+        let faces = get_initial_state();
+
+        for face in faces {
+            count[usize::from(face)] += 1;
+        }
+
+        for item in count {
+            assert_eq!(item, 9);
+        }
+    }
+
+    #[test]
+    fn get_initial_state_correct_values() {
+        let faces = get_initial_state();
+
+        for i in 0..54 {
+            let face = usize::from(faces[i]);
+            assert_eq!(face, i / 9);
+        }
+    }
+}
