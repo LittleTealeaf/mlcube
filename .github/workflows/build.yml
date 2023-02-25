@@ -68,3 +68,25 @@ jobs:
         run: cd environment && cargo build --release
       - name: Run Pytest
         run: pytest
+  rust_build:
+    name: Build Rust Module
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout Repository
+      - uses: actions/cache@v3
+        name: Rust Cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            rust/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build
+        run: cd rust && cargo build --verbose
+      - name: Run tests
+        run: cd rust && cargo test --verbose
+      - name: Build Release
+        run: cd rust && cargo build --release --verbose
