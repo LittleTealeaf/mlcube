@@ -6,6 +6,10 @@ pub struct Action {
 }
 
 impl Action {
+    pub fn new(face: Face, rotation: Rotation) -> Self {
+        Self { face, rotation }
+    }
+
     pub fn get_permutations(&self) -> [[usize; 4]; 5] {
         match self.face {
             Face::R => [
