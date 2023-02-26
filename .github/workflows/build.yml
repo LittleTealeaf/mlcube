@@ -84,7 +84,7 @@ jobs:
             ~/.cargo/git/db/
             rust/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Run tests
+      - name: Run Tests
         run: cd rust && cargo test --verbose
       - name: Build Release
         run: cd rust && cargo build --release --verbose
