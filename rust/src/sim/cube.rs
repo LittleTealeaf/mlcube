@@ -130,7 +130,6 @@ fn get_initial_state() -> [Face; 54] {
     ]
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
