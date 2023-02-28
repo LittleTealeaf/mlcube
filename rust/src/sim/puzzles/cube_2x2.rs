@@ -26,6 +26,7 @@ pub struct Cube2x2;
 impl PuzzleTrait<Cube2x2> for Puzzle<Cube2x2> {
     const ACTION_SIZE: usize = 18;
     const OBSERVATION_LENGTH: usize = 4 * 6 * 6;
+    const STATE_SIZE: usize = 6 * 4;
 
     fn apply_action(&mut self, action: usize) -> Result<(), InvalidActionIndex> {
         let permutations = PERMUTATIONS[action % 6];
@@ -135,6 +136,19 @@ mod tests {
     fn observations_have_correct_length() {
         let cube: Puzzle<Cube2x2> = Puzzle::default();
         let observations = cube.get_observations();
-        assert_eq!(observations.len(), Puzzle::OBSERVATION_LENGTH);
+        assert_eq!(observations.len(), Puzzle::<Cube2x2>::OBSERVATION_LENGTH);
+    }
+
+    #[test]
+    fn applying_action_makes_unsolved() {
+        for i in 0..Puzzle::<Cube2x2>::ACTION_SIZE {
+            let mut cube: Puzzle<Cube2x2> = Puzzle::default();
+            let action_applied = match cube.apply_action(i) {
+                Ok(_) => true,
+                Err(_) => false
+            };
+            assert!(action_applied);
+            assert!(!cube.is_solved());
+        }
     }
 }

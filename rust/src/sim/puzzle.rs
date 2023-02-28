@@ -10,6 +10,7 @@ pub struct InvalidActionIndex;
 pub trait PuzzleTrait<Size>: Default {
     const OBSERVATION_LENGTH: usize;
     const ACTION_SIZE: usize;
+    const STATE_SIZE: usize;
 
     fn apply_action(&mut self, action: usize) -> Result<(), InvalidActionIndex>;
 
@@ -18,4 +19,5 @@ pub trait PuzzleTrait<Size>: Default {
     fn reset(&mut self);
 
     fn is_solved(&self) -> bool;
+
 }
