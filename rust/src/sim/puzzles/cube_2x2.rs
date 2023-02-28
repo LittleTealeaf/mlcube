@@ -142,7 +142,7 @@ mod tests {
     #[test]
     fn applying_action_makes_unsolved() {
         for i in 0..Puzzle::<Cube2x2>::ACTION_SIZE {
-            let mut cube: Puzzle<Cube2x2> = Puzzle::default();
+            let mut cube = Puzzle::<Cube2x2>::default();
             let action_applied = match cube.apply_action(i) {
                 Ok(_) => true,
                 Err(_) => false
