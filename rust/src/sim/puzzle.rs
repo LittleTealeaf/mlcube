@@ -1,15 +1,21 @@
+use std::marker::PhantomData;
+
+pub struct Puzzle<Size> {
+    pub(crate) state: Vec<usize>,
+    pub(crate) size: PhantomData<Size>,
+}
 
 pub struct InvalidActionIndex;
 
-pub trait Puzzle: Default {
-  fn apply_action(&mut self, action: usize) -> Result<(), InvalidActionIndex>;
+pub trait PuzzleTrait<Size>: Default {
+    const OBSERVATION_LENGTH: usize;
+    const ACTION_SIZE: usize;
 
-  fn get_observations(&self) -> Vec<u8>;
+    fn apply_action(&mut self, action: usize) -> Result<(), InvalidActionIndex>;
 
-  fn reset(&mut self);
+    fn get_observations(&self) -> Vec<u8>;
 
-  const OBSERVATION_LENGTH: usize;
-  const ACTION_SIZE: usize;
+    fn reset(&mut self);
 
-  fn is_solved(&self) -> bool;
+    fn is_solved(&self) -> bool;
 }

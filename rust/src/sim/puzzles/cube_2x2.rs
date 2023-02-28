@@ -1,12 +1,31 @@
-use crate::sim::{InvalidActionIndex, Puzzle};
+use std::marker::PhantomData;
 
-pub struct Cube2x2 {
-    state: [usize; 24],
-}
+use crate::sim::{InvalidActionIndex, Puzzle, PuzzleTrait};
 
-impl Puzzle for Cube2x2 {
-    const OBSERVATION_LENGTH: usize = 4 * 6 * 6;
+const DEFAULT_STATE: [usize; 24] = [
+    0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
+];
+
+const PERMUTATIONS: [[[usize; 4]; 3]; 6] = [
+    // U
+    [[0, 1, 3, 2], [8, 4, 16, 12], [9, 5, 17, 13]],
+    // L
+    [[0, 8, 20, 19], [2, 10, 22, 17], [5, 7, 6, 4]],
+    // F
+    [[8, 9, 11, 10], [5, 3, 14, 20], [7, 2, 12, 21]],
+    // R
+    [[14, 12, 13, 15], [9, 1, 18, 21], [11, 3, 16, 23]],
+    // B
+    [[16, 17, 19, 18], [13, 0, 6, 23], [15, 1, 4, 22]],
+    // D
+    [[20, 21, 23, 22], [10, 14, 18, 6], [11, 15, 19, 7]],
+];
+
+pub struct Cube2x2;
+
+impl PuzzleTrait<Cube2x2> for Puzzle<Cube2x2> {
     const ACTION_SIZE: usize = 18;
+    const OBSERVATION_LENGTH: usize = 4 * 6 * 6;
 
     fn apply_action(&mut self, action: usize) -> Result<(), InvalidActionIndex> {
         let permutations = PERMUTATIONS[action % 6];
@@ -71,36 +90,18 @@ impl Puzzle for Cube2x2 {
     }
 
     fn reset(&mut self) {
-        self.state = DEFAULT_STATE;
+        self.state = Vec::from(DEFAULT_STATE);
     }
 }
 
-impl Default for Cube2x2 {
+impl Default for Puzzle<Cube2x2> {
     fn default() -> Self {
         Self {
-            state: DEFAULT_STATE,
+            state: Vec::from(DEFAULT_STATE),
+            size: PhantomData::<Cube2x2>,
         }
     }
 }
-
-const DEFAULT_STATE: [usize; 24] = [
-    0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
-];
-
-const PERMUTATIONS: [[[usize; 4]; 3]; 6] = [
-    // U
-    [[0, 1, 3, 2], [8, 4, 16, 12], [9, 5, 17, 13]],
-    // L
-    [[0, 8, 20, 19], [2, 10, 22, 17], [5, 7, 6, 4]],
-    // F
-    [[8, 9, 11, 10], [5, 3, 14, 20], [7, 2, 12, 21]],
-    // R
-    [[14, 12, 13, 15], [9, 1, 18, 21], [11, 3, 16, 23]],
-    // B
-    [[16, 17, 19, 18], [13, 0, 6, 23], [15, 1, 4, 22]],
-    // D
-    [[20, 21, 23, 22], [10, 14, 18, 6], [11, 15, 19, 7]],
-];
 
 #[cfg(test)]
 mod tests {
@@ -126,14 +127,14 @@ mod tests {
 
     #[test]
     fn new_cube_is_solved() {
-        let cube = Cube2x2::default();
+        let cube: Puzzle<Cube2x2> = Puzzle::default();
         assert!(cube.is_solved());
     }
 
     #[test]
     fn observations_have_correct_length() {
-        let cube = Cube2x2::default();
+        let cube: Puzzle<Cube2x2> = Puzzle::default();
         let observations = cube.get_observations();
-        assert_eq!(observations.len(), Cube2x2::OBSERVATION_LENGTH);
+        assert_eq!(observations.len(), Puzzle::OBSERVATION_LENGTH);
     }
 }
