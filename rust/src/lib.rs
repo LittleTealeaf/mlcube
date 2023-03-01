@@ -1,4 +1,6 @@
-mod sim;
+
+mod py;
+mod puzzle;
 
 #[macro_use]
 extern crate cpython;

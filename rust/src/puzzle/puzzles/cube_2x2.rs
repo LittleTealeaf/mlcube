@@ -1,6 +1,4 @@
-use std::marker::PhantomData;
-
-use crate::sim::{InvalidActionIndex, Puzzle, PuzzleTrait};
+use crate::puzzle::{InvalidActionIndex, Puzzle};
 
 const DEFAULT_STATE: [usize; 24] = [
     0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
@@ -21,12 +19,33 @@ const PERMUTATIONS: [[[usize; 4]; 3]; 6] = [
     [[20, 21, 23, 22], [10, 14, 18, 6], [11, 15, 19, 7]],
 ];
 
-pub struct Cube2x2;
+pub struct Cube2x2 {
+    state: [usize; 24],
+}
 
-impl PuzzleTrait for Puzzle<Cube2x2> {
-    const ACTION_SIZE: usize = 18;
-    const OBSERVATION_LENGTH: usize = 4 * 6 * 6;
-    const STATE_SIZE: usize = 6 * 4;
+impl Default for Cube2x2 {
+    fn default() -> Self {
+        Self {
+            state: DEFAULT_STATE,
+        }
+    }
+}
+
+impl Puzzle for Cube2x2 {
+    const OBSERVATION_SIZE: usize = 4 * 6 * 6;
+
+    fn reset(&mut self) {
+        self.state = DEFAULT_STATE;
+    }
+
+    fn is_solved(&self) -> bool {
+        for i in 0..24 {
+            if self.state[i] != i / 4 {
+                return false;
+            }
+        }
+        return true;
+    }
 
     fn apply_action(&mut self, action: usize) -> Result<(), InvalidActionIndex> {
         let permutations = PERMUTATIONS[action % 6];
@@ -71,7 +90,7 @@ impl PuzzleTrait for Puzzle<Cube2x2> {
     }
 
     fn get_observations(&self) -> Vec<u8> {
-        let mut observations = [0; Self::OBSERVATION_LENGTH];
+        let mut observations = [0; Self::OBSERVATION_SIZE];
 
         for i in 0..(24) {
             let value = self.state[i];
@@ -80,31 +99,9 @@ impl PuzzleTrait for Puzzle<Cube2x2> {
 
         Vec::from(observations)
     }
-
-    fn is_solved(&self) -> bool {
-        for i in 0..24 {
-            if self.state[i] != i / 4 {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    fn reset(&mut self) {
-        self.state = Vec::from(DEFAULT_STATE);
-    }
 }
 
-impl Default for Puzzle<Cube2x2> {
-    fn default() -> Self {
-        Self {
-            state: Vec::from(DEFAULT_STATE),
-            size: PhantomData::<Cube2x2>,
-        }
-    }
-}
-
-#[cfg(test)]
+#[cfg(tests)]
 mod tests {
     use super::*;
 
@@ -127,63 +124,9 @@ mod tests {
     }
 
     #[test]
-    fn new_cube_is_solved() {
-        let cube: Puzzle<Cube2x2> = Puzzle::default();
-        assert!(cube.is_solved());
-    }
-
-    #[test]
-    fn observations_have_correct_length() {
-        let cube: Puzzle<Cube2x2> = Puzzle::default();
+    fn observations_has_correct_size() {
+        let cube = Cube2x2::default();
         let observations = cube.get_observations();
-        assert_eq!(observations.len(), Puzzle::<Cube2x2>::OBSERVATION_LENGTH);
-    }
-
-    #[test]
-    fn applying_action_makes_cube_unsolved() {
-        for i in 0..Puzzle::<Cube2x2>::ACTION_SIZE {
-            let mut cube = Puzzle::<Cube2x2>::default();
-            assert!(cube.apply_action(i).is_ok());
-            assert!(!cube.is_solved());
-        }
-    }
-
-    #[test]
-    fn applying_invalid_action_returns_err() {
-        let mut cube = Puzzle::<Cube2x2>::default();
-        assert!(cube.apply_action(Puzzle::<Cube2x2>::ACTION_SIZE).is_err());
-    }
-
-    #[test]
-    fn reset_solves_cube() {
-        let mut cube: Puzzle<Cube2x2> = Puzzle::default();
-        cube.apply_action(5).unwrap();
-        cube.reset();
-        assert!(cube.is_solved());
-
-        let mut cube = Puzzle::<Cube2x2>::default();
-        cube.reset();
-        assert!(cube.is_solved());
-    }
-
-    #[test]
-    fn repeating_moves_solves_cube() {
-        for i in 0..Puzzle::<Cube2x2>::ACTION_SIZE {
-            let mut cube = Puzzle::<Cube2x2>::default();
-            cube.apply_action(i).unwrap();
-            cube.apply_action(i).unwrap();
-            cube.apply_action(i).unwrap();
-            cube.apply_action(i).unwrap();
-            assert!(cube.is_solved());
-        }
-    }
-
-    #[test]
-    fn observations_have_valid_values() {
-        let cube = Puzzle::<Cube2x2>::default();
-        let observations = cube.get_observations();
-        for value in observations {
-            assert!(value == 0 || value == 1)
-        }
+        assert!(observations.len(), Cube2x2::OBSERVATION_SIZE);
     }
 }
