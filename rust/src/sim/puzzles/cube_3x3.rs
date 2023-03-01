@@ -60,7 +60,7 @@ const PERMUTATIONS: [[[usize; 4]; 5]; 6] = [
 
 pub struct Cube3x3;
 
-impl PuzzleTrait<Cube3x3> for Puzzle<Cube3x3> {
+impl PuzzleTrait for Puzzle<Cube3x3> {
     const ACTION_SIZE: usize = 18;
     const OBSERVATION_LENGTH: usize = 9 * 6 * 6;
     const STATE_SIZE: usize = 9 * 6;

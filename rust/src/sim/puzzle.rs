@@ -5,9 +5,10 @@ pub struct Puzzle<Size> {
     pub(crate) size: PhantomData<Size>,
 }
 
+#[derive(Debug)]
 pub struct InvalidActionIndex;
 
-pub trait PuzzleTrait<Size>: Default {
+pub trait PuzzleTrait: Default {
     const OBSERVATION_LENGTH: usize;
     const ACTION_SIZE: usize;
     const STATE_SIZE: usize;

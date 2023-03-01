@@ -23,7 +23,7 @@ const PERMUTATIONS: [[[usize; 4]; 3]; 6] = [
 
 pub struct Cube2x2;
 
-impl PuzzleTrait<Cube2x2> for Puzzle<Cube2x2> {
+impl PuzzleTrait for Puzzle<Cube2x2> {
     const ACTION_SIZE: usize = 18;
     const OBSERVATION_LENGTH: usize = 4 * 6 * 6;
     const STATE_SIZE: usize = 6 * 4;
@@ -143,12 +143,22 @@ mod tests {
     fn applying_action_makes_unsolved() {
         for i in 0..Puzzle::<Cube2x2>::ACTION_SIZE {
             let mut cube = Puzzle::<Cube2x2>::default();
-            let action_applied = match cube.apply_action(i) {
-                Ok(_) => true,
-                Err(_) => false
-            };
-            assert!(action_applied);
+            assert!(cube.apply_action(i).is_ok());
             assert!(!cube.is_solved());
         }
+    }
+
+    #[test]
+    fn applying_invalid_action_returns_err() {
+        let mut cube = Puzzle::<Cube2x2>::default();
+        assert!(cube.apply_action(Puzzle::<Cube2x2>::ACTION_SIZE).is_err());
+    }
+
+    #[test]
+    fn reset_solves_cube() {
+        let mut cube: Puzzle<Cube2x2> = Puzzle::default();
+        cube.apply_action(5).unwrap();
+        cube.reset();
+        assert!(cube.is_solved());
     }
 }
