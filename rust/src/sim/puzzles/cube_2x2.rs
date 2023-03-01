@@ -109,7 +109,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn permutations_contains_valid_indices() {
+    fn permutations_have_valid_indeces() {
         for perms in PERMUTATIONS {
             for row in perms {
                 for index in row {
@@ -120,7 +120,7 @@ mod tests {
     }
 
     #[test]
-    fn default_state_contains_valid_values() {
+    fn default_state_has_valid_values() {
         for item in DEFAULT_STATE {
             assert!(item < 6);
         }
@@ -140,7 +140,7 @@ mod tests {
     }
 
     #[test]
-    fn applying_action_makes_unsolved() {
+    fn applying_action_makes_cube_unsolved() {
         for i in 0..Puzzle::<Cube2x2>::ACTION_SIZE {
             let mut cube = Puzzle::<Cube2x2>::default();
             assert!(cube.apply_action(i).is_ok());
@@ -160,5 +160,30 @@ mod tests {
         cube.apply_action(5).unwrap();
         cube.reset();
         assert!(cube.is_solved());
+
+        let mut cube = Puzzle::<Cube2x2>::default();
+        cube.reset();
+        assert!(cube.is_solved());
+    }
+
+    #[test]
+    fn repeating_moves_solves_cube() {
+        for i in 0..Puzzle::<Cube2x2>::ACTION_SIZE {
+            let mut cube = Puzzle::<Cube2x2>::default();
+            cube.apply_action(i).unwrap();
+            cube.apply_action(i).unwrap();
+            cube.apply_action(i).unwrap();
+            cube.apply_action(i).unwrap();
+            assert!(cube.is_solved());
+        }
+    }
+
+    #[test]
+    fn observations_have_valid_values() {
+        let cube = Puzzle::<Cube2x2>::default();
+        let observations = cube.get_observations();
+        for value in observations {
+            assert!(value == 0 || value == 1)
+        }
     }
 }
