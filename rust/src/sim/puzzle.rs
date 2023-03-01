@@ -5,10 +5,6 @@ pub struct Puzzle<Size> {
     pub(crate) size: PhantomData<Size>,
 }
 
-
-impl<Size> Puzzle<Size> {
-}
-
 #[derive(Debug)]
 pub struct InvalidActionIndex;
 
