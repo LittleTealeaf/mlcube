@@ -1,10 +1,12 @@
 
 
+
 #[derive(Debug)]
 pub struct InvalidActionIndex;
 
 pub trait Puzzle: Default {
     const OBSERVATION_SIZE: usize;
+    const ACTION_SIZE: usize;
 
     fn apply_action(&mut self, action: usize) -> Result<(), InvalidActionIndex>;
     

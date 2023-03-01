@@ -33,6 +33,7 @@ impl Default for Cube2x2 {
 
 impl Puzzle for Cube2x2 {
     const OBSERVATION_SIZE: usize = 4 * 6 * 6;
+    const ACTION_SIZE: usize = 18;
 
     fn reset(&mut self) {
         self.state = DEFAULT_STATE;
@@ -101,12 +102,12 @@ impl Puzzle for Cube2x2 {
     }
 }
 
-#[cfg(tests)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn permutations_have_valid_indeces() {
+    fn permutations_have_valid_indices() {
         for perms in PERMUTATIONS {
             for row in perms {
                 for index in row {
@@ -127,6 +128,64 @@ mod tests {
     fn observations_has_correct_size() {
         let cube = Cube2x2::default();
         let observations = cube.get_observations();
-        assert!(observations.len(), Cube2x2::OBSERVATION_SIZE);
+        assert_eq!(observations.len(), Cube2x2::OBSERVATION_SIZE);
+    }
+
+    #[test]
+    fn observations_have_valid_values() {
+        let cube = Cube2x2::default();
+        for value in cube.get_observations() {
+            assert!(value == 0 || value == 1);
+        }
+    }
+
+    #[test]
+    fn default_cube_is_solved() {
+        let cube = Cube2x2::default();
+        assert!(cube.is_solved());
+    }
+
+    #[test]
+    fn applying_move_makes_cube_unsolved() {
+        for i in 0..18 {
+            let mut cube = Cube2x2::default();
+            cube.apply_action(i).unwrap();
+            assert!(!cube.is_solved());
+        }
+    }
+
+    #[test]
+    fn repeat_moves_loops_to_solved() {
+        for i in 0..18 {
+            let mut cube = Cube2x2::default();
+            cube.apply_action(i).unwrap();
+            cube.apply_action(i).unwrap();
+            cube.apply_action(i).unwrap();
+            cube.apply_action(i).unwrap();
+            assert!(cube.is_solved());
+        }
+    }
+
+    #[test]
+    fn reset_solved_cube_is_solved() {
+        let mut cube = Cube2x2::default();
+        cube.reset();
+        assert!(cube.is_solved());
+    }
+
+    #[test]
+    fn reset_unsolved_cube_is_solved() {
+        for i in 0..18 {
+            let mut cube = Cube2x2::default();
+            cube.apply_action(i).unwrap();
+            cube.reset();
+            assert!(cube.is_solved());
+        }
+    }
+
+    #[test]
+    fn invalid_action_returns_error() {
+        let mut cube = Cube2x2::default();
+        assert!(cube.apply_action(18).is_err());
     }
 }
