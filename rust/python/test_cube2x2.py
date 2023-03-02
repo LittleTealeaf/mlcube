@@ -1,6 +1,6 @@
 import librust
 
-def test_create_cube2x2():
+def test_create_cube():
   cube = librust.PyCube2x2()
   assert cube is not None
 
