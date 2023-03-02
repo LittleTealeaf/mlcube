@@ -18,6 +18,7 @@ def test_apply_valid_action():
 def test_get_observation_length():
   cube = librust.PyCube2x2()
   assert type(cube.get_observation_length()) == int
+  assert cube.get_observation_length() > 0
 
 def test_get_observations_is_of_length():
   cube = librust.PyCube2x2()
