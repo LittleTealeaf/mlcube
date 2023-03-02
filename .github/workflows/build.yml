@@ -25,7 +25,9 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             rust/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-rust-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-cargo-
       - name: Run Tests
         run: cd rust && cargo test --verbose
       - name: Build Release
@@ -51,14 +53,19 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             rust/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-rust-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-cargo-
       - uses: actions/cache@v3
         name: Rust Pytest Cache
         with:
           path: |
             rust/.pytest_cache/
             rust/python/__pycache__/
-          key: ${{runner.os}}-pytest-${{hashFiles('**/requirements.txt')}}-${{hashFiles('rust/**.py')}}
+          key: ${{runner.os}}-rust-pytest-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('rust/**/*.py') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-pytest-${{ hashFiles('**/requirements.txt') }}-
+            ${{ runner.os }}-rust-pytest-
       - name: Install Python Packages
         run: pip install -r requirements.txt
       - name: Build Rust Release
