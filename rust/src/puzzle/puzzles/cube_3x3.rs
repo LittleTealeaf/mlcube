@@ -1,6 +1,4 @@
-use std::marker::PhantomData;
-
-use crate::sim::{InvalidActionIndex, Puzzle, PuzzleTrait};
+use crate::puzzle::{InvalidActionIndex, Puzzle};
 
 const DEFAULT_STATE: [usize; 9 * 6] = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3,
@@ -58,17 +56,25 @@ const PERMUTATIONS: [[[usize; 4]; 5]; 6] = [
     ],
 ];
 
-pub struct Cube3x3;
+pub struct Cube3x3 {
+    state: [usize; 54],
+}
 
-impl PuzzleTrait for Puzzle<Cube3x3> {
+impl Default for Cube3x3 {
+    fn default() -> Self {
+        Self {
+            state: DEFAULT_STATE,
+        }
+    }
+}
+
+impl Puzzle for Cube3x3 {
     const ACTION_SIZE: usize = 18;
-    const OBSERVATION_LENGTH: usize = 9 * 6 * 6;
-    const STATE_SIZE: usize = 9 * 6;
+    const OBSERVATION_SIZE: usize = 9 * 6 * 6;
 
     fn apply_action(&mut self, action: usize) -> Result<(), InvalidActionIndex> {
         let permutations = PERMUTATIONS[action % 6];
         let rotation = action / 6;
-
         match rotation {
             0 => {
                 // Normal
@@ -109,9 +115,9 @@ impl PuzzleTrait for Puzzle<Cube3x3> {
     }
 
     fn get_observations(&self) -> Vec<u8> {
-        let mut observations = [0; Self::OBSERVATION_LENGTH];
+        let mut observations = [0; Self::OBSERVATION_SIZE];
 
-        for i in 0..(24) {
+        for i in 0..(54) {
             let value = self.state[i];
             observations[i * 6 + value] = 1;
         }
@@ -127,50 +133,97 @@ impl PuzzleTrait for Puzzle<Cube3x3> {
         }
         return true;
     }
-    fn reset(&mut self) {}
-}
 
-impl Default for Puzzle<Cube3x3> {
-    fn default() -> Self {
-        Self {
-            state: Vec::from(DEFAULT_STATE),
-            size: PhantomData::<Cube3x3>,
-        }
+    fn reset(&mut self) {
+        self.state = DEFAULT_STATE;
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+  use super::*;
 
-    #[test]
-    fn permutations_contains_valid_indices() {
-        for perms in PERMUTATIONS {
-            for row in perms {
-                for index in row {
-                    assert!(index < Puzzle::<Cube3x3>::STATE_SIZE);
-                }
-            }
-        }
-    }
 
-    #[test]
-    fn default_state_contains_valid_values() {
-        for item in DEFAULT_STATE {
-            assert!(item < 6);
-        }
-    }
+  #[test]
+  fn permutations_have_valid_indices() {
+      for perms in PERMUTATIONS {
+          for row in perms {
+              for index in row {
+                  assert!(index < 54);
+              }
+          }
+      }
+  }
 
-    #[test]
-    fn new_cube_is_solved() {
-        let cube: Puzzle<Cube3x3> = Puzzle::default();
-        assert!(cube.is_solved());
-    }
+  #[test]
+  fn default_state_has_valid_values() {
+      for item in DEFAULT_STATE {
+          assert!(item < 6);
+      }
+  }
 
-    #[test]
-    fn observations_have_correct_length() {
-        let cube: Puzzle<Cube3x3> = Puzzle::default();
-        let observations = cube.get_observations();
-        assert_eq!(observations.len(), Puzzle::<Cube3x3>::OBSERVATION_LENGTH);
-    }
+  #[test]
+  fn observations_has_correct_size() {
+      let cube = Cube3x3::default();
+      let observations = cube.get_observations();
+      assert_eq!(observations.len(), Cube3x3::OBSERVATION_SIZE);
+  }
+
+  #[test]
+  fn observations_have_valid_values() {
+      let cube = Cube3x3::default();
+      for value in cube.get_observations() {
+          assert!(value == 0 || value == 1);
+      }
+  }
+
+  #[test]
+  fn default_cube_is_solved() {
+      let cube = Cube3x3::default();
+      assert!(cube.is_solved());
+  }
+
+  #[test]
+  fn applying_move_makes_cube_unsolved() {
+      for i in 0..18 {
+          let mut cube = Cube3x3::default();
+          cube.apply_action(i).unwrap();
+          assert!(!cube.is_solved());
+      }
+  }
+
+  #[test]
+  fn repeat_moves_loops_to_solved() {
+      for i in 0..18 {
+          let mut cube = Cube3x3::default();
+          cube.apply_action(i).unwrap();
+          cube.apply_action(i).unwrap();
+          cube.apply_action(i).unwrap();
+          cube.apply_action(i).unwrap();
+          assert!(cube.is_solved());
+      }
+  }
+
+  #[test]
+  fn reset_solved_cube_is_solved() {
+      let mut cube = Cube3x3::default();
+      cube.reset();
+      assert!(cube.is_solved());
+  }
+
+  #[test]
+  fn reset_unsolved_cube_is_solved() {
+      for i in 0..18 {
+          let mut cube = Cube3x3::default();
+          cube.apply_action(i).unwrap();
+          cube.reset();
+          assert!(cube.is_solved());
+      }
+  }
+
+  #[test]
+  fn invalid_action_returns_error() {
+      let mut cube = Cube3x3::default();
+      assert!(cube.apply_action(18).is_err());
+  }
 }
