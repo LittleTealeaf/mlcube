@@ -111,7 +111,11 @@ mod tests {
         for perms in PERMUTATIONS {
             for row in perms {
                 for index in row {
-                    assert!(index < 24);
+                    assert!(
+                        index < 24,
+                        "Index values must be less than 24, found {}",
+                        index
+                    );
                 }
             }
         }
@@ -120,7 +124,11 @@ mod tests {
     #[test]
     fn default_state_has_valid_values() {
         for item in DEFAULT_STATE {
-            assert!(item < 6);
+            assert!(
+                item < 6,
+                "A color value should be within the range [0,5], found {}",
+                item
+            );
         }
     }
 
@@ -128,21 +136,35 @@ mod tests {
     fn observations_has_correct_size() {
         let cube = Cube2x2::default();
         let observations = cube.get_observations();
-        assert_eq!(observations.len(), Cube2x2::OBSERVATION_SIZE);
+        let observation_length = observations.len();
+        assert_eq!(
+            observation_length,
+            Cube2x2::OBSERVATION_SIZE,
+            "Observations should be of length {}, found {}",
+            Cube2x2::OBSERVATION_SIZE,
+            observation_length
+        );
     }
 
     #[test]
     fn observations_have_valid_values() {
         let cube = Cube2x2::default();
         for value in cube.get_observations() {
-            assert!(value == 0 || value == 1);
+            assert!(
+                value == 0 || value == 1,
+                "Any value in cube should be 0 or 1, found {}",
+                value
+            );
         }
     }
 
     #[test]
     fn default_cube_is_solved() {
         let cube = Cube2x2::default();
-        assert!(cube.is_solved());
+        assert!(
+            cube.is_solved(),
+            "A default cube should be solved, found unsolved cube"
+        );
     }
 
     #[test]
@@ -150,7 +172,12 @@ mod tests {
         for i in 0..18 {
             let mut cube = Cube2x2::default();
             cube.apply_action(i).unwrap();
-            assert!(!cube.is_solved());
+
+            assert!(
+                !cube.is_solved(),
+                "Applying the action {} should be unsolved, found a solved cube",
+                i
+            );
         }
     }
 
@@ -162,7 +189,11 @@ mod tests {
             cube.apply_action(i).unwrap();
             cube.apply_action(i).unwrap();
             cube.apply_action(i).unwrap();
-            assert!(cube.is_solved());
+            assert!(
+                cube.is_solved(),
+                "Applying the action {} four times should be solved, found an unsolved cube",
+                i
+            );
         }
     }
 
@@ -170,7 +201,10 @@ mod tests {
     fn reset_solved_cube_is_solved() {
         let mut cube = Cube2x2::default();
         cube.reset();
-        assert!(cube.is_solved());
+        assert!(
+            cube.is_solved(),
+            "A cube should be solved after resetting it"
+        );
     }
 
     #[test]
@@ -179,13 +213,22 @@ mod tests {
             let mut cube = Cube2x2::default();
             cube.apply_action(i).unwrap();
             cube.reset();
-            assert!(cube.is_solved());
+            assert!(
+                cube.is_solved(),
+                "A cube unsolved by the action {} should be solved after a reset",
+                i
+            );
         }
     }
 
     #[test]
     fn invalid_action_returns_error() {
         let mut cube = Cube2x2::default();
-        assert!(cube.apply_action(18).is_err());
+        assert!(
+            cube.apply_action(Cube2x2::ACTION_SIZE).is_err(),
+            "Applying the action {} should return an Err because {} is an invalid action",
+            Cube2x2::ACTION_SIZE,
+            Cube2x2::ACTION_SIZE
+        );
     }
 }
