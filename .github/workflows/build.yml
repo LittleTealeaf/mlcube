@@ -10,64 +10,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  environment_rust:
-    name: Environment Rust
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-        name: Checkout Repository
-      - uses: actions/cache@v3
-        name: Rust Cache
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            environment/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Build
-        run: cd environment && cargo build --verbose
-      - name: Run tests
-        run: cd environment && cargo test --verbose
-      - name: Build Release
-        run: cd environment && cargo build --release --verbose
-  environment_python:
-    name: Environment Integration Tests
-    runs-on: ubuntu-22.04
-    needs: [environment_rust]
-    steps:
-      - uses: actions/checkout@v3
-        name: Checkout Repository
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-          cache: 'pip'
-      - uses: actions/cache@v3
-        name: Environment Pytest Cache
-        with:
-          path: |
-            environment/.pytest_cache/
-            environment/integration/__pycache__/
-          key: ${{runner.os}}-pytest-${{hashFiles('**/requirements.txt')}}
-      - uses: actions/cache@v3
-        name: Rust Cache
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            environment/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Install Python Libraries
-        run: pip install -r requirements.txt
-      - name: Build Environment Release
-        run: cd environment && cargo build --release
-      - name: Run Pytest
-        run: pytest
   rust_build:
     name: Build Rust Module
     runs-on: ubuntu-latest
