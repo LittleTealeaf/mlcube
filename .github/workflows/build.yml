@@ -24,10 +24,18 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            rust/target/
           key: ${{ runner.os }}-rust-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-cargo-
+      - uses: actions/cache@v3
+        name: Rust Target Cache
+        with:
+          path: |
+            rust/target/
+          key: ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('rust/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}-
+            ${{ runner.os }}-rust-target-
       - name: Run Tests
         run: cd rust && cargo test --verbose
       - name: Build Release
@@ -52,10 +60,18 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            rust/target/
-          key: ${{ runner.os }}-rust-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-rust-cargo-${{ hashFiles('**/Cargo.lock') }}-
           restore-keys: |
             ${{ runner.os }}-rust-cargo-
+      - uses: actions/cache@v3
+        name: Rust Target Cache
+        with:
+          path: |
+            rust/target/
+          key: ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('rust/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}-
+            ${{ runner.os }}-rust-target-
       - uses: actions/cache@v3
         name: Rust Pytest Cache
         with:
