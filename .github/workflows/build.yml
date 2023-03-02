@@ -88,3 +88,38 @@ jobs:
         run: cd rust && cargo test --verbose
       - name: Build Release
         run: cd rust && cargo build --release --verbose
+  rust_python_test:
+    name: Test Rust Python Module
+    needs: [rust_build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout Repository
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - uses: action/cache@v3
+        name: Rust Cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            rust/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: actions/cache@v3
+        name: Rust Pytest Cache
+        with:
+          path: |
+            rust/.pytest_cache/
+            rust/python/__pycache__/
+          key: ${{runner.os}}-pytest-${{hashFiles('**/requirements.txt')}}-${{hashFiles('rust/**.py')}}
+      - name: Install Python Packages
+        run: pip install -r requirements.txt
+      - name: Build Rust Release
+        run: cd rust && cargo build --release
+      - name: Run Python Tests
+        run: cd rust && pytest
