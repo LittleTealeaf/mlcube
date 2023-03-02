@@ -1,4 +1,4 @@
-use crate::puzzle::{InvalidActionIndex, Puzzle};
+use crate::puzzle::{ApplyActionError, Puzzle};
 
 const DEFAULT_STATE: [usize; 24] = [
     0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
@@ -48,7 +48,7 @@ impl Puzzle for Cube2x2 {
         return true;
     }
 
-    fn apply_action(&mut self, action: usize) -> Result<(), InvalidActionIndex> {
+    fn apply_action(&mut self, action: usize) -> Result<(), ApplyActionError> {
         let permutations = PERMUTATIONS[action % 6];
         let rotation = action / 6;
         match rotation {
@@ -86,7 +86,7 @@ impl Puzzle for Cube2x2 {
                 }
                 Ok(())
             }
-            _ => Err(InvalidActionIndex),
+            _ => Err(ApplyActionError::InvalidActionIndex),
         }
     }
 
