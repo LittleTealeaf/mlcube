@@ -231,4 +231,30 @@ mod tests {
             Cube2x2::ACTION_SIZE
         );
     }
+
+    #[test]
+    fn observations_have_valid_format() {
+        let cube = Cube2x2::default();
+        let observations = cube.get_observations();
+        for segment in 0..(4 * 6) {
+            let start_index = segment * 6;
+            let slice = &observations[start_index..(start_index + 6)];
+
+            let sum: u8 = slice.iter().sum();
+
+            assert!(
+                sum > 0,
+                "Invalid slice from {} to {}, did not find any positive value",
+                start_index,
+                start_index + 6
+            );
+
+            assert!(
+                sum < 2,
+                "Invalid slice from {} to {}, too many positive values found",
+                start_index,
+                start_index + 6
+            );
+        }
+    }
 }
