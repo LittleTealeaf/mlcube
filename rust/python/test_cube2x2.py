@@ -23,3 +23,10 @@ def test_get_observations_is_of_length():
   cube = librust.PyCube2x2()
   length = cube.get_observation_length()
   assert len(cube.get_observations()) == length
+
+def test_reset():
+    for i in range(18):
+        cube = librust.PyCube2x2()
+        cube.apply_action(i)
+        cube.reset()
+        assert cube.is_solved()
