@@ -7,8 +7,5 @@ edition = "2021"
 name = "rust"
 crate-type = ["cdylib"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies.cpython]
-version = "0.7"
-features = ["extension-module"]
+[dependencies]
+cpython = { version = "0.7.1", features = ["extension-module"] }
