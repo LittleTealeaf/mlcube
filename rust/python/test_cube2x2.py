@@ -1,3 +1,4 @@
+# type: ignore
 import librust
 
 def test_create_cube():
