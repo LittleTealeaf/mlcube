@@ -1,7 +1,6 @@
 #[derive(Debug)]
 pub enum ApplyActionError {
     InvalidActionIndex,
-    IllegalMove,
 }
 
 /// Implements functions that every puzzle should be able to manage
