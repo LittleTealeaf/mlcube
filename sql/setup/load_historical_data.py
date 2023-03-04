@@ -145,15 +145,15 @@ WHERE EvaluationId IN (SELECT EvaluationId
     max_len = 500
 
     for evaluation in evaluations:
-        cursor.execute(f'''INSERT INTO Evaluations (ModelId, Epoch, Solved, MoveCount, MaxReward, FinalReward) OUTPUT Inserted.EvaluationId
-        VALUES ({str(model_id)}, {str(evaluation.epoch)}, {str(evaluation.solved)}, {str(evaluation.move_count)}, {str(evaluation.max_reward)}, {str(evaluation.final_reward)})''')
+        cursor.execute(f'''INSERT INTO Evaluations (ModelId, Epoch, Solved, MoveCount) OUTPUT Inserted.EvaluationId
+        VALUES ({str(model_id)}, {str(evaluation.epoch)}, {str(evaluation.solved)}, {str(evaluation.move_count)})''')
 
         eval_id = cursor.fetchone()['EvaluationId']
 
         if len(evaluation.moves) > 0:
             for index, move in enumerate(evaluation.moves):
-                cursor.execute(f'''INSERT INTO EvaluationMoves (EvaluationId, MoveIndex, MoveName) VALUES
-                ({str(eval_id)}, {str(index)}, '{str(move)}')''')
+                cursor.execute(f'''INSERT INTO EvaluationMoves (EvaluationId, MoveIndex, MoveName, Reward) VALUES
+                ({str(eval_id)}, {str(index)}, '{str(move)}', 0)''')
 
     cursor.close()
     connection.commit()

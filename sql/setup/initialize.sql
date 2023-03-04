@@ -4,6 +4,7 @@ CREATE TABLE Models
 (
     ModelId   INT          NOT NULL IDENTITY PRIMARY KEY,
     ModelName VARCHAR(100) NOT NULL,
+    GitHash   VARCHAR(40)
 )
 
 CREATE TABLE Nodes
@@ -31,9 +32,7 @@ CREATE TABLE Evaluations
     ModelId      INT NOT NULL FOREIGN KEY REFERENCES Models (ModelId),
     Epoch        INT NOT NULL,
     Solved       BIT,
-    MoveCount        INT,
-    MaxReward    FLOAT(53),
-    FinalReward  FLOAT(53)
+    MoveCount    INT,
 )
 
 CREATE TABLE EvaluationMoves
@@ -42,5 +41,5 @@ CREATE TABLE EvaluationMoves
     EvaluationId     INT FOREIGN KEY REFERENCES Evaluations (EvaluationId),
     MoveIndex        INT,
     MoveName         VARCHAR(2),
-    Reward  FLOAT(53)
+    Reward           FLOAT(53)
 )
