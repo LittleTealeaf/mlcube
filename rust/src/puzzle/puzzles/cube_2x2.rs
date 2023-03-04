@@ -257,4 +257,47 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn scramble_with_seed_unsolves_cube() {
+        let mut cube = Cube2x2::default();
+        let seed = 1234;
+        cube.scramble_with_seed(100, seed);
+        assert!(!cube.is_solved());
+    }
+
+    #[test]
+    fn scramble_unsolves_cube() {
+        let mut cube = Cube2x2::default();
+        cube.scramble(100);
+        assert!(!cube.is_solved());
+    }
+
+    #[test]
+    fn scramble_returns_correct_seed() {
+        let mut cube = Cube2x2::default();
+        let seed = cube.scramble(100);
+
+        let mut cube_clone = Cube2x2::default();
+        cube_clone.scramble_with_seed(100, seed);
+
+        for i in 0..24 {
+            assert_eq!(cube.state[i], cube_clone.state[i]);
+        }
+    }
+
+    #[test]
+    fn scramble_seeds_produce_identical_cubes() {
+        let seed = 12342;
+
+        let mut cube_a = Cube2x2::default();
+        cube_a.scramble_with_seed(100, seed);
+
+        let mut cube_b = Cube2x2::default();
+        cube_b.scramble_with_seed(100, seed);
+
+        for i in 0..24 {
+            assert_eq!(cube_a.state[i], cube_b.state[i]);
+        }
+    }
 }

@@ -36,4 +36,13 @@ py_class!(pub class PyCube2x2 |py| {
         Ok(self.cube(py).borrow().get_observations())
     }
 
+    def scramble(&self, steps: usize) -> PyResult<u64> {
+        Ok(self.cube(py).borrow_mut().scramble(steps))
+    }
+
+    def scramble_with_seed(&self, steps: usize, seed: u64) -> PyResult<PyNone> {
+        self.cube(py).borrow_mut().scramble_with_seed(steps, seed);
+        Ok(PyNone)
+    }
+
 });

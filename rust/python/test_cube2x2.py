@@ -31,3 +31,42 @@ def test_reset():
         cube.apply_action(i)
         cube.reset()
         assert cube.is_solved()
+
+def test_scramble_unsovles_cube():
+    cube = librust.PyCube2x2()
+    cube.scramble(100)
+    assert not cube.is_solved()
+
+def test_scramble_with_seed_unsolves_cube():
+   cube = librust.PyCube2x2()
+   cube.scramble_with_seed(100,12345)
+   assert not cube.is_solved()
+
+def test_scramble_seeds_produce_identical_cubes():
+
+   seed = 12345
+
+   cube_a = librust.PyCube2x2()
+   cube_a.scramble_with_seed(100,seed)
+
+   cube_b = librust.PyCube2x2()
+   cube_b.scramble_with_seed(100,seed)
+
+   obs_a = cube_a.get_observations()
+   obs_b = cube_b.get_observations()
+
+   for i in range(cube_a.get_observation_length()):
+      assert obs_a[i] == obs_b[i]
+
+def test_scramble_returns_correct_seed():
+   cube_a = librust.PyCube2x2()
+   seed = cube_a.scramble(100)
+
+   cube_b = librust.PyCube2x2()
+   cube_b.scramble_with_seed(100,seed)
+
+   obs_a = cube_a.get_observations()
+   obs_b = cube_b.get_observations()
+
+   for i in range(cube_a.get_observation_length()):
+      assert obs_a[i] == obs_b[i]
