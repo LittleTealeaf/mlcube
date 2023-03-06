@@ -18,7 +18,7 @@ pub trait Puzzle: Default {
     ///
     /// Parameters
     /// ----------
-    /// action: usize
+    /// action: `usize`
     ///     The action to apply to the puzzle. Each puzzle will have a different number of possible
     ///     actions, which can be found from `Puzzle::ACTION_SIZE`
     /// 

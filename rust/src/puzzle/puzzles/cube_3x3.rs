@@ -226,11 +226,11 @@ mod tests {
             assert!(cube.is_solved());
         }
     }
-
+    
     #[test]
     fn invalid_action_returns_error() {
         let mut cube = Cube3x3::default();
-        assert!(cube.apply_action(18).is_err());
+        assert!(cube.apply_action(Cube3x3::ACTION_SIZE).is_err());
     }
 
     #[test]
