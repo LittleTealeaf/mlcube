@@ -1,10 +1,17 @@
 use crate::puzzle::{ApplyActionError, Puzzle};
 
+/// The initial coded state of the cube
 const DEFAULT_STATE: [usize; 9 * 6] = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3,
     3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 ];
 
+/// The permutations for each move that can be applied to the cube.
+///
+/// The first dimension indicates each individual potential move.
+/// The next dimension indicates each permutation set
+/// THe final dimension contains the ordered list of indexes that should be swapped to perform the
+/// permutation
 const PERMUTATIONS: [[[usize; 4]; 5]; 6] = [
     // U
     [
