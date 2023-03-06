@@ -64,6 +64,7 @@ const PERMUTATIONS: [[[usize; 4]; 5]; 6] = [
 ];
 
 pub struct Cube3x3 {
+    /// The current state of the 3x3 Cube
     state: [usize; 54],
 }
 
