@@ -10,7 +10,7 @@ const DEFAULT_STATE: [usize; 9 * 6] = [
 ///
 /// The first dimension indicates each individual potential move.
 /// The next dimension indicates each permutation set
-/// THe final dimension contains the ordered list of indexes that should be swapped to perform the
+/// The final dimension contains the ordered list of indexes that should be swapped to perform the
 /// permutation
 const PERMUTATIONS: [[[usize; 4]; 5]; 6] = [
     // U
