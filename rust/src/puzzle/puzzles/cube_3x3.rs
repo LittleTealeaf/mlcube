@@ -77,8 +77,8 @@ impl Default for Cube3x3 {
 }
 
 impl Puzzle for Cube3x3 {
-    const ACTION_SIZE: usize = 18;
     const OBSERVATION_SIZE: usize = 9 * 6 * 6;
+    const ACTION_SIZE: usize = 18;
 
     fn apply_action(&mut self, action: usize) -> Result<(), ApplyActionError> {
         let permutations = PERMUTATIONS[action % 6];
@@ -133,6 +133,10 @@ impl Puzzle for Cube3x3 {
         Vec::from(observations)
     }
 
+    fn reset(&mut self) {
+        self.state = DEFAULT_STATE;
+    }
+
     fn is_solved(&self) -> bool {
         for i in 0..54 {
             if self.state[i] != i / 9 {
@@ -140,10 +144,6 @@ impl Puzzle for Cube3x3 {
             }
         }
         return true;
-    }
-
-    fn reset(&mut self) {
-        self.state = DEFAULT_STATE;
     }
 }
 

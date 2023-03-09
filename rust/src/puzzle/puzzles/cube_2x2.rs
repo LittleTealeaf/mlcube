@@ -35,19 +35,6 @@ impl Puzzle for Cube2x2 {
     const OBSERVATION_SIZE: usize = 4 * 6 * 6;
     const ACTION_SIZE: usize = 18;
 
-    fn reset(&mut self) {
-        self.state = DEFAULT_STATE;
-    }
-
-    fn is_solved(&self) -> bool {
-        for i in 0..24 {
-            if self.state[i] != i / 4 {
-                return false;
-            }
-        }
-        return true;
-    }
-
     fn apply_action(&mut self, action: usize) -> Result<(), ApplyActionError> {
         let permutations = PERMUTATIONS[action % 6];
         let rotation = action / 6;
@@ -99,6 +86,19 @@ impl Puzzle for Cube2x2 {
         }
 
         Vec::from(observations)
+    }
+
+    fn reset(&mut self) {
+        self.state = DEFAULT_STATE;
+    }
+
+    fn is_solved(&self) -> bool {
+        for i in 0..24 {
+            if self.state[i] != i / 4 {
+                return false;
+            }
+        }
+        return true;
     }
 }
 
