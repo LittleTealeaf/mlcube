@@ -261,14 +261,15 @@ mod tests {
         }
     }
 
+
     #[test]
-    fn scramble_seseds_produce_identical_cubes() {
+    fn scramble_seeds_produce_identical_cubes() {
         let seed = 12342;
-
+        
         let mut cube_a = Cube3x3::default();
-        cube_a.scramble_with_seed(100, seed);
-
         let mut cube_b = Cube3x3::default();
+
+        cube_a.scramble_with_seed(100, seed);
         cube_b.scramble_with_seed(100, seed);
 
         for i in 0..54 {
