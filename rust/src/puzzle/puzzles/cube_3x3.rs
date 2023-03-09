@@ -203,10 +203,9 @@ mod tests {
     fn repeat_moves_loops_to_solved() {
         for i in 0..18 {
             let mut cube = Cube3x3::default();
-            cube.apply_action(i).unwrap();
-            cube.apply_action(i).unwrap();
-            cube.apply_action(i).unwrap();
-            cube.apply_action(i).unwrap();
+            for _ in 0..4 {
+                cube.apply_action(i).unwrap();
+            }
             assert!(cube.is_solved());
         }
     }
