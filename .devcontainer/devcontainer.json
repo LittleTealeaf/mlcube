@@ -12,7 +12,20 @@
 			"version": "3.9.10"
 		}
 	},
-	"postCreateCommand": "pip install -r /workspaces/mlcube/requirements.txt"
+	"postCreateCommand": "pip install -r /workspaces/mlcube/requirements.txt",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"rust-lang.rust-analyzer",
+				"ms-python.python",
+				"ms-mssql.mssql",
+				"esbenp.prettier-vscode"
+			],
+			"settings": {
+
+			}
+		}
+	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
