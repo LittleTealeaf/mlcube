@@ -11,7 +11,8 @@
 		"ghcr.io/devcontainers/features/python:1": {
 			"version": "3.9.10"
 		}
-	}
+	},
+	"postCreateCommand": "pip install -r /workspaces/mlcube/requirements.txt"
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
