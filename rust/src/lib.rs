@@ -1,8 +1,8 @@
 use crate::py::{PyCube2x2, PyCube3x3};
 
 
-mod py;
-mod puzzle;
+pub mod py;
+pub mod puzzle;
 
 #[macro_use]
 extern crate cpython;
