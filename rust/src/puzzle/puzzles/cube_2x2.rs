@@ -287,6 +287,17 @@ mod tests {
     }
 
     #[test]
+    fn scramble_seeds_are_random() {
+        let mut prior_seeds = Vec::new();
+        for _ in 0..100 {
+            let mut cube = Cube2x2::default();
+            let seed = cube.scramble(10);
+            assert!(!prior_seeds.contains(&seed));
+            prior_seeds.push(seed);
+        }
+    }
+
+    #[test]
     fn scramble_seeds_produce_identical_cubes() {
         let seed = 12342;
 

@@ -301,4 +301,15 @@ mod tests {
             );
         }
     }
+    
+    #[test]
+    fn scramble_seeds_are_random() {
+        let mut visited_seeds = Vec::new();
+        for _ in 0..100 {
+            let mut cube = Cube3x3::default();
+            let seed = cube.scramble(10);
+            assert!(!visited_seeds.contains(&seed));
+            visited_seeds.push(seed);
+        }
+    }
 }
