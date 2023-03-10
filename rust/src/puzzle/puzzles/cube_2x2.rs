@@ -288,12 +288,16 @@ mod tests {
 
     #[test]
     fn scramble_seeds_are_random() {
-        let mut prior_seeds = Vec::new();
+        let mut visited_seeds = Vec::new();
         for _ in 0..100 {
             let mut cube = Cube2x2::default();
             let seed = cube.scramble(10);
-            assert!(!prior_seeds.contains(&seed));
-            prior_seeds.push(seed);
+            assert!(
+                !visited_seeds.contains(&seed),
+                "Duplicate Seed Found: {}",
+                seed
+            );
+            visited_seeds.push(seed);
         }
     }
 

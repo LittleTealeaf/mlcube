@@ -308,7 +308,11 @@ mod tests {
         for _ in 0..100 {
             let mut cube = Cube3x3::default();
             let seed = cube.scramble(10);
-            assert!(!visited_seeds.contains(&seed));
+            assert!(
+                !visited_seeds.contains(&seed),
+                "Duplicate Seed Found: {}",
+                seed
+            );
             visited_seeds.push(seed);
         }
     }
