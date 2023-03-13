@@ -39,7 +39,7 @@ def test_scramble_with_seed_unsolves_cube():
     cube.scramble_with_seed(110,12345)
     assert not cube.is_solved()
 
-def test_scramble_seeds_produce_dientical_cubes():
+def test_scramble_seeds_produce_identical_cubes():
 
     seed = 12345
 
@@ -54,3 +54,17 @@ def test_scramble_seeds_produce_dientical_cubes():
 
     for i in range(cube_a.get_observation_length()):
         assert obs_a[i] == obs_b[i]
+
+def test_scramble_returns_correct_seed():
+    cube_a = PyCube3x3()
+    seed = cube_a.scramble(100)
+
+    cube_b = PyCube3x3()
+    cube_b.scramble_with_seed(100, seed)
+
+    obs_a = cube_a.get_observations()
+    obs_b = cube_b.get_observations()
+
+    for i in range(cube_a.get_observation_length()):
+        assert obs_a[i] == obs_b[i]
+
