@@ -1,6 +1,7 @@
-import tensorflow as tf
-import numpy as np
+import database
+import librust
 
-
-
+class Model:
+    def __init__(self):
+        ...
 
