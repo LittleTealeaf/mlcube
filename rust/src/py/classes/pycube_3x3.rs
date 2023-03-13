@@ -35,7 +35,7 @@ py_class!(pub class PyCube3x3 |py| {
     Ok(self.cube(py).borrow().get_observations())
   }
 
-  def scrambe(&self, steps: usize) -> PyResult<u64> {
+  def scramble(&self, steps: usize) -> PyResult<u64> {
       Ok(self.cube(py).borrow_mut().scramble(steps))
   }
 
