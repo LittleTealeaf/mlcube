@@ -7,7 +7,7 @@ pub enum ApplyActionError {
     InvalidActionIndex,
 }
 
-/// Implements functions that every puzzle should be able to manage
+/// Exposes variables and functions generalized for any puzzle
 pub trait Puzzle: Default {
     /// The length of the array that will be returned from the `get_observations()` method.
     const OBSERVATION_SIZE: usize;
