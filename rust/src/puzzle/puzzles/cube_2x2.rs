@@ -1,3 +1,4 @@
+
 use crate::puzzle::{ApplyActionError, Puzzle};
 
 pub struct Cube2x2 {
