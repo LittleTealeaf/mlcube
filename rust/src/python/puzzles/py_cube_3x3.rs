@@ -19,6 +19,11 @@ impl PyCube3x3 {
         Cube3x3::OBSERVATION_SIZE
     }
 
+    #[classattr]
+    fn action_size() -> usize {
+        Cube3x3::ACTION_SIZE
+    }
+
     fn reset(&mut self) {
         self.cube.reset();
     }

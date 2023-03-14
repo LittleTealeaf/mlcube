@@ -19,6 +19,11 @@ impl PyCube2x2 {
         Cube2x2::OBSERVATION_SIZE
     }
 
+    #[classattr]
+    fn action_size() -> usize {
+        Cube2x2::ACTION_SIZE
+    }
+
     fn reset(&mut self) {
         self.cube.reset();
     }
