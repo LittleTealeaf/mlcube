@@ -20,7 +20,7 @@ impl PyCube3x3 {
     }
 
     fn reset(&mut self) {
-        self.cube.reset()
+        self.cube.reset();
     }
 
     fn is_solved(&self) -> bool {
