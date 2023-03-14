@@ -16,7 +16,7 @@ def test_new_cube_is_solved():
     assert cube.is_solved()
 
 def test_applying_move_unsolves_cube():
-    for i in range(18):
+    for i in range(PyCube2x2.action_size):
         cube = PyCube2x2()
         cube.apply_action(i)
         assert not cube.is_solved()
