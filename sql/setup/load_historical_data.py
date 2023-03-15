@@ -157,6 +157,8 @@ WHERE EvaluationId IN (SELECT EvaluationId
 
     cursor.close()
     connection.commit()
+    del cursor
+
 
 
 # %% Importing data
@@ -178,5 +180,9 @@ for model_name in agents:
         print(f'Pushing {model_name} to database')
         load_historical_evaluations(f'hist-{model_name}', evaluations)
 
+        del data
+        del evaluations
+
 # %%
 
+print("done")
