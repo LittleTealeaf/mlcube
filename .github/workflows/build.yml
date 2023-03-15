@@ -37,9 +37,7 @@ jobs:
             ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}-
             ${{ runner.os }}-rust-target-
       - name: Run Tests
-        run: cd rust && cargo test --verbose
-      - name: Build Release
-        run: cd rust && cargo build --release
+        run: cd rust && cargo test
   rust_python_test:
     name: Test Rust Python Module
     needs: [rust_build]
