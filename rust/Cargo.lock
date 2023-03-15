@@ -63,6 +63,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "mlcube"
+version = "0.1.0"
+dependencies = [
+ "pyo3",
+ "rand",
+ "rand_chacha",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -212,15 +221,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fb5a58c1855b4b6819d59012155603f0b22ad30cad752600aadfcb695265519a"
 dependencies = [
  "bitflags",
-]
-
-[[package]]
-name = "rust"
-version = "0.1.0"
-dependencies = [
- "pyo3",
- "rand",
- "rand_chacha",
 ]
 
 [[package]]

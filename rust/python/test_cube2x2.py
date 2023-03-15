@@ -1,4 +1,4 @@
-from librust import PyCube2x2
+from mlcube import PyCube2x2
 
 def test_observation_size():
     assert PyCube2x2.observation_length > 0
@@ -80,4 +80,3 @@ def test_scramble_returns_correct_seed():
 
     for i in range(PyCube2x2.observation_length):
         assert obs_a[i] == obs_b[i]
-

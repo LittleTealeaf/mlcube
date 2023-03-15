@@ -6,7 +6,7 @@ pub mod python;
 
 
 #[pymodule]
-fn librust(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn mlcube(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyCube2x2>()?;
     m.add_class::<PyCube3x3>()?;
     Ok(())
