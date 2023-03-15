@@ -1,43 +1,48 @@
 from os import getenv
 
-import pymssql
-from dotenv import load_dotenv
 
-load_dotenv()
+import pyodbc
 
 
-def create_database_connection() -> pymssql._pymssql.Connection:
-    return pymssql.connect(
-        host=getenv("SQL_HOST"),
-        port=getenv("SQL_PORT"),
-        user=getenv("SQL_USER"),
-        password=getenv("SQL_PASSWORD"),
-        database=getenv("SQL_DATABASE")
-    )
+
+# import pymssql
+# from dotenv import load_dotenv
+
+# load_dotenv()
 
 
-def get_model_id(name: str, connection=None, create_missing=True) -> int:
-    created_connection = not connection
-    if created_connection:
-        connection = create_database_connection()
+# def create_database_connection() -> pymssql._pymssql.Connection:
+#     return pymssql.connect(
+#         host=getenv("SQL_HOST"),
+#         port=getenv("SQL_PORT"),
+#         user=getenv("SQL_USER"),
+#         password=getenv("SQL_PASSWORD"),
+#         database=getenv("SQL_DATABASE")
+#     )
 
-    cursor = connection.cursor(as_dict=True)
 
-    cursor.execute(f'SELECT ModelId FROM Models WHERE ModelName = \'{name}\'')
+# def get_model_id(name: str, connection=None, create_missing=True) -> int:
+#     created_connection = not connection
+#     if created_connection:
+#         connection = create_database_connection()
 
-    row = cursor.fetchone()
+#     cursor = connection.cursor(as_dict=True)
 
-    if row is None:
-        if create_missing:
-            cursor.execute(f'INSERT INTO Models (ModelName) OUTPUT Inserted.ModelId VALUES (\'{name}\')')
-            row = cursor.fetchone()
-        else:
-            row = {'ModelId': -1}
+#     cursor.execute(f'SELECT ModelId FROM Models WHERE ModelName = \'{name}\'')
 
-    cursor.close()
-    connection.commit()
+#     row = cursor.fetchone()
 
-    if created_connection:
-        connection.close()
+#     if row is None:
+#         if create_missing:
+#             cursor.execute(f'INSERT INTO Models (ModelName) OUTPUT Inserted.ModelId VALUES (\'{name}\')')
+#             row = cursor.fetchone()
+#         else:
+#             row = {'ModelId': -1}
 
-    return row['ModelId']
+#     cursor.close()
+#     connection.commit()
+
+#     if created_connection:
+#         connection.close()
+
+#     return row['ModelId']
