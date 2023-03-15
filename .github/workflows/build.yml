@@ -49,10 +49,10 @@ jobs:
         name: Checkout Repository
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.9.10'
+          python-version: '3.9'
       - uses: s-weigand/setup-conda@v1
         with:
-          python-version: 3.9.10
+          python-version: 3.9
           activate-conda: true
       - uses: actions/cache@v3
         name: Rust Cache
