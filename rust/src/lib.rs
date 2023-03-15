@@ -1,15 +1,13 @@
-use crate::py::{PyCube2x2, PyCube3x3};
+use pyo3::{types::PyModule, PyResult, Python, pymodule};
+use python::{PyCube2x2, PyCube3x3};
 
-
-pub mod py;
 pub mod puzzle;
+pub mod python;
 
-#[macro_use]
-extern crate cpython;
 
-py_module_initializer!(librust, |py, m| {
-    m.add(py, "__doc__", "This module is implemented in rust")?;
-    m.add_class::<PyCube2x2>(py)?;
-    m.add_class::<PyCube3x3>(py)?;
+#[pymodule]
+fn librust(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    m.add_class::<PyCube2x2>()?;
+    m.add_class::<PyCube3x3>()?;
     Ok(())
-});
+}
