@@ -38,8 +38,8 @@ jobs:
             ${{ runner.os }}-rust-target-
       - name: Run Tests
         run: cd rust && cargo test --verbose
-      - name: Build Maturin
-        run: cd rust && maturin develop
+      - name: Build Release
+        run: cd rust && cargo build --release
   rust_python_test:
     name: Test Rust Python Module
     needs: [rust_build]
