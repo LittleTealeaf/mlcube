@@ -12,7 +12,7 @@
 			"version": "3.9.10"
 		}
 	},
-	"postCreateCommand": "pip install -r /workspaces/mlcube/requirements.txt",
+	// "postCreateCommand": "pip install -r /workspaces/mlcube/requirements.txt",
 	"customizations": {
 		"vscode": {
 			"extensions": [

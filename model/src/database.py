@@ -1,4 +1,3 @@
-# type: ignore
 from os import getenv
 
 import pymssql
@@ -42,5 +41,3 @@ def get_model_id(name: str, connection=None, create_missing=True) -> int:
         connection.close()
 
     return row['ModelId']
-
-
