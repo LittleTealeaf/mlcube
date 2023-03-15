@@ -77,8 +77,8 @@ jobs:
         with:
           path: |
             rust/.pytest_cache/
-            rust/python/__pycache__/
-          key: ${{runner.os}}-rust-pytest-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('rust/**/*.py') }}
+            rust/pytest/__pycache__/
+          key: ${{runner.os}}-rust-pytest-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('rust/pytest/*.py') }}
           restore-keys: |
             ${{ runner.os }}-rust-pytest-${{ hashFiles('**/requirements.txt') }}-
             ${{ runner.os }}-rust-pytest-

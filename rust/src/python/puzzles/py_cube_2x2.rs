@@ -2,6 +2,7 @@ use pyo3::{pyclass, pymethods, PyResult};
 
 use crate::puzzle::{puzzles::Cube2x2, Puzzle};
 
+/// A PyCube3x3
 #[pyclass]
 pub struct PyCube2x2 {
     cube: Cube2x2,
@@ -14,6 +15,7 @@ impl PyCube2x2 {
         Self::default()
     }
 
+    /// The length of the array returned from `get_observations()`
     #[classattr]
     fn observation_length() -> usize {
         Cube2x2::OBSERVATION_SIZE

@@ -5,6 +5,7 @@ pub mod puzzle;
 pub mod python;
 
 
+/// This module is implemented in rust
 #[pymodule]
 fn mlcube(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyCube2x2>()?;
