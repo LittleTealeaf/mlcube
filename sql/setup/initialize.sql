@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS Models
 CREATE TABLE Models
 (
     ModelId   INT          NOT NULL IDENTITY PRIMARY KEY,
@@ -6,7 +5,6 @@ CREATE TABLE Models
     GitHash   VARCHAR(40)
 )
 
-DROP TABLE IF EXISTS Nodes
 CREATE TABLE Nodes
 (
     NodeId  INT NOT NULL IDENTITY PRIMARY KEY,
@@ -17,7 +15,6 @@ CREATE TABLE Nodes
     ModelId INT NOT NULL FOREIGN KEY REFERENCES Models (ModelId)
 )
 
-DROP TABLE IF EXISTS Epochs
 CREATE TABLE Epochs
 (
     EpochId INT NOT NULL IDENTITY PRIMARY KEY,
@@ -27,7 +24,6 @@ CREATE TABLE Epochs
     Reward  FLOAT(53)
 )
 
-DROP TABLE IF EXISTS Evaluations
 CREATE TABLE Evaluations
 (
     EvaluationId INT NOT NULL IDENTITY PRIMARY KEY,
@@ -38,7 +34,6 @@ CREATE TABLE Evaluations
     Seed         BIGINT,
 )
 
-DROP TABLE IF EXISTS EvaluationMoves
 CREATE TABLE EvaluationMoves
 (
     EvaluationMoveId INT NOT NULL IDENTITY PRIMARY KEY,
