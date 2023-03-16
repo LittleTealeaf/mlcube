@@ -42,12 +42,3 @@ CREATE TABLE EvaluationMoves
     MoveName VARCHAR(2),
     Reward FLOAT(53)
 )
-
-CREATE TABLE ModelNodes
-(
-    ModelId INT NOT NULL FOREIGN KEY REFERENCES Models (ModelId),
-    Layer INT NOT NULL,
-    Node INT NOT NULL,
-    W FLOAT(53),
-    B FLOAT(53)
-)
