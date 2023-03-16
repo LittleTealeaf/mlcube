@@ -1,7 +1,7 @@
 CREATE TABLE Models
 (
     ModelId INT NOT NULL IDENTITY PRIMARY KEY,
-    ModelName VARCHAR(100) NOT NULL,
+    ModelName VARCHAR(100),
     GitHash VARCHAR(40)
 )
 
