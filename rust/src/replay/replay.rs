@@ -2,6 +2,7 @@ use rand::Rng;
 
 use crate::puzzle::{ApplyActionError, Puzzle};
 
+#[derive(Clone)]
 pub struct ReplayEntry {
     pub current_state: Vec<u8>,
     pub action: usize,
@@ -54,7 +55,7 @@ impl<T: Puzzle> Replay<T> {
 
         for _ in 0..count {
             let index = rng.gen_range(0..(self.data.len()));
-            let instance = self.data.swap_remove(index);
+            let instance = self.data.get(index).unwrap().clone();
             replay.push(instance);
         }
 
