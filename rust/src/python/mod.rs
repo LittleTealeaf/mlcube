@@ -1,4 +1,4 @@
 mod puzzles;
 pub use puzzles::*;
-mod puzzle;
-pub use puzzle::*;
+mod replays;
+pub use replays::*;

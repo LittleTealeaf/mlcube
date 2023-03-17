@@ -1,14 +1,12 @@
-use std::collections::HashSet;
-
 use rand::Rng;
 
 use crate::puzzle::{ApplyActionError, Puzzle};
 
 pub struct ReplayEntry {
-    current_state: Vec<u8>,
-    action: usize,
-    reward: f64,
-    next_state: Vec<u8>,
+    pub current_state: Vec<u8>,
+    pub action: usize,
+    pub reward: f64,
+    pub next_state: Vec<u8>,
 }
 
 pub struct Replay<T: Puzzle> {
@@ -18,7 +16,7 @@ pub struct Replay<T: Puzzle> {
 }
 
 impl<T: Puzzle> Replay<T> {
-    fn create_with_capacity(capacity: usize) -> Self {
+    pub fn with_capacity(capacity: usize) -> Self {
         Self {
             puzzle: T::default(),
             data: Vec::with_capacity(capacity),
@@ -26,7 +24,7 @@ impl<T: Puzzle> Replay<T> {
         }
     }
 
-    fn record_action(&mut self, action: usize, reward: f64) -> Result<(), RecordActionError> {
+    pub fn record_action(&mut self, action: usize, reward: f64) -> Result<(), RecordActionError> {
         let current_state = self.get_observations();
         self.apply_action(action)?;
         let next_state = self.get_observations();
@@ -49,7 +47,7 @@ impl<T: Puzzle> Replay<T> {
         Ok(())
     }
 
-    fn sample_replay(&mut self, count: usize) -> Vec<ReplayEntry> {
+    pub fn sample_replay(&mut self, count: usize) -> Vec<ReplayEntry> {
         let mut replay = Vec::new();
 
         let mut rng = rand::thread_rng();
@@ -63,7 +61,7 @@ impl<T: Puzzle> Replay<T> {
         replay
     }
 
-    fn is_at_capacity(&self) -> bool {
+    pub fn is_at_capacity(&self) -> bool {
         self.data.len() == self.capacity
     }
 }
