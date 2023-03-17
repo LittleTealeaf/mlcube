@@ -3,6 +3,7 @@ use python::{PyCube2x2, PyCube3x3};
 
 pub mod puzzle;
 pub mod python;
+pub mod replay;
 
 
 /// This module is implemented in rust

@@ -1,0 +1,333 @@
+use std::collections::HashSet;
+
+use rand::Rng;
+
+use crate::puzzle::{ApplyActionError, Puzzle};
+
+pub struct ReplayEntry {
+    current_state: Vec<u8>,
+    action: usize,
+    reward: f64,
+    next_state: Vec<u8>,
+}
+
+pub struct Replay<T: Puzzle> {
+    puzzle: T,
+    data: Vec<ReplayEntry>,
+    capacity: usize,
+}
+
+impl<T: Puzzle> Replay<T> {
+    fn create_with_capacity(capacity: usize) -> Self {
+        Self {
+            puzzle: T::default(),
+            data: Vec::with_capacity(capacity),
+            capacity,
+        }
+    }
+
+    fn record_action(&mut self, action: usize, reward: f64) -> Result<(), RecordActionError> {
+        let current_state = self.get_observations();
+        self.apply_action(action)?;
+        let next_state = self.get_observations();
+
+        if self.data.len() == self.capacity {
+            // Randomly remove an instance
+
+            let mut rng = rand::thread_rng();
+            let index = rng.gen_range(0..(self.capacity));
+            self.data.swap_remove(index);
+        }
+
+        self.data.push(ReplayEntry {
+            current_state,
+            action,
+            reward,
+            next_state,
+        });
+
+        Ok(())
+    }
+
+    fn sample_replay(&mut self, count: usize) -> Vec<ReplayEntry> {
+        let mut replay = Vec::new();
+
+        let mut rng = rand::thread_rng();
+
+        for _ in 0..count {
+            let index = rng.gen_range(0..(self.data.len()));
+            let instance = self.data.swap_remove(index);
+            replay.push(instance);
+        }
+
+        replay
+    }
+
+    fn is_at_capacity(&self) -> bool {
+        self.data.len() == self.capacity
+    }
+}
+
+impl<T: Puzzle> Puzzle for Replay<T> {
+    const OBSERVATION_SIZE: usize = T::OBSERVATION_SIZE;
+
+    const ACTION_SIZE: usize = T::ACTION_SIZE;
+
+    /// Deprecated: Please use apply_replay_action(action, reward) instead
+    fn apply_action(&mut self, action: usize) -> Result<(), ApplyActionError> {
+        self.puzzle.apply_action(action)
+    }
+
+    fn get_observations(&self) -> Vec<u8> {
+        self.puzzle.get_observations()
+    }
+
+    fn reset(&mut self) {
+        self.puzzle.reset()
+    }
+
+    fn is_solved(&self) -> bool {
+        self.puzzle.is_solved()
+    }
+}
+
+impl<T: Puzzle> Default for Replay<T> {
+    fn default() -> Self {
+        Self {
+            puzzle: T::default(),
+            data: Vec::with_capacity(100_000),
+            capacity: 100_000,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum RecordActionError {
+    ApplyActionError(ApplyActionError),
+}
+
+impl From<ApplyActionError> for RecordActionError {
+    fn from(value: ApplyActionError) -> Self {
+        Self::ApplyActionError(value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::puzzle::puzzles::{Cube2x2, Cube3x3};
+
+    use super::*;
+
+    #[test]
+    fn is_at_capacity_functions() {
+        let mut replay = Replay::<Cube2x2>::default();
+        let capacity = replay.capacity;
+
+        assert!(!replay.is_at_capacity());
+
+        let mut rng = rand::thread_rng();
+        for _ in 0..(capacity - 1) {
+            let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
+            replay.record_action(action, 0.0).unwrap();
+            assert!(!replay.is_at_capacity());
+        }
+
+        let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
+        replay.record_action(action, 0.0).unwrap();
+        assert!(replay.is_at_capacity());
+    }
+
+    #[test]
+    fn data_stays_at_capacity() {
+        let mut replay = Replay::<Cube3x3>::default();
+        let capacity = replay.capacity;
+
+        let mut rng = rand::thread_rng();
+        for _ in 0..capacity {
+            let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
+            replay.record_action(action, 0.0).unwrap();
+        }
+
+        assert!(replay.is_at_capacity());
+
+        let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
+        let obs = replay.get_observations();
+        replay.record_action(action, 0.0).unwrap();
+        assert!(replay.data.len() == capacity);
+
+        {
+            let mut found = false;
+            for item in replay.data {
+                if item.current_state.eq(&obs) {
+                    found = true;
+                }
+            }
+            assert!(
+                found,
+                "Most recent insert should be in the experience replay"
+            );
+        }
+    }
+
+    mod puzzle_trait {
+        use crate::puzzle::puzzles::Cube2x2;
+
+        use super::*;
+
+        #[test]
+        fn observations_has_correct_size() {
+            let cube = Replay::<Cube2x2>::default();
+            let observations = cube.get_observations();
+            let observation_length = observations.len();
+            assert_eq!(
+                observation_length,
+                Cube2x2::OBSERVATION_SIZE,
+                "Observations should be of length {}, found {}",
+                Cube2x2::OBSERVATION_SIZE,
+                observation_length
+            );
+        }
+
+        #[test]
+        fn observations_have_valid_values() {
+            let cube = Replay::<Cube2x2>::default();
+            for value in cube.get_observations() {
+                assert!(
+                    value == 0 || value == 1,
+                    "Any value in cube should be 0 or 1, found {}",
+                    value
+                );
+            }
+        }
+
+        #[test]
+        fn default_cube_is_solved() {
+            let cube = Replay::<Cube2x2>::default();
+            assert!(
+                cube.is_solved(),
+                "A default cube should be solved, found unsolved cube"
+            );
+        }
+
+        #[test]
+        fn applying_move_makes_cube_unsolved() {
+            for i in 0..18 {
+                let mut cube = Replay::<Cube2x2>::default();
+                cube.apply_action(i).unwrap();
+
+                assert!(
+                    !cube.is_solved(),
+                    "Applying the action {} should be unsolved, found a solved cube",
+                    i
+                );
+            }
+        }
+
+        #[test]
+        fn repeat_moves_loops_to_solved() {
+            for i in 0..18 {
+                let mut cube = Replay::<Cube2x2>::default();
+                cube.apply_action(i).unwrap();
+                cube.apply_action(i).unwrap();
+                cube.apply_action(i).unwrap();
+                cube.apply_action(i).unwrap();
+                assert!(
+                    cube.is_solved(),
+                    "Applying the action {} four times should be solved, found an unsolved cube",
+                    i
+                );
+            }
+        }
+
+        #[test]
+        fn reset_solved_cube_is_solved() {
+            let mut cube = Replay::<Cube2x2>::default();
+            cube.reset();
+            assert!(
+                cube.is_solved(),
+                "A cube should be solved after resetting it"
+            );
+        }
+
+        #[test]
+        fn reset_unsolved_cube_is_solved() {
+            for i in 0..18 {
+                let mut cube = Replay::<Cube2x2>::default();
+                cube.apply_action(i).unwrap();
+                cube.reset();
+                assert!(
+                    cube.is_solved(),
+                    "A cube unsolved by the action {} should be solved after a reset",
+                    i
+                );
+            }
+        }
+
+        #[test]
+        fn invalid_action_returns_error() {
+            let mut cube = Replay::<Cube2x2>::default();
+            assert!(
+                cube.apply_action(Cube2x2::ACTION_SIZE).is_err(),
+                "Applying the action {} should return an Err because {} is an invalid action",
+                Cube2x2::ACTION_SIZE,
+                Cube2x2::ACTION_SIZE
+            );
+        }
+
+        #[test]
+        fn observations_have_valid_format() {
+            let cube = Replay::<Cube2x2>::default();
+            let observations = cube.get_observations();
+            for segment in 0..(4 * 6) {
+                let start_index = segment * 6;
+                let slice = &observations[start_index..(start_index + 6)];
+
+                let sum: u8 = slice.iter().sum();
+
+                assert!(
+                    sum > 0,
+                    "Invalid slice from {} to {}, did not find any positive value",
+                    start_index,
+                    start_index + 6
+                );
+
+                assert!(
+                    sum < 2,
+                    "Invalid slice from {} to {}, too many positive values found",
+                    start_index,
+                    start_index + 6
+                );
+            }
+        }
+
+        #[test]
+        fn scramble_with_seed_unsolves_cube() {
+            let mut cube = Replay::<Cube2x2>::default();
+            let seed = 1234;
+            cube.scramble_with_seed(100, seed);
+            assert!(!cube.is_solved());
+        }
+
+        #[test]
+        fn scramble_unsolves_cube() {
+            let mut cube = Replay::<Cube2x2>::default();
+            cube.scramble(100);
+            assert!(!cube.is_solved());
+        }
+
+        #[test]
+        fn scramble_seeds_are_random() {
+            let mut visited_seeds = Vec::new();
+            for _ in 0..100 {
+                let mut cube = Replay::<Cube2x2>::default();
+                let seed = cube.scramble(10);
+                assert!(
+                    !visited_seeds.contains(&seed),
+                    "Duplicate Seed Found: {}",
+                    seed
+                );
+                visited_seeds.push(seed);
+            }
+        }
+    }
+}
