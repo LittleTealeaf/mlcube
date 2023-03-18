@@ -61,6 +61,11 @@ impl PyReplay2x2 {
     fn is_solved(&mut self) -> bool {
         self.replay.is_solved()
     }
+
+    fn apply_action(&mut self, action: usize) -> PyResult<()> {
+        self.replay.apply_action(action)?;
+        Ok(())
+    }
 }
 
 impl Default for PyReplay2x2 {
