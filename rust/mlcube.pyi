@@ -33,6 +33,8 @@ class PyCube3x3(Puzzle):
     ...
 
 class Replay:
+    observation_length: int
+    action_size: int
     def __init__(self, capacity: int):
         ...
     def record_action(self, action: int, reward: float):

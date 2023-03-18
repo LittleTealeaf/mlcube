@@ -7,9 +7,11 @@ use crate::{
 
 use super::PyReplayEntry;
 
+type Replay2x2 = Replay<Cube2x2>;
+
 #[pyclass]
 pub struct PyReplay2x2 {
-    replay: Replay<Cube2x2>,
+    replay: Replay2x2,
 }
 
 #[pymethods]
@@ -19,6 +21,16 @@ impl PyReplay2x2 {
         Self {
             replay: Replay::with_capacity(capacity),
         }
+    }
+
+    #[classattr]
+    fn observation_length() -> usize {
+        Replay2x2::OBSERVATION_SIZE
+    }
+
+    #[classattr]
+    fn action_size() -> usize {
+        Replay2x2::ACTION_SIZE
     }
 
     fn record_action(&mut self, action: usize, reward: f64) -> PyResult<()> {
