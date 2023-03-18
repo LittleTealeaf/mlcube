@@ -1,5 +1,7 @@
 mod replay_cube_2x2;
 pub use replay_cube_2x2::*;
+mod replay_cube_3x3;
+pub use replay_cube_3x3::*;
 
 
 

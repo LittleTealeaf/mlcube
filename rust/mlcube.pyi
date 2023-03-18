@@ -42,3 +42,6 @@ class Replay(Puzzle):
 
 class PyReplay2x2(Replay):
     ...
+
+class PyReplay3x3(Replay):
+    ...
