@@ -66,6 +66,10 @@ impl PyReplay2x2 {
         self.replay.apply_action(action)?;
         Ok(())
     }
+
+    fn is_at_capacity(&self) -> bool {
+        self.replay.is_at_capacity()
+    }
 }
 
 impl Default for PyReplay2x2 {

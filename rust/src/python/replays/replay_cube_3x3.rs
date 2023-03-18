@@ -66,4 +66,8 @@ impl PyReplay3x3 {
         self.replay.apply_action(action)?;
         Ok(())
     }
+
+    fn is_at_capacity(&self) -> bool {
+        self.replay.is_at_capacity()
+    }
 }
