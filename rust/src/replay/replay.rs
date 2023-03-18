@@ -48,7 +48,11 @@ impl<T: Puzzle> Replay<T> {
         Ok(())
     }
 
-    pub fn sample_replay(&mut self, count: usize) -> Vec<ReplayEntry> {
+    pub fn sample_replay(&mut self, count: usize) -> Result<Vec<ReplayEntry>, SampleReplayError> {
+        if self.data.len() == 0 {
+            return Err(SampleReplayError::EmptyReplay);
+        }
+
         let mut replay = Vec::new();
 
         let mut rng = rand::thread_rng();
@@ -59,7 +63,7 @@ impl<T: Puzzle> Replay<T> {
             replay.push(instance);
         }
 
-        replay
+        Ok(replay)
     }
 
     pub fn is_at_capacity(&self) -> bool {
@@ -109,6 +113,10 @@ impl From<ApplyActionError> for RecordActionError {
     fn from(value: ApplyActionError) -> Self {
         Self::ApplyActionError(value)
     }
+}
+
+pub enum SampleReplayError {
+    EmptyReplay,
 }
 
 #[cfg(test)]

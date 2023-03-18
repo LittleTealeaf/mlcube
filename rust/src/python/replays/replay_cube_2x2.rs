@@ -38,12 +38,13 @@ impl PyReplay2x2 {
         Ok(())
     }
 
-    fn sample_replay(&mut self, count: usize) -> Vec<PyReplayEntry> {
-        self.replay
-            .sample_replay(count)
+    fn sample_replay(&mut self, count: usize) -> PyResult<Vec<PyReplayEntry>> {
+        Ok(self
+            .replay
+            .sample_replay(count)?
             .into_iter()
             .map(PyReplayEntry::from)
-            .collect()
+            .collect())
     }
 
     fn scramble(&mut self, steps: usize) -> u64 {
