@@ -1,68 +1,5 @@
 use crate::puzzle::{ApplyActionError, Puzzle};
 
-/// The initial coded state of the cube
-const DEFAULT_STATE: [usize; 9 * 6] = [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3,
-    3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-];
-
-/// The permutations for each move that can be applied to the cube.
-///
-/// The first dimension indicates each individual potential move.
-/// The next dimension indicates each permutation set
-/// The final dimension contains the ordered list of indexes that should be swapped to perform the
-/// permutation
-const PERMUTATIONS: [[[usize; 4]; 5]; 6] = [
-    // U
-    [
-        [20, 11, 38, 29],
-        [19, 10, 37, 28],
-        [18, 9, 36, 27],
-        [8, 6, 0, 2],
-        [7, 3, 1, 5],
-    ],
-    //L
-    [
-        [18, 45, 44, 0],
-        [21, 48, 41, 3],
-        [24, 51, 38, 6],
-        [11, 17, 15, 9],
-        [14, 16, 12, 10],
-    ],
-    //F
-    [
-        [6, 27, 47, 17],
-        [7, 30, 46, 14],
-        [8, 33, 45, 11],
-        [18, 20, 26, 24],
-        [19, 23, 25, 21],
-    ],
-    // R
-    [
-        [20, 2, 42, 47],
-        [23, 5, 39, 50],
-        [26, 8, 36, 53],
-        [27, 29, 35, 33],
-        [28, 32, 34, 30],
-    ],
-    // D
-    [
-        [24, 33, 42, 15],
-        [25, 34, 43, 16],
-        [26, 35, 44, 17],
-        [45, 47, 53, 51],
-        [46, 50, 52, 48],
-    ],
-    //B
-    [
-        [36, 38, 44, 42],
-        [37, 41, 43, 39],
-        [29, 0, 15, 53],
-        [32, 1, 12, 52],
-        [35, 2, 9, 51],
-    ],
-];
-
 pub struct Cube3x3 {
     /// The current state of the 3x3 Cube
     state: [usize; 54],
@@ -147,6 +84,69 @@ impl Puzzle for Cube3x3 {
     }
 }
 
+/// The initial coded state of the cube
+const DEFAULT_STATE: [usize; 9 * 6] = [
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3,
+    3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+];
+
+/// The permutations for each move that can be applied to the cube.
+///
+/// The first dimension indicates each individual potential move.
+/// The next dimension indicates each permutation set
+/// The final dimension contains the ordered list of indexes that should be swapped to perform the
+/// permutation
+const PERMUTATIONS: [[[usize; 4]; 5]; 6] = [
+    // U
+    [
+        [20, 11, 38, 29],
+        [19, 10, 37, 28],
+        [18, 9, 36, 27],
+        [8, 6, 0, 2],
+        [7, 3, 1, 5],
+    ],
+    //L
+    [
+        [18, 45, 44, 0],
+        [21, 48, 41, 3],
+        [24, 51, 38, 6],
+        [11, 17, 15, 9],
+        [14, 16, 12, 10],
+    ],
+    //F
+    [
+        [6, 27, 47, 17],
+        [7, 30, 46, 14],
+        [8, 33, 45, 11],
+        [18, 20, 26, 24],
+        [19, 23, 25, 21],
+    ],
+    // R
+    [
+        [20, 2, 42, 47],
+        [23, 5, 39, 50],
+        [26, 8, 36, 53],
+        [27, 29, 35, 33],
+        [28, 32, 34, 30],
+    ],
+    // D
+    [
+        [24, 33, 42, 15],
+        [25, 34, 43, 16],
+        [26, 35, 44, 17],
+        [45, 47, 53, 51],
+        [46, 50, 52, 48],
+    ],
+    //B
+    [
+        [36, 38, 44, 42],
+        [37, 41, 43, 39],
+        [29, 0, 15, 53],
+        [32, 1, 12, 52],
+        [35, 2, 9, 51],
+    ],
+];
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -226,7 +226,7 @@ mod tests {
             assert!(cube.is_solved());
         }
     }
-    
+
     #[test]
     fn invalid_action_returns_error() {
         let mut cube = Cube3x3::default();
@@ -260,11 +260,10 @@ mod tests {
         }
     }
 
-
     #[test]
     fn scramble_seeds_produce_identical_cubes() {
         let seed = 12342;
-        
+
         let mut cube_a = Cube3x3::default();
         let mut cube_b = Cube3x3::default();
 
@@ -301,7 +300,7 @@ mod tests {
             );
         }
     }
-    
+
     #[test]
     fn scramble_seeds_are_random() {
         let mut visited_seeds = Vec::new();
