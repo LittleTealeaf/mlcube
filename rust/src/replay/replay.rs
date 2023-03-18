@@ -143,35 +143,92 @@ mod tests {
     }
 
     #[test]
-    fn data_stays_at_capacity() {
+    fn vector_length_stays_at_capacity() {
         let mut replay = Replay::<Cube3x3>::default();
         let capacity = replay.capacity;
 
         let mut rng = rand::thread_rng();
-        for _ in 0..capacity {
+        for _ in 0..(capacity + 1) {
             let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
             replay.record_action(action, 0.0).unwrap();
         }
+    }
 
-        assert!(replay.is_at_capacity());
+    #[test]
+    fn latest_record_is_always_inserted() {
+        let mut replay = Replay::<Cube3x3>::default();
+        let capacity = replay.capacity;
 
-        let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
-        let obs = replay.get_observations();
-        replay.record_action(action, 0.0).unwrap();
-        assert!(replay.data.len() == capacity);
+        let mut rng = rand::thread_rng();
 
-        {
+        for _ in 0..(capacity * 2) {
+            let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
+            let obs = replay.get_observations();
+            replay.record_action(action, 0.0).unwrap();
+
             let mut found = false;
-            for item in replay.data {
+            for item in replay.data.iter().rev() {
                 if item.current_state.eq(&obs) {
                     found = true;
+                    break;
                 }
             }
-            assert!(
-                found,
-                "Most recent insert should be in the experience replay"
-            );
+            assert!(found, "Latest entry was not found");
         }
+    }
+
+    #[test]
+    fn data_capacity_is_not_increased() {
+        let mut replay = Replay::<Cube2x2>::default();
+        let capacity = replay.capacity;
+
+        let mut rng = rand::thread_rng();
+
+        for _ in 0..(capacity + 5) {
+            let action = rng.gen_range(0..(Replay::<Cube2x2>::ACTION_SIZE));
+            replay.record_action(action, 0.0).unwrap();
+            assert_eq!(capacity, replay.data.capacity());
+        }
+    }
+
+    #[test]
+    fn sampling_empty_data_returns_error() {
+        let mut replay = Replay::<Cube3x3>::default();
+
+        assert!(match replay.sample_replay(10) {
+            Ok(_) => false,
+            Err(error) => match error {
+                SampleReplayError::EmptyReplay => true,
+            },
+        });
+    }
+
+    #[test]
+    fn record_action_scrambles_cube_correctly() {
+        for action in 0..(Replay::<Cube3x3>::ACTION_SIZE) {
+            let mut replay = Replay::<Cube3x3>::default();
+            let mut cube = Cube3x3::default();
+
+            replay.record_action(action, 0.0).unwrap();
+            cube.apply_action(action).unwrap();
+
+            let obs_replay = replay.get_observations();
+            let obs_cube = cube.get_observations();
+
+            assert_eq!(obs_replay, obs_cube);
+        }
+    }
+
+    #[test]
+    fn record_invalid_action_returns_error() {
+        let mut replay = Replay::<Cube3x3>::default();
+        let result = replay.record_action(Replay::<Cube3x3>::ACTION_SIZE, 0.0);
+        assert!(match result {
+            Ok(_) => false,
+            Err(err) => match err {
+                RecordActionError::ApplyActionError(_) => true,
+            },
+        })
     }
 
     mod puzzle_trait {
