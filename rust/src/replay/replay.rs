@@ -31,8 +31,6 @@ impl<T: Puzzle> Replay<T> {
         let next_state = self.get_observations();
 
         if self.data.len() == self.capacity {
-            // Randomly remove an instance
-
             let mut rng = rand::thread_rng();
             let index = rng.gen_range(0..(self.capacity));
             self.data.swap_remove(index);
