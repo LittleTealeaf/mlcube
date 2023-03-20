@@ -34,6 +34,7 @@ class PyCube3x3(Puzzle):
 
 class Replay(Puzzle):
     def __init__(self, capacity: int):
+        "Creates a replay with the specified capacity"
         ...
     def record_action(self, action: int, reward: float):
         ...
