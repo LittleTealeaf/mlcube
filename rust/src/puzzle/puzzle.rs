@@ -14,6 +14,10 @@ pub trait Puzzle: Default {
     /// The number of possible actions that can be performed on the puzzle.
     const ACTION_SIZE: usize;
 
+    fn new() -> Self {
+        Self::default()
+    }
+
     /// Attempts to apply an action to the puzzle.
     ///
     /// Parameters
