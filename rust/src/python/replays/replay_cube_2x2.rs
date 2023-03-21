@@ -71,6 +71,10 @@ impl PyReplay2x2 {
     fn is_at_capacity(&self) -> bool {
         self.replay.is_at_capacity()
     }
+
+    fn get_observations(&self) -> Vec<u8> {
+        self.replay.get_observations()
+    }
 }
 
 impl Default for PyReplay2x2 {

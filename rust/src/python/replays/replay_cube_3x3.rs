@@ -71,4 +71,8 @@ impl PyReplay3x3 {
     fn is_at_capacity(&self) -> bool {
         self.replay.is_at_capacity()
     }
+
+    fn get_observations(&self) -> Vec<u8> {
+        self.replay.get_observations()
+    }
 }

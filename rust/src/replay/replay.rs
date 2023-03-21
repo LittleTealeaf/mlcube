@@ -57,7 +57,7 @@ impl<T: Puzzle> Replay<T> {
 
         for _ in 0..count {
             let index = rng.gen_range(0..(self.data.len()));
-            let instance = self.data.get(index).unwrap().clone();
+            let instance = self.data[index].clone();
             replay.push(instance);
         }
 
