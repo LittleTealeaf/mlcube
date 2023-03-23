@@ -124,21 +124,17 @@ mod tests {
     use super::*;
 
     #[test]
-    fn is_at_capacity_functions() {
+    fn is_at_capacity() {
         let mut replay = Replay::<Cube2x2>::default();
         let capacity = replay.capacity;
 
-        assert!(!replay.is_at_capacity());
-
         let mut rng = rand::thread_rng();
-        for _ in 0..(capacity - 1) {
-            let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
-            replay.record_action(action, 0.0).unwrap();
-            assert!(!replay.is_at_capacity());
-        }
 
-        let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
-        replay.record_action(action, 0.0).unwrap();
+        for _ in 0..capacity {
+            assert!(!replay.is_at_capacity());
+            let action = rng.gen_range(0..(Replay::<Cube2x2>::ACTION_SIZE));
+            replay.record_action(action, rng.gen()).unwrap();
+        }
         assert!(replay.is_at_capacity());
     }
 
