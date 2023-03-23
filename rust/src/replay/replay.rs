@@ -132,7 +132,7 @@ mod tests {
 
         for _ in 0..capacity {
             assert!(!replay.is_at_capacity());
-            let action = rng.gen_range(0..(Replay::<Cube2x2>::ACTION_SIZE));
+            let action = rng.gen_range(0..Replay::<Cube2x2>::ACTION_SIZE);
             replay.record_action(action, rng.gen()).unwrap();
         }
         assert!(replay.is_at_capacity());
@@ -145,7 +145,7 @@ mod tests {
 
         let mut rng = rand::thread_rng();
         for _ in 0..(capacity + 1) {
-            let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
+            let action = rng.gen_range(0..Replay::<Cube3x3>::ACTION_SIZE);
             replay.record_action(action, 0.0).unwrap();
         }
     }
@@ -158,7 +158,7 @@ mod tests {
         let mut rng = rand::thread_rng();
 
         for _ in 0..(capacity * 2) {
-            let action = rng.gen_range(0..(Replay::<Cube3x3>::ACTION_SIZE));
+            let action = rng.gen_range(0..Replay::<Cube3x3>::ACTION_SIZE);
             let obs = replay.get_observations();
             replay.record_action(action, 0.0).unwrap();
 
@@ -234,8 +234,8 @@ mod tests {
 
         #[test]
         fn observations_has_correct_size() {
-            let cube = Replay::<Cube2x2>::default();
-            let observations = cube.get_observations();
+            let replay = Replay::<Cube2x2>::default();
+            let observations = replay.get_observations();
             let observation_length = observations.len();
             assert_eq!(
                 observation_length,
@@ -248,8 +248,8 @@ mod tests {
 
         #[test]
         fn observations_have_valid_values() {
-            let cube = Replay::<Cube2x2>::default();
-            for value in cube.get_observations() {
+            let replay = Replay::<Cube2x2>::default();
+            for value in replay.get_observations() {
                 assert!(
                     value == 0 || value == 1,
                     "Any value in cube should be 0 or 1, found {}",
@@ -260,9 +260,9 @@ mod tests {
 
         #[test]
         fn default_cube_is_solved() {
-            let cube = Replay::<Cube2x2>::default();
+            let replay = Replay::<Cube2x2>::default();
             assert!(
-                cube.is_solved(),
+                replay.is_solved(),
                 "A default cube should be solved, found unsolved cube"
             );
         }
@@ -270,11 +270,11 @@ mod tests {
         #[test]
         fn applying_move_makes_cube_unsolved() {
             for i in 0..18 {
-                let mut cube = Replay::<Cube2x2>::default();
-                cube.apply_action(i).unwrap();
+                let mut replay = Replay::<Cube2x2>::default();
+                replay.apply_action(i).unwrap();
 
                 assert!(
-                    !cube.is_solved(),
+                    !replay.is_solved(),
                     "Applying the action {} should be unsolved, found a solved cube",
                     i
                 );
@@ -284,13 +284,13 @@ mod tests {
         #[test]
         fn repeat_moves_loops_to_solved() {
             for i in 0..18 {
-                let mut cube = Replay::<Cube2x2>::default();
-                cube.apply_action(i).unwrap();
-                cube.apply_action(i).unwrap();
-                cube.apply_action(i).unwrap();
-                cube.apply_action(i).unwrap();
+                let mut replay = Replay::<Cube2x2>::default();
+                replay.apply_action(i).unwrap();
+                replay.apply_action(i).unwrap();
+                replay.apply_action(i).unwrap();
+                replay.apply_action(i).unwrap();
                 assert!(
-                    cube.is_solved(),
+                    replay.is_solved(),
                     "Applying the action {} four times should be solved, found an unsolved cube",
                     i
                 );
@@ -299,10 +299,10 @@ mod tests {
 
         #[test]
         fn reset_solved_cube_is_solved() {
-            let mut cube = Replay::<Cube2x2>::default();
-            cube.reset();
+            let mut replay = Replay::<Cube2x2>::default();
+            replay.reset();
             assert!(
-                cube.is_solved(),
+                replay.is_solved(),
                 "A cube should be solved after resetting it"
             );
         }
@@ -310,11 +310,11 @@ mod tests {
         #[test]
         fn reset_unsolved_cube_is_solved() {
             for i in 0..18 {
-                let mut cube = Replay::<Cube2x2>::default();
-                cube.apply_action(i).unwrap();
-                cube.reset();
+                let mut replay = Replay::<Cube2x2>::default();
+                replay.apply_action(i).unwrap();
+                replay.reset();
                 assert!(
-                    cube.is_solved(),
+                    replay.is_solved(),
                     "A cube unsolved by the action {} should be solved after a reset",
                     i
                 );
@@ -323,9 +323,9 @@ mod tests {
 
         #[test]
         fn invalid_action_returns_error() {
-            let mut cube = Replay::<Cube2x2>::default();
+            let mut replay = Replay::<Cube2x2>::default();
             assert!(
-                cube.apply_action(Cube2x2::ACTION_SIZE).is_err(),
+                replay.apply_action(Cube2x2::ACTION_SIZE).is_err(),
                 "Applying the action {} should return an Err because {} is an invalid action",
                 Cube2x2::ACTION_SIZE,
                 Cube2x2::ACTION_SIZE
@@ -334,8 +334,8 @@ mod tests {
 
         #[test]
         fn observations_have_valid_format() {
-            let cube = Replay::<Cube2x2>::default();
-            let observations = cube.get_observations();
+            let replay = Replay::<Cube2x2>::default();
+            let observations = replay.get_observations();
             for segment in 0..(4 * 6) {
                 let start_index = segment * 6;
                 let slice = &observations[start_index..(start_index + 6)];
@@ -360,25 +360,25 @@ mod tests {
 
         #[test]
         fn scramble_with_seed_unsolves_cube() {
-            let mut cube = Replay::<Cube2x2>::default();
+            let mut replay = Replay::<Cube2x2>::default();
             let seed = 1234;
-            cube.scramble_with_seed(100, seed);
-            assert!(!cube.is_solved());
+            replay.scramble_with_seed(100, seed);
+            assert!(!replay.is_solved());
         }
 
         #[test]
         fn scramble_unsolves_cube() {
-            let mut cube = Replay::<Cube2x2>::default();
-            cube.scramble(100);
-            assert!(!cube.is_solved());
+            let mut replay = Replay::<Cube2x2>::default();
+            replay.scramble(100);
+            assert!(!replay.is_solved());
         }
 
         #[test]
         fn scramble_seeds_are_random() {
             let mut visited_seeds = Vec::new();
             for _ in 0..100 {
-                let mut cube = Replay::<Cube2x2>::default();
-                let seed = cube.scramble(10);
+                let mut replay = Replay::<Cube2x2>::default();
+                let seed = replay.scramble(10);
                 assert!(
                     !visited_seeds.contains(&seed),
                     "Duplicate Seed Found: {}",
