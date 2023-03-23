@@ -56,7 +56,7 @@ impl<T: Puzzle> Replay<T> {
         let mut rng = rand::thread_rng();
 
         for _ in 0..count {
-            let index = rng.gen_range(0..(self.data.len()));
+            let index = rng.gen_range(0..self.data.len());
             let instance = self.data[index].clone();
             replay.push(instance);
         }
