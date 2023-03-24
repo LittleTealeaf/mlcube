@@ -23,5 +23,5 @@
       "settings": {}
     }
   },
-  "runArgs": ["--gpus", "all"]
+  // "runArgs": ["--gpus", "all"]
 }
