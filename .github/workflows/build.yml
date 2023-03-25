@@ -11,7 +11,7 @@ env:
 
 jobs:
   rust_test:
-    name: Build Rust Module
+    name: Test Rust Module
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -89,7 +89,7 @@ jobs:
       - name: Run Python Tests
         run: cd rust && pytest
   api_test:
-    name: Build Rust Module
+    name: Test Rust API
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
