@@ -115,4 +115,4 @@ jobs:
             ${{ runner.os }}-api-target-${{ hashFiles('api/Cargo.lock') }}-
             ${{ runner.os }}-api-target-
       - name: Run Tests
-        run: cd rust && cargo test
+        run: cd api && cargo test
