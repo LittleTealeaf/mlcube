@@ -17,6 +17,7 @@ pub struct PyReplay2x2 {
 #[pymethods]
 impl PyReplay2x2 {
     #[new]
+    #[pyo3(signature = (capacity = 100_000))]
     fn new(capacity: usize) -> Self {
         Self {
             replay: Replay::with_capacity(capacity),
