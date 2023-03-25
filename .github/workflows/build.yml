@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  rust_build:
+  rust_test:
     name: Build Rust Module
     runs-on: ubuntu-latest
     steps:
@@ -24,7 +24,7 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ runner.os }}-rust-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-rust-cargo-${{ hashFiles('rust/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-cargo-
       - uses: actions/cache@v3
@@ -32,15 +32,15 @@ jobs:
         with:
           path: |
             rust/target/
-          key: ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('rust/**/*.rs') }}
+          key: ${{ runner.os }}-rust-target-${{ hashFiles('rust/Cargo.lock') }}-${{ hashFiles('rust/**/*.rs') }}
           restore-keys: |
-            ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}-
+            ${{ runner.os }}-rust-target-${{ hashFiles('rust/Cargo.lock') }}-
             ${{ runner.os }}-rust-target-
       - name: Run Tests
         run: cd rust && cargo test
   rust_python_test:
     name: Test Rust Python Module
-    needs: [rust_build]
+    needs: [rust_test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -60,7 +60,7 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ runner.os }}-rust-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-rust-cargo-${{ hashFiles('rust/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-cargo-
       - uses: actions/cache@v3
@@ -68,9 +68,9 @@ jobs:
         with:
           path: |
             rust/target/
-          key: ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('rust/**/*.rs') }}
+          key: ${{ runner.os }}-rust-target-${{ hashFiles('rust/Cargo.lock') }}-${{ hashFiles('rust/**/*.rs') }}
           restore-keys: |
-            ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}-
+            ${{ runner.os }}-rust-target-${{ hashFiles('rust/Cargo.lock') }}-
             ${{ runner.os }}-rust-target-
       - uses: actions/cache@v3
         name: Rust Pytest Cache
@@ -88,3 +88,31 @@ jobs:
         run: cd rust && maturin develop
       - name: Run Python Tests
         run: cd rust && pytest
+  api_test:
+    name: Build Rust Module
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout Repository
+      - uses: actions/cache@v3
+        name: Rust Cache
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-api-cargo-${{ hashFiles('api/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-api-cargo-
+      - uses: actions/cache@v3
+        name: Rust Target Cache
+        with:
+          path: |
+            rust/target/
+          key: ${{ runner.os }}-api-target-${{ hashFiles('api/Cargo.lock') }}-${{ hashFiles('api/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-api-target-${{ hashFiles('api/Cargo.lock') }}-
+            ${{ runner.os }}-api-target-
+      - name: Run Tests
+        run: cd rust && cargo test
