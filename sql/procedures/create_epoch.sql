@@ -1,13 +1,14 @@
-CREATE PROCEDURE record_epoch(@ModelId INT,
+CREATE PROCEDURE create_epoch(@ModelId INT,
+    @Epoch INT,
     @Loss FLOAT,
     @Reward FLOAT)
 AS
-BEGIN
-    DECLARE @Epoch AS INT;
-    EXEC @Epoch = get_current_epoch @ModelId = @ModelId;
 
+BEGIN
     INSERT INTO Epochs
         (ModelId, Epoch, Loss, Reward)
+    OUTPUT
+    inserted.EpochId
     VALUES
         (@ModelId, @Epoch, @Loss, @Reward)
 END
