@@ -2,10 +2,7 @@ use rand::prelude::Rng;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 
-#[derive(Debug)]
-pub enum ApplyActionError {
-    InvalidActionIndex,
-}
+use super::ApplyActionError;
 
 /// Exposes variables and functions generalized for any puzzle
 pub trait Puzzle: Default {
@@ -25,7 +22,7 @@ pub trait Puzzle: Default {
     /// action: `usize`
     ///     The action to apply to the puzzle. Each puzzle will have a different number of possible
     ///     actions, which can be found from `Puzzle::ACTION_SIZE`
-    /// 
+    ///
     /// Returns
     /// -------
     /// `Result<(), ApplyActionIndex>`

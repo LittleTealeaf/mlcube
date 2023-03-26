@@ -2,6 +2,8 @@ use rand::Rng;
 
 use crate::puzzle::{ApplyActionError, Puzzle};
 
+use super::{RecordActionError, SampleReplayError};
+
 #[derive(Clone)]
 pub struct ReplayEntry {
     pub current_state: Vec<u8>,
@@ -100,21 +102,6 @@ impl<T: Puzzle> Default for Replay<T> {
             capacity: 100_000,
         }
     }
-}
-
-#[derive(Debug)]
-pub enum RecordActionError {
-    ApplyActionError(ApplyActionError),
-}
-
-impl From<ApplyActionError> for RecordActionError {
-    fn from(value: ApplyActionError) -> Self {
-        Self::ApplyActionError(value)
-    }
-}
-
-pub enum SampleReplayError {
-    EmptyReplay,
 }
 
 #[cfg(test)]
