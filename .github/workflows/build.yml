@@ -109,7 +109,7 @@ jobs:
         name: Rust Target Cache
         with:
           path: |
-            rust/target/
+            api/target/
           key: ${{ runner.os }}-api-target-${{ hashFiles('api/Cargo.lock') }}-${{ hashFiles('api/**/*.rs') }}
           restore-keys: |
             ${{ runner.os }}-api-target-${{ hashFiles('api/Cargo.lock') }}-
