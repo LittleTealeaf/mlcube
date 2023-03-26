@@ -13,14 +13,16 @@
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.9.10"
     },
-    "ghcr.io/devcontainers/features/nvidia-cuda:1": {
-      "installCudnn": true
-    },
+    "ghcr.io/rocker-org/devcontainer-features/r-apt:0": {},
+    // "ghcr.io/devcontainers/features/nvidia-cuda:1": {
+    //   "installCudnn": true
+    // },
+
     "ghcr.io/devcontainers/features/node:1": {}
   },
   "customizations": {
     "vscode": {
-      "extensions": ["rust-lang.rust-analyzer", "ms-python.python", "ms-mssql.mssql", "esbenp.prettier-vscode"],
+      "extensions": ["rust-lang.rust-analyzer", "ms-python.python", "ms-mssql.mssql", "esbenp.prettier-vscode", "reditorsupport.r"],
       "settings": {}
     }
   },
