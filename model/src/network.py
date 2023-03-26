@@ -23,8 +23,8 @@ class Network:
             W = tf.Variable(
                 VarianceScaling(
                     scale=1.0, mode="fan_in", distribution="truncated_normal"
-                )
-            )(shape=(length_prev, length_cur), dtype=tf.float32)
+                )(shape=(length_prev, length_cur), dtype=tf.float32)
+            )
 
             b = tf.Variable(
                 VarianceScaling(
@@ -35,3 +35,5 @@ class Network:
             self.layers.append((W, b))
             self.trainable_variables.append(W)
             self.trainable_variables.append(b)
+
+a = Network(3*3*6*6, 18, [300,200,100])
