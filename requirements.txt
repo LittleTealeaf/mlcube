@@ -5,4 +5,4 @@ pymssql==2.2.7
 pyodbc==4.0.34
 python-dotenv==1.0.0
 pytest==7.2.2
-maturin==0.14.15
+maturin==0.14.16
