@@ -7,15 +7,7 @@ pub(crate) type PyReplayEntry = (Vec<u8>, usize, f64, Vec<u8>);
 
 use pyo3::{exceptions::PyValueError, PyErr};
 
-use crate::replay::{RecordActionError, ReplayEntry, SampleReplayError};
-
-impl From<RecordActionError> for PyErr {
-    fn from(error: RecordActionError) -> Self {
-        match error {
-            RecordActionError::ApplyActionError(error) => error.into(),
-        }
-    }
-}
+use crate::replay::{ReplayEntry, SampleReplayError};
 
 impl From<ReplayEntry> for PyReplayEntry {
     fn from(value: ReplayEntry) -> Self {
