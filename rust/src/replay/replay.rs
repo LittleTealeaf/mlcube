@@ -63,7 +63,7 @@ impl<T: Puzzle> Puzzle for Replay<T> {
 
         if self.data.len() == self.capacity {
             let mut rng = rand::thread_rng();
-            let index = rng.gen_range(0..(self.capacity));
+            let index = rng.gen_range(0..self.capacity);
             self.data.swap_remove(index);
         }
 
