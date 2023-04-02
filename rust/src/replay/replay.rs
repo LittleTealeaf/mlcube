@@ -27,7 +27,8 @@ impl<T: Puzzle> Replay<T> {
         }
     }
 
-    pub fn record_action(&mut self, action: usize, reward: f64) -> Result<(), RecordActionError> {
+    pub fn record_action(&mut self, action: usize) -> Result<(), RecordActionError> {
+        let reward = self.get_reward();
         let current_state = self.get_observations();
         self.apply_action(action)?;
         let next_state = self.get_observations();
@@ -124,7 +125,7 @@ mod tests {
         for _ in 0..capacity {
             assert!(!replay.is_at_capacity());
             let action = rng.gen_range(0..Replay::<Cube2x2>::ACTION_SIZE);
-            replay.record_action(action, rng.gen()).unwrap();
+            replay.record_action(action).unwrap();
         }
         assert!(replay.is_at_capacity());
     }
@@ -137,7 +138,7 @@ mod tests {
         let mut rng = rand::thread_rng();
         for _ in 0..(capacity + 1) {
             let action = rng.gen_range(0..Replay::<Cube3x3>::ACTION_SIZE);
-            replay.record_action(action, 0.0).unwrap();
+            replay.record_action(action).unwrap();
         }
     }
 
@@ -151,7 +152,7 @@ mod tests {
         for _ in 0..(capacity * 2) {
             let action = rng.gen_range(0..Replay::<Cube3x3>::ACTION_SIZE);
             let obs = replay.get_observations();
-            replay.record_action(action, 0.0).unwrap();
+            replay.record_action(action).unwrap();
 
             let mut found = false;
             for item in replay.data.iter().rev() {
@@ -173,7 +174,7 @@ mod tests {
 
         for _ in 0..(capacity + 5) {
             let action = rng.gen_range(0..(Replay::<Cube2x2>::ACTION_SIZE));
-            replay.record_action(action, 0.0).unwrap();
+            replay.record_action(action).unwrap();
             assert_eq!(capacity, replay.data.capacity());
         }
     }
@@ -196,7 +197,7 @@ mod tests {
             let mut replay = Replay::<Cube3x3>::default();
             let mut cube = Cube3x3::default();
 
-            replay.record_action(action, 0.0).unwrap();
+            replay.record_action(action).unwrap();
             cube.apply_action(action).unwrap();
 
             let obs_replay = replay.get_observations();
@@ -209,7 +210,7 @@ mod tests {
     #[test]
     fn record_invalid_action_returns_error() {
         let mut replay = Replay::<Cube3x3>::default();
-        let result = replay.record_action(Replay::<Cube3x3>::ACTION_SIZE, 0.0);
+        let result = replay.record_action(Replay::<Cube3x3>::ACTION_SIZE);
         assert!(match result {
             Ok(_) => false,
             Err(err) => match err {

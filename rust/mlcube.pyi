@@ -24,6 +24,9 @@ class Puzzle:
     def scramble_with_seed(self, steps: int, seed: int):
         "Scrambles the cube randomly for `steps` steps using the provided seed."
         ...
+    def get_reward(self) -> float:
+        "Returns the calculated reward of the cube at the current state"
+        ...
 
 
 class PyCube2x2(Puzzle):
@@ -36,7 +39,7 @@ class Replay(Puzzle):
     def __init__(self, capacity: int = 100_000):
         "Creates a replay with the specified capacity"
         ...
-    def record_action(self, action: int, reward: float):
+    def record_action(self, action: int):
         ...
     def sample_replay(self, count: int) -> list[tuple[list[int], int, float, list[int]]]:
         ...

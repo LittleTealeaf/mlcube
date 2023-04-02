@@ -34,8 +34,8 @@ impl PyReplay2x2 {
         Replay2x2::ACTION_SIZE
     }
 
-    fn record_action(&mut self, action: usize, reward: f64) -> PyResult<()> {
-        self.replay.record_action(action, reward)?;
+    fn record_action(&mut self, action: usize) -> PyResult<()> {
+        self.replay.record_action(action)?;
         Ok(())
     }
 
