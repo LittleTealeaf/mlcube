@@ -2,7 +2,7 @@ use rand::Rng;
 
 use crate::puzzle::{ApplyActionError, Puzzle};
 
-use super::{RecordActionError, SampleReplayError};
+use super::SampleReplayError;
 
 #[derive(Clone)]
 pub struct ReplayEntry {
