@@ -34,8 +34,8 @@ impl PyReplay2x2 {
         Replay2x2::ACTION_SIZE
     }
 
-    fn record_action(&mut self, action: usize) -> PyResult<()> {
-        self.replay.record_action(action)?;
+    fn apply_action(&mut self, action: usize) -> PyResult<()> {
+        self.replay.apply_action(action)?;
         Ok(())
     }
 
@@ -62,11 +62,6 @@ impl PyReplay2x2 {
 
     fn is_solved(&mut self) -> bool {
         self.replay.is_solved()
-    }
-
-    fn apply_action(&mut self, action: usize) -> PyResult<()> {
-        self.replay.apply_action(action)?;
-        Ok(())
     }
 
     fn is_at_capacity(&self) -> bool {

@@ -27,28 +27,6 @@ impl<T: Puzzle> Replay<T> {
         }
     }
 
-    pub fn record_action(&mut self, action: usize) -> Result<(), RecordActionError> {
-        let reward = self.get_reward();
-        let current_state = self.get_observations();
-        self.apply_action(action)?;
-        let next_state = self.get_observations();
-
-        if self.data.len() == self.capacity {
-            let mut rng = rand::thread_rng();
-            let index = rng.gen_range(0..(self.capacity));
-            self.data.swap_remove(index);
-        }
-
-        self.data.push(ReplayEntry {
-            current_state,
-            action,
-            reward,
-            next_state,
-        });
-
-        Ok(())
-    }
-
     pub fn sample_replay(&mut self, count: usize) -> Result<Vec<ReplayEntry>, SampleReplayError> {
         if self.data.len() == 0 {
             return Err(SampleReplayError::EmptyReplay);
@@ -77,9 +55,26 @@ impl<T: Puzzle> Puzzle for Replay<T> {
 
     const ACTION_SIZE: usize = T::ACTION_SIZE;
 
-    /// Deprecated: Please use apply_replay_action(action, reward) instead
     fn apply_action(&mut self, action: usize) -> Result<(), ApplyActionError> {
-        self.puzzle.apply_action(action)
+        let reward = self.get_reward();
+        let current_state = self.get_observations();
+        self.puzzle.apply_action(action)?;
+        let next_state = self.get_observations();
+
+        if self.data.len() == self.capacity {
+            let mut rng = rand::thread_rng();
+            let index = rng.gen_range(0..(self.capacity));
+            self.data.swap_remove(index);
+        }
+
+        self.data.push(ReplayEntry {
+            current_state,
+            action,
+            reward,
+            next_state,
+        });
+
+        Ok(())
     }
 
     fn get_observations(&self) -> Vec<u8> {
@@ -96,6 +91,14 @@ impl<T: Puzzle> Puzzle for Replay<T> {
 
     fn get_reward(&self) -> f64 {
         self.puzzle.get_reward()
+    }
+
+    fn scramble(&mut self, steps: usize) -> u64 {
+        self.puzzle.scramble(steps)
+    }
+
+    fn scramble_with_seed(&mut self, steps: usize, seed: u64) {
+        self.puzzle.scramble_with_seed(steps, seed);
     }
 }
 
@@ -125,7 +128,7 @@ mod tests {
         for _ in 0..capacity {
             assert!(!replay.is_at_capacity());
             let action = rng.gen_range(0..Replay::<Cube2x2>::ACTION_SIZE);
-            replay.record_action(action).unwrap();
+            replay.apply_action(action).unwrap();
         }
         assert!(replay.is_at_capacity());
     }
@@ -138,7 +141,7 @@ mod tests {
         let mut rng = rand::thread_rng();
         for _ in 0..(capacity + 1) {
             let action = rng.gen_range(0..Replay::<Cube3x3>::ACTION_SIZE);
-            replay.record_action(action).unwrap();
+            replay.apply_action(action).unwrap();
         }
     }
 
@@ -152,7 +155,7 @@ mod tests {
         for _ in 0..(capacity * 2) {
             let action = rng.gen_range(0..Replay::<Cube3x3>::ACTION_SIZE);
             let obs = replay.get_observations();
-            replay.record_action(action).unwrap();
+            replay.apply_action(action).unwrap();
 
             let mut found = false;
             for item in replay.data.iter().rev() {
@@ -174,7 +177,7 @@ mod tests {
 
         for _ in 0..(capacity + 5) {
             let action = rng.gen_range(0..(Replay::<Cube2x2>::ACTION_SIZE));
-            replay.record_action(action).unwrap();
+            replay.apply_action(action).unwrap();
             assert_eq!(capacity, replay.data.capacity());
         }
     }
@@ -197,7 +200,7 @@ mod tests {
             let mut replay = Replay::<Cube3x3>::default();
             let mut cube = Cube3x3::default();
 
-            replay.record_action(action).unwrap();
+            replay.apply_action(action).unwrap();
             cube.apply_action(action).unwrap();
 
             let obs_replay = replay.get_observations();
@@ -210,13 +213,27 @@ mod tests {
     #[test]
     fn record_invalid_action_returns_error() {
         let mut replay = Replay::<Cube3x3>::default();
-        let result = replay.record_action(Replay::<Cube3x3>::ACTION_SIZE);
+        let result = replay.apply_action(Replay::<Cube3x3>::ACTION_SIZE);
         assert!(match result {
             Ok(_) => false,
             Err(err) => match err {
-                RecordActionError::ApplyActionError(_) => true,
+                ApplyActionError::InvalidActionIndex => true,
             },
         })
+    }
+
+    #[test]
+    fn scramble_doesnt_add_entries() {
+        let mut replay = Replay::<Cube3x3>::default();
+        replay.scramble(100);
+        assert_eq!(replay.data.len(), 0);
+    }
+
+    #[test]
+    fn scramble_with_seed_doesnt_add_entries() {
+        let mut replay = Replay::<Cube2x2>::default();
+        replay.scramble_with_seed(100, 1032);
+        assert_eq!(replay.data.len(), 0);
     }
 
     mod puzzle_trait {
