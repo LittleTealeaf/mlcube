@@ -65,4 +65,7 @@ pub trait Puzzle: Default {
         self.scramble_with_seed(steps, seed);
         seed
     }
+
+
+    fn get_reward(&self) -> f64; 
 }

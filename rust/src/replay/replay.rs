@@ -92,6 +92,10 @@ impl<T: Puzzle> Puzzle for Replay<T> {
     fn is_solved(&self) -> bool {
         self.puzzle.is_solved()
     }
+
+    fn get_reward(&self) -> f64 {
+        self.puzzle.get_reward()
+    }
 }
 
 impl<T: Puzzle> Default for Replay<T> {

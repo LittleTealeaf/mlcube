@@ -50,6 +50,10 @@ impl PyCube2x2 {
     fn scramble_with_seed(&mut self, seed: u64, steps: usize) {
         self.cube.scramble_with_seed(steps, seed);
     }
+
+    fn get_reward(&mut self) -> f64 {
+        self.cube.get_reward()
+    }
 }
 
 impl Default for PyCube2x2 {

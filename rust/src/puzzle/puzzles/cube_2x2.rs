@@ -81,6 +81,17 @@ impl Puzzle for Cube2x2 {
         }
         return true;
     }
+
+    fn get_reward(&self) -> f64 {
+        let mut total = 0f64;
+        for i in 0..24 {
+            if self.state[i] == i / 4 {
+                total += 1f64;
+            }
+        }
+
+        return total / 24f64;
+    }
 }
 
 const DEFAULT_STATE: [usize; 24] = [
@@ -314,5 +325,34 @@ mod tests {
         for i in 0..24 {
             assert_eq!(cube_a.state[i], cube_b.state[i]);
         }
+    }
+
+    #[test]
+    fn reward_drops_after_move() {
+        let mut cube = Cube2x2::default();
+
+        for i in 0..Cube2x2::ACTION_SIZE {
+            cube.reset();
+            let reward_1 = cube.get_reward();
+            cube.apply_action(i).unwrap();
+            let reward_2 = cube.get_reward();
+
+            assert!(reward_1 > reward_2);
+        }
+
+    }
+
+    #[test]
+    fn scramble_cubes_have_less_reward() {
+        let mut cube = Cube2x2::default();
+
+        let reward_1 = cube.get_reward();
+
+        cube.scramble(100);
+
+        let reward_2 = cube.get_reward();
+
+
+        assert!(reward_1 > reward_2);
     }
 }

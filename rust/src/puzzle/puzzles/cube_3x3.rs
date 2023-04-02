@@ -82,6 +82,18 @@ impl Puzzle for Cube3x3 {
         }
         return true;
     }
+
+
+    fn get_reward(&self) -> f64 {
+        let mut total = 0f64;
+        for i in 0..54 {
+            if self.state[i] == i / 9 {
+                total += 1f64;
+            }
+        }
+
+        return total / 54f64;
+    }
 }
 
 /// The initial coded state of the cube
@@ -314,5 +326,35 @@ mod tests {
             );
             visited_seeds.push(seed);
         }
+    }
+
+
+    #[test]
+    fn reward_drops_after_move() {
+        let mut cube = Cube3x3::default();
+
+        for i in 0..Cube3x3::ACTION_SIZE {
+            cube.reset();
+            let reward_1 = cube.get_reward();
+            cube.apply_action(i).unwrap();
+            let reward_2 = cube.get_reward();
+
+            assert!(reward_1 > reward_2, "Found {} to be less than {} for action {}", reward_1, reward_2, i);
+        }
+
+    }
+
+    #[test]
+    fn scramble_cubes_have_less_reward() {
+        let mut cube = Cube3x3::default();
+
+        let reward_1 = cube.get_reward();
+
+        cube.scramble(100);
+
+        let reward_2 = cube.get_reward();
+
+
+        assert!(reward_1 > reward_2);
     }
 }
