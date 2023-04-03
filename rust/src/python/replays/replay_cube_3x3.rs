@@ -71,4 +71,8 @@ impl PyReplay3x3 {
     fn get_observations(&self) -> Vec<u8> {
         self.replay.get_observations()
     }
+
+    fn get_reward(&self) -> f64 {
+        self.replay.get_reward()
+    }
 }
