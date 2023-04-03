@@ -104,11 +104,7 @@ impl<T: Puzzle> Puzzle for Replay<T> {
 
 impl<T: Puzzle> Default for Replay<T> {
     fn default() -> Self {
-        Self {
-            puzzle: T::default(),
-            data: Vec::with_capacity(100_000),
-            capacity: 100_000,
-        }
+        Self::with_capacity(100_000)
     }
 }
 
@@ -131,6 +127,22 @@ mod tests {
             replay.apply_action(action).unwrap();
         }
         assert!(replay.is_at_capacity());
+    }
+
+    #[test]
+    fn with_capacity_sets_capacity() {
+        let mut rng = rand::thread_rng();
+
+        for capacity in [100, 1000, 1243, 50000, 100000] {
+            let mut replay = Replay::<Cube2x2>::with_capacity(capacity);
+
+            for _ in 0..capacity {
+                assert!(!replay.is_at_capacity());
+                let action = rng.gen_range(0..Replay::<Cube2x2>::ACTION_SIZE);
+                replay.apply_action(action).unwrap();
+            }
+            assert!(replay.is_at_capacity());
+        }
     }
 
     #[test]
