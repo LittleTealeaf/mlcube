@@ -56,9 +56,9 @@ impl<T: Puzzle> Puzzle for Replay<T> {
     const ACTION_SIZE: usize = T::ACTION_SIZE;
 
     fn apply_action(&mut self, action: usize) -> Result<(), ApplyActionError> {
-        let reward = self.get_reward();
         let current_state = self.get_observations();
         self.puzzle.apply_action(action)?;
+        let reward = self.get_reward();
         let next_state = self.get_observations();
 
         if self.data.len() == self.capacity {
@@ -234,6 +234,20 @@ mod tests {
         let mut replay = Replay::<Cube2x2>::default();
         replay.scramble_with_seed(100, 1032);
         assert_eq!(replay.data.len(), 0);
+    }
+
+    #[test]
+    fn reward_recorded_after_move() {
+        let mut replay = Replay::<Cube2x2>::default();
+        let reward_incorrect = replay.get_reward();
+        replay.apply_action(5).unwrap();
+        let reward_expected = replay.get_reward();
+
+        let entry = replay.data.first().unwrap();
+        let reward_actual = entry.reward;
+
+        assert_ne!(reward_incorrect, reward_actual);
+        assert_eq!(reward_expected, reward_actual);
     }
 
     mod puzzle_trait {
