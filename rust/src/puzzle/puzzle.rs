@@ -2,8 +2,6 @@ use rand::prelude::Rng;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 
-use super::ApplyActionError;
-
 /// Exposes variables and functions generalized for any puzzle
 pub trait Puzzle: Default {
     /// The length of the array that will be returned from the `get_observations()` method.
@@ -68,4 +66,9 @@ pub trait Puzzle: Default {
 
 
     fn get_reward(&self) -> f64; 
+}
+
+#[derive(Debug)]
+pub enum ApplyActionError {
+    InvalidActionIndex,
 }
