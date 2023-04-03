@@ -83,7 +83,6 @@ impl Puzzle for Cube3x3 {
         return true;
     }
 
-
     fn get_reward(&self) -> f64 {
         let mut total = 0f64;
         for i in 0..54 {
@@ -328,7 +327,6 @@ mod tests {
         }
     }
 
-
     #[test]
     fn reward_drops_after_move() {
         let mut cube = Cube3x3::default();
@@ -339,9 +337,14 @@ mod tests {
             cube.apply_action(i).unwrap();
             let reward_2 = cube.get_reward();
 
-            assert!(reward_1 > reward_2, "Found {} to be less than {} for action {}", reward_1, reward_2, i);
+            assert!(
+                reward_1 > reward_2,
+                "Found {} to be less than {} for action {}",
+                reward_1,
+                reward_2,
+                i
+            );
         }
-
     }
 
     #[test]
@@ -353,7 +356,6 @@ mod tests {
         cube.scramble(100);
 
         let reward_2 = cube.get_reward();
-
 
         assert!(reward_1 > reward_2);
     }
