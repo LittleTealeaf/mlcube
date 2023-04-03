@@ -91,7 +91,7 @@ impl Puzzle for Cube3x3 {
             }
         }
 
-        return total / 54f64;
+        total
     }
 }
 

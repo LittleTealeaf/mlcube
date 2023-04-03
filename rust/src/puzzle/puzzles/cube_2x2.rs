@@ -90,7 +90,7 @@ impl Puzzle for Cube2x2 {
             }
         }
 
-        return total / 24f64;
+        total
     }
 }
 
@@ -339,7 +339,6 @@ mod tests {
 
             assert!(reward_1 > reward_2);
         }
-
     }
 
     #[test]
@@ -351,7 +350,6 @@ mod tests {
         cube.scramble(100);
 
         let reward_2 = cube.get_reward();
-
 
         assert!(reward_1 > reward_2);
     }
