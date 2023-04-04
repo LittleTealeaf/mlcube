@@ -23,7 +23,7 @@ def test_applying_move_unsolves_replay():
 
 def test_repeat_moves_to_solved():
     replay = PyReplay2x2(100)
-    for i in range(18):
+    for i in range(replay.action_size):
         replay.apply_action(i)
         replay.apply_action(i)
         replay.apply_action(i)
@@ -32,7 +32,7 @@ def test_repeat_moves_to_solved():
 
 def test_reset_solves_cube():
     replay = PyReplay2x2(100)
-    for i in range(18):
+    for i in range(replay.action_size):
         replay.apply_action(i)
         replay.reset()
         assert replay.is_solved()
