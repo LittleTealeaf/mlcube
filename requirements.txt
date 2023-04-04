@@ -1,5 +1,5 @@
 tensorflow==2.12.0
-pandas==1.5.3
+pandas==2.0.0
 pymssql==2.2.7
 pyodbc==4.0.34
 python-dotenv==1.0.0
