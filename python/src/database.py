@@ -16,63 +16,48 @@ def create_database_connection():
         f"DRIVER={driver};SERVER={server},{port};DATABASE={database};UID={username};PWD={password}"
     )
 
-def get_model_id(name: str, connection=None, create_missing=False):
-    new_connection = not connection
-    if new_connection:
-        connection = create_database_connection()
+def ensure_connection(connection):
+    if connection == None:
+        return (create_database_connection(), True)
+    else:
+        return (connection, False)
+
+def get_model_id(name: str, connection=None):
+    connection, is_new = ensure_connection(connection)
 
     cursor = connection.cursor()
-    cursor.execute(f'SELECT ModelId FROM Models WHERE ModelName = \'{name}\'')
+    cursor.execute('SELECT ModelId FROM Models WHERE ModelName = ?', name)
     row = cursor.fetchone()
     cursor.close()
 
-    if new_connection:
+
+    if is_new:
         connection.commit()
         connection.close()
 
-    return row[0]
+    return row[0] if row else None
 
 
+print(get_model_id("hist-5"))
 
 
-# import pymssql
-# from dotenv import load_dotenv
-
-# load_dotenv()
-
-
-# def create_database_connection() -> pymssql._pymssql.Connection:
-#     return pymssql.connect(
-#         host=getenv("SQL_HOST"),
-#         port=getenv("SQL_PORT"),
-#         user=getenv("SQL_USER"),
-#         password=getenv("SQL_PASSWORD"),
-#         database=getenv("SQL_DATABASE")
-#     )
-
-
-# def get_model_id(name: str, connection=None, create_missing=True) -> int:
-#     created_connection = not connection
-#     if created_connection:
+# def get_model_id(name: str, connection=None, create_missing=False):
+#     new_connection = not connection
+#     if new_connection:
 #         connection = create_database_connection()
-
-#     cursor = connection.cursor(as_dict=True)
-
+#
+#     cursor = connection.cursor()
 #     cursor.execute(f'SELECT ModelId FROM Models WHERE ModelName = \'{name}\'')
-
 #     row = cursor.fetchone()
-
-#     if row is None:
-#         if create_missing:
-#             cursor.execute(f'INSERT INTO Models (ModelName) OUTPUT Inserted.ModelId VALUES (\'{name}\')')
-#             row = cursor.fetchone()
-#         else:
-#             row = {'ModelId': -1}
-
 #     cursor.close()
-#     connection.commit()
-
-#     if created_connection:
+#
+#     if new_connection:
+#         connection.commit()
 #         connection.close()
-
-#     return row['ModelId']
+#
+#     return row[0]
+#
+# connection = create_database_connection()
+#
+# model = get_model_id("hist-1",connection=connection)
+# print(model)
