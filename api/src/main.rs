@@ -39,13 +39,13 @@ async fn demo_fetch_models(connection: &Pool<Mssql>) {
 #[derive(FromRow, Debug)]
 struct Epoch {
     Epoch: i32,
-    Loss: Option<f32>,
-    Reward: Option<f32>,
+    Loss: Option<f64>,
+    Reward: Option<f64>,
 }
 
 async fn demo_select_with_binds(connection: &Pool<Mssql>, ModelId: i32) {
     let query: Vec<Epoch> =
-        sqlx::query_as("SELECT Epoch, Loss, Reward FROM Epochs WHERE ModelId = (?)")
+        sqlx::query_as("SELECT Epoch, Loss, Reward FROM Epochs WHERE ModelId = $1")
             .bind(ModelId)
             .fetch_all(connection)
             .await
