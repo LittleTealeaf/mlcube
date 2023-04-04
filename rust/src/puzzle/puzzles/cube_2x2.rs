@@ -14,11 +14,11 @@ impl Default for Cube2x2 {
 
 impl Puzzle for Cube2x2 {
     const OBSERVATION_SIZE: usize = 4 * 6 * 6;
-    const ACTION_SIZE: usize = 18;
+    const ACTION_SIZE: usize = 9;
 
     fn apply_action(&mut self, action: usize) -> Result<(), ApplyActionError> {
-        let permutations = PERMUTATIONS[action % 6];
-        let rotation = action / 6;
+        let permutations = PERMUTATIONS[action % 3];
+        let rotation = action / 3;
         match rotation {
             0 => {
                 // Normal
@@ -98,19 +98,13 @@ const DEFAULT_STATE: [usize; 24] = [
     0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
 ];
 
-const PERMUTATIONS: [[[usize; 4]; 3]; 6] = [
+const PERMUTATIONS: [[[usize; 4]; 3]; 3] = [
     // U
     [[0, 1, 3, 2], [8, 4, 16, 12], [9, 5, 17, 13]],
-    // L
-    [[0, 8, 20, 19], [2, 10, 22, 17], [5, 7, 6, 4]],
     // F
     [[8, 9, 11, 10], [5, 3, 14, 20], [7, 2, 12, 21]],
     // R
     [[14, 12, 13, 15], [9, 1, 18, 21], [11, 3, 16, 23]],
-    // B
-    [[16, 17, 19, 18], [13, 0, 6, 23], [15, 1, 4, 22]],
-    // D
-    [[20, 21, 23, 22], [10, 14, 18, 6], [11, 15, 19, 7]],
 ];
 
 #[cfg(test)]
@@ -180,7 +174,7 @@ mod tests {
 
     #[test]
     fn applying_move_makes_cube_unsolved() {
-        for i in 0..18 {
+        for i in 0..Cube2x2::ACTION_SIZE {
             let mut cube = Cube2x2::default();
             cube.apply_action(i).unwrap();
 
@@ -194,7 +188,7 @@ mod tests {
 
     #[test]
     fn repeat_moves_loops_to_solved() {
-        for i in 0..18 {
+        for i in 0..Cube2x2::ACTION_SIZE {
             let mut cube = Cube2x2::default();
             cube.apply_action(i).unwrap();
             cube.apply_action(i).unwrap();
@@ -220,7 +214,7 @@ mod tests {
 
     #[test]
     fn reset_unsolved_cube_is_solved() {
-        for i in 0..18 {
+        for i in 0..Cube2x2::ACTION_SIZE {
             let mut cube = Cube2x2::default();
             cube.apply_action(i).unwrap();
             cube.reset();
