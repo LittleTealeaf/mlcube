@@ -21,37 +21,21 @@ async fn main() {
         .await
         .unwrap();
 
-    // demo_fetch_models(&connection).await;
-    demo_select_with_binds(&connection, 3).await;
-}
-
-async fn demo_fetch_models(connection: &Pool<Mssql>) {
-    let query: Vec<Model> = sqlx::query_as("SELECT * FROM Models")
-        .fetch_all(connection)
-        .await
-        .unwrap();
-
-    for item in query.into_iter() {
-        println!("{:?}", item);
-    }
+    let values = get_epochs_for_model(&connection, 1).await;
+    println!("{:?}", values.len());
 }
 
 #[derive(FromRow, Debug)]
 struct Epoch {
-    Epoch: i32,
-    Loss: Option<f64>,
-    Reward: Option<f64>,
+    epoch: i32,
+    loss: Option<f64>,
+    reward: Option<f64>,
 }
 
-async fn demo_select_with_binds(connection: &Pool<Mssql>, ModelId: i32) {
-    let query: Vec<Epoch> =
-        sqlx::query_as("SELECT Epoch, Loss, Reward FROM Epochs WHERE ModelId = $1")
-            .bind(ModelId)
-            .fetch_all(connection)
-            .await
-            .unwrap();
-
-    for item in query {
-        println!("{:?}", item);
-    }
+async fn get_epochs_for_model(connection: &Pool<Mssql>, model_id: i32) -> Vec<Epoch> {
+    sqlx::query_as("SELECT epoch, loss, reward FROM Epochs WHERE ModelId = $1")
+        .bind(model_id)
+        .fetch_all(connection)
+        .await
+        .unwrap()
 }
