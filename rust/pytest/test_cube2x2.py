@@ -22,7 +22,7 @@ def test_applying_move_unsolves_cube():
         assert not cube.is_solved()
 
 def test_repeat_moves_to_solved():
-    for i in range(18):
+    for i in range(PyCube2x2.action_size):
         cube = PyCube2x2()
         cube.apply_action(i)
         cube.apply_action(i)
@@ -31,14 +31,14 @@ def test_repeat_moves_to_solved():
         assert cube.is_solved()
 
 def test_reset_solves_cube():
-    for i in range(18):
+    for i in range(PyCube2x2.action_size):
         cube = PyCube2x2()
         cube.apply_action(i)
         cube.reset()
         assert cube.is_solved()
 
 def test_get_observations_are_unique():
-    for i in range(18):
+    for i in range(PyCube2x2.action_size):
         cube = PyCube2x2()
         obs_a = cube.get_observations()
         cube.apply_action(i)

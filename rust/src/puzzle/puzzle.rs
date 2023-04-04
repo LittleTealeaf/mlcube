@@ -64,8 +64,7 @@ pub trait Puzzle: Default {
         seed
     }
 
-
-    fn get_reward(&self) -> f64; 
+    fn get_reward(&self) -> f64;
 }
 
 #[derive(Debug)]

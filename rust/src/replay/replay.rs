@@ -306,7 +306,7 @@ mod tests {
 
         #[test]
         fn applying_move_makes_cube_unsolved() {
-            for i in 0..18 {
+            for i in 0..Cube2x2::ACTION_SIZE {
                 let mut replay = Replay::<Cube2x2>::default();
                 replay.apply_action(i).unwrap();
 
@@ -320,7 +320,7 @@ mod tests {
 
         #[test]
         fn repeat_moves_loops_to_solved() {
-            for i in 0..18 {
+            for i in 0..Cube2x2::ACTION_SIZE {
                 let mut replay = Replay::<Cube2x2>::default();
                 replay.apply_action(i).unwrap();
                 replay.apply_action(i).unwrap();
@@ -346,7 +346,7 @@ mod tests {
 
         #[test]
         fn reset_unsolved_cube_is_solved() {
-            for i in 0..18 {
+            for i in 0..Cube2x2::ACTION_SIZE {
                 let mut replay = Replay::<Cube2x2>::default();
                 replay.apply_action(i).unwrap();
                 replay.reset();
