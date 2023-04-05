@@ -2,7 +2,8 @@ CREATE TABLE Models
 (
     ModelId   INT NOT NULL IDENTITY PRIMARY KEY,
     ModelName VARCHAR(100),
-    GitHash   VARCHAR(40)
+    GitHash   VARCHAR(40),
+    CubeType  VARCHAR(50),
 )
 
 CREATE TABLE Nodes
