@@ -15,6 +15,4 @@ GRANT INSERT ON EvaluationMoves TO Agent;
 
 GRANT INSERT ON Epochs TO Agent;
 
-
-
 GRANT EXECUTE ON get_current_epoch TO Agent;

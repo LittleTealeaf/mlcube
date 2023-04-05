@@ -1,11 +1,11 @@
 from os import getenv
 import numpy as np
 from dotenv import load_dotenv
-from git import Repo
+from git import repo
 import pyodbc
 
 
-repo = Repo(search_parent_directories=True)
+repo = repo.Repo(search_parent_directories=True)
 git_commit = repo.head.object.hexsha
 
 load_dotenv()
@@ -39,7 +39,7 @@ def create_model(name: str, cube_type: str, connection=None):
     if is_new:
         connection.close()
 
-    return value
+    return value[0]
 
 def get_model_id(name: str, connection=None):
     connection, is_new = ensure_connection(connection)
@@ -61,7 +61,7 @@ def get_nodes(model_id: int, connection=None):
 
     cursor = connection.cursor()
     cursor.execute('SELECT Layer, NodeIndex, Weight, Bias FROM Nodes WHERE ModelId = ?', model_id)
-    rows = cursor.fetchall()
+    rows,  = cursor.fetchall()
 
     if is_new:
         connection.commit()
@@ -78,3 +78,5 @@ def insert_epoch(model_id: int, epoch: int, loss: np.float32, reward: np.float32
 
     if is_new:
         connection.close()
+
+print(create_model('HI_WORLD_TESTING_PYTHON','Cube3x3'))
