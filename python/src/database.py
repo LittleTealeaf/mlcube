@@ -1,7 +1,12 @@
 from os import getenv
 import numpy as np
 from dotenv import load_dotenv
+from git import Repo
 import pyodbc
+
+
+repo = Repo(search_parent_directories=True)
+git_commit = repo.head.object.hexsha
 
 load_dotenv()
 
@@ -22,6 +27,19 @@ def ensure_connection(connection):
         return (create_database_connection(), True)
     else:
         return (connection, False)
+
+def create_model(name: str, cube_type: str, connection=None):
+    connection, is_new = ensure_connection(connection)
+
+    cursor = connection.cursor()
+    cursor.execute('INSERT INTO Models (ModelName, GitHash, CubeType) OUTPUT inserted.ModelId VALUES (?, ?, ?)', name, git_commit, cube_type)
+    value = cursor.fetchone()
+    connection.commit()
+
+    if is_new:
+        connection.close()
+
+    return value
 
 def get_model_id(name: str, connection=None):
     connection, is_new = ensure_connection(connection)
