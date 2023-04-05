@@ -54,6 +54,10 @@ impl PyCube2x2 {
     fn get_reward(&mut self) -> f64 {
         self.cube.get_reward()
     }
+
+    fn get_name(&self) -> String {
+        String::from("Cube2x2")
+    }
 }
 
 impl Default for PyCube2x2 {

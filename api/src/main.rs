@@ -6,13 +6,6 @@ use sqlx::{
     FromRow, Pool,
 };
 
-#[derive(FromRow, Debug)]
-struct Model {
-    ModelId: i32,
-    ModelName: String,
-    GitHash: Option<String>,
-}
-
 #[actix_web::main]
 async fn main() {
     dotenv().unwrap();
@@ -22,7 +15,10 @@ async fn main() {
         .unwrap();
 
     let values = get_epochs_for_model(&connection, 1).await;
-    println!("{:?}", values.len());
+
+    for value in values {
+        println!("{} {:?} {:?}", value.epoch, value.loss, value.reward);
+    }
 }
 
 #[derive(FromRow, Debug)]

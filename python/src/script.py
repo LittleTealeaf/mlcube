@@ -11,4 +11,3 @@ for i in range(10000):
     agent.step_experience( 1 - i / 100000)
 
 
-print(replay.sample_replay(1000))

@@ -27,6 +27,9 @@ class Puzzle:
     def get_reward(self) -> float:
         "Returns the calculated reward of the cube at the current state"
         ...
+    def get_name(self) -> str:
+        "Returns the name of the cube"
+        ...
 
 
 class PyCube2x2(Puzzle):

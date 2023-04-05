@@ -1,4 +1,5 @@
 from os import getenv
+import numpy as np
 from dotenv import load_dotenv
 import pyodbc
 
@@ -37,27 +38,25 @@ def get_model_id(name: str, connection=None):
 
     return row[0] if row else None
 
+def get_nodes(model_id: int, connection=None):
+    connection, is_new = ensure_connection(connection)
 
-print(get_model_id("hist-5"))
+    cursor = connection.cursor()
+    cursor.execute('SELECT Layer, NodeIndex, Weight, Bias FROM Nodes WHERE ModelId = ?', model_id)
+    rows = cursor.fetchall()
 
+    if is_new:
+        connection.commit()
+        connection.close()
 
-# def get_model_id(name: str, connection=None, create_missing=False):
-#     new_connection = not connection
-#     if new_connection:
-#         connection = create_database_connection()
-#
-#     cursor = connection.cursor()
-#     cursor.execute(f'SELECT ModelId FROM Models WHERE ModelName = \'{name}\'')
-#     row = cursor.fetchone()
-#     cursor.close()
-#
-#     if new_connection:
-#         connection.commit()
-#         connection.close()
-#
-#     return row[0]
-#
-# connection = create_database_connection()
-#
-# model = get_model_id("hist-1",connection=connection)
-# print(model)
+    return rows
+
+def insert_epoch(model_id: int, epoch: int, loss: np.float32, reward: np.float32, connection = None):
+    connection, is_new = ensure_connection(connection)
+
+    cursor = connection.cursor()
+    cursor.execute('INSERT INTO Epochs (ModelId, Epoch, Loss, Reward) VALUES (?, ?, ?, ?)', model_id, epoch, loss, reward)
+    connection.commit()
+
+    if is_new:
+        connection.close()

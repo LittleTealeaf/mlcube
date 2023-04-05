@@ -52,6 +52,10 @@ impl PyCube3x3 {
     fn get_reward(&self) -> f64 {
         self.cube.get_reward()
     }
+
+    fn get_name(&self) -> String {
+        String::from("Cube3x3")
+    }
 }
 
 impl Default for PyCube3x3 {

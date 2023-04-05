@@ -4,7 +4,8 @@ import tensorflow as tf
 import random
 
 class Agent:
-    def __init__(self, replay: PyReplay2x2, hidden_layers: list[int]) -> None:
+    def __init__(self, name: str, replay: PyReplay2x2, hidden_layers: list[int]) -> None:
+        self.name = name
         self.replay = replay
         self.network = Network(replay.observation_length, replay.action_size, hidden_layers = hidden_layers)
         self.target = Network(replay.observation_length, replay.action_size, clone_variables=self.network.layers)

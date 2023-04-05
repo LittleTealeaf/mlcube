@@ -75,4 +75,8 @@ impl PyReplay3x3 {
     fn get_reward(&self) -> f64 {
         self.replay.get_reward()
     }
+
+    fn get_name(&self) -> String {
+        String::from("Cube3x3")
+    }
 }

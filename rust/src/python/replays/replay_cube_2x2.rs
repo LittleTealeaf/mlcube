@@ -75,6 +75,10 @@ impl PyReplay2x2 {
     fn get_reward(&self) -> f64 {
         self.replay.get_reward()
     }
+
+    fn get_name(&self) -> String {
+        String::from("Cube2x2")
+    }
 }
 
 impl Default for PyReplay2x2 {
