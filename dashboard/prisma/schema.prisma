@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Epochs {
+  EpochId Int    @id(map: "PK__Epochs__97971E396A8F4803") @default(autoincrement())
+  ModelId Int
+  Epoch   Int
+  Loss    Float?
+  Reward  Float?
+  Models  Models @relation(fields: [ModelId], references: [ModelId], onUpdate: NoAction, map: "FK__Epochs__ModelId__49C3F6B7")
+}
+
+model EvaluationMoves {
+  EvaluationMoveId Int          @id(map: "PK__Evaluati__772CA240D89BB96E") @default(autoincrement())
+  EvaluationId     Int?
+  MoveIndex        Int?
+  MoveName         String?      @db.VarChar(2)
+  Reward           Float?
+  Evaluations      Evaluations? @relation(fields: [EvaluationId], references: [EvaluationId], onDelete: NoAction, onUpdate: NoAction, map: "FK__Evaluatio__Evalu__4F7CD00D")
+}
+
+model Evaluations {
+  EvaluationId    Int               @id(map: "PK__Evaluati__36AE68F3C5CFD38C") @default(autoincrement())
+  ModelId         Int
+  Epoch           Int
+  Solved          Boolean?
+  MoveCount       Int?
+  Seed            BigInt?
+  EvaluationMoves EvaluationMoves[]
+  Models          Models            @relation(fields: [ModelId], references: [ModelId], onUpdate: NoAction, map: "FK__Evaluatio__Model__4CA06362")
+}
+
+model Models {
+  ModelId     Int           @id(map: "PK__Models__E8D7A12C80EFBE84") @default(autoincrement())
+  ModelName   String?       @db.VarChar(100)
+  GitHash     String?       @db.VarChar(40)
+  CubeType    String?       @db.VarChar(50)
+  Epochs      Epochs[]
+  Evaluations Evaluations[]
+  Nodes       Nodes[]       @ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model ModelsBkp {
+  ModelId   Int     @default(autoincrement())
+  ModelName String? @db.VarChar(100)
+  GitHash   String? @db.VarChar(40)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model Nodes {
+  Weight    Float?
+  Bias      Float?
+  Layer     Int
+  NodeIndex Int
+  ModelId   Int
+  Models    Models @relation(fields: [ModelId], references: [ModelId], onUpdate: NoAction, map: "FK__Nodes__ModelId__787EE5A0")
+
+  @@ignore
+}
