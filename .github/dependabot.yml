@@ -21,3 +21,7 @@ updates:
     directory: "/api/"
     schedule:
       interval: "daily"
+  - package-ecosystem: "npm"
+    directory: "/dashboard/"
+    schedule:
+      interval: "daily"
