@@ -43,26 +43,4 @@ model Models {
   CubeType    String?       @db.VarChar(50)
   Epochs      Epochs[]
   Evaluations Evaluations[]
-  Nodes       Nodes[]       @ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-model ModelsBkp {
-  ModelId   Int     @default(autoincrement())
-  ModelName String? @db.VarChar(100)
-  GitHash   String? @db.VarChar(40)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-model Nodes {
-  Weight    Float?
-  Bias      Float?
-  Layer     Int
-  NodeIndex Int
-  ModelId   Int
-  Models    Models @relation(fields: [ModelId], references: [ModelId], onUpdate: NoAction, map: "FK__Nodes__ModelId__787EE5A0")
-
-  @@ignore
 }
