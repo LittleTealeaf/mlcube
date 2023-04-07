@@ -2,6 +2,9 @@ use rand::prelude::Rng;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 
+
+// TODO: Add methods to get "named" versions of actions (ex: get_action_name(action))
+
 /// Exposes variables and functions generalized for any puzzle
 pub trait Puzzle: Default {
     /// The length of the array that will be returned from the `get_observations()` method.
