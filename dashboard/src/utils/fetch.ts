@@ -5,15 +5,10 @@ export type ApiParams = {
 	[key: string]: any;
 }
 
-export async function fetchAPI(url: string, method: RestEndpoint, params: ApiParams = {}) {
-	// const fetch_url = new URL(url);
-	// Object.entries(params).forEach(([key, value]) => {
-	// 	fetch_url.searchParams.set(key, value);
-	// })
-	
+export async function fetchAPI(url: string, params: ApiParams = {}, init?: RequestInit) {
 	const fetch_url = `${url}?${Object.entries(params).map(([key,value]) => `${key}=${value}`).join("&")}`
 
-	return fetch(fetch_url, {method});
+	return fetch(fetch_url, init);
 }
 
 

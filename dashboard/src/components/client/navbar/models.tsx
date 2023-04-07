@@ -13,7 +13,7 @@ export default function ModelNavBar({ ModelName }: ModelNavBarParams) {
 
 	return (
 		<>
-			<AppBar position="sticky">
+			<AppBar position="static">
 				<Toolbar variant="dense">
 					<Typography variant="subtitle1" sx={{ flexGRow: 1 }}>{ModelName}</Typography>
 				</Toolbar>

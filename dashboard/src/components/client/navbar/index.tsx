@@ -24,8 +24,11 @@ export default function NavBar({ }) {
 	}
 
 
+//TODO: redo the header to be ontop on all parts of the page. We can do this by only including a scrollbar on content
+
 	return (
-			<AppBar position="sticky">
+		<>
+			<AppBar position="static">
 				<Toolbar>
 					<Breadcrumbs sx={{ flexGrow: 1 }}>
 						{path.map(({ path, link }, index) => (
@@ -40,11 +43,6 @@ export default function NavBar({ }) {
 					<Button color="inherit" component={Link} href="/models">Models</Button>
 				</Toolbar>
 			</AppBar>
+		</>
 	)
 }
-							// <MuiLink key={link} href={link} color="inherit" underline="hover" component={Link}>
-							// 	<Typography color="white" variant="h6">
-							// 		{path}
-							// 	</Typography>
-							// </MuiLink>
-	

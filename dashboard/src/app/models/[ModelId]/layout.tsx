@@ -14,9 +14,11 @@ export default async function Layout({ children, params: { ModelId } }: LayoutPa
 	const model = await prisma.models.findFirst({ where: { ModelId: { equals: Number(ModelId) } } });
 
 	return (
-		<>
+		<div style={{ display: 'flex', flexDirection: 'column' }}>
 			<ModelNavBar ModelName={model?.ModelName || undefined} />
-			{children}
-		</>
+			<div style={{ flexGrow: 1 }}>
+				{children}
+			</div>
+		</div>
 	)
 }

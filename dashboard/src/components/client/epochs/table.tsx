@@ -23,12 +23,12 @@ export default function EpochTable({ ModelId }: EpochsTableParams) {
 
 	useEffect(() => {
 		setEpochs(null);
-		fetchAPI("/api/epochs/table/paginated", 'GET', { per_page: perPage, page, model_id: ModelId }).then(jsonResponse).then(setEpochs)
+		fetchAPI("/api/epochs/table/paginated", { per_page: perPage, page, model_id: ModelId }).then(jsonResponse).then(setEpochs)
 	}, [perPage, page])
 
 	const { data: count, mutate, isValidating } = useSWR<number>(
 		'api/epochs/count',
-		() => fetchAPI('/api/epochs/count', 'GET', { ModelId })
+		() => fetchAPI('/api/epochs/count', { ModelId }, {next: {revalidate: 60}})
 			.then(requireStatus(200))
 			.then(jsonResponse)
 	)
@@ -43,7 +43,7 @@ export default function EpochTable({ ModelId }: EpochsTableParams) {
 	}, []);
 
 	return (
-		<Paper>
+		<>
 			<TablePagination
 				rowsPerPageOptions={[10, 25, 50, 100, 200, 500, 1000]}
 				component="div"
@@ -52,8 +52,9 @@ export default function EpochTable({ ModelId }: EpochsTableParams) {
 				page={page}
 				onRowsPerPageChange={handleChangePerPage}
 				onPageChange={handleChangePage}
+				sx={{ position: 'sticky' }}
 			/>
-			<TableContainer sx={{flexGrow: 1}}>
+			<TableContainer sx={{ maxHeight: '100vh' }}>
 				<Table size="small" stickyHeader>
 					<TableHead>
 						<TableRow>
@@ -81,6 +82,6 @@ export default function EpochTable({ ModelId }: EpochsTableParams) {
 					</TableBody>
 				</Table>
 			</TableContainer>
-		</Paper>
+		</>
 	)
 }
