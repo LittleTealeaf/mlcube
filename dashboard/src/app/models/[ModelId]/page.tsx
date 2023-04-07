@@ -18,12 +18,12 @@ export default async function Page({ params }: { params: { ModelId: number } }) 
 	return (
 		<div>
 			{model.ModelName}
-			<EpochGraph ModelId={params.ModelId}/>
+			<EpochGraph ModelId={params.ModelId} />
 		</div>
 	)
 }
 
 
 export async function generateStaticParams() {
-	return await prisma.models.findMany().then(models => models.map(({ ModelId }) => ({ ModelId })))
+	return await prisma.models.findMany().then(models => models.map(({ ModelId }) => String(ModelId)).map(ModelId => ({ ModelId })))
 }

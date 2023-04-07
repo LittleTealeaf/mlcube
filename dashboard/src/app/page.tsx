@@ -8,6 +8,7 @@ const Page: NextPage = ({ }) => {
 
 
 	return (<>
+		<div>Hi world</div>
 	</>)
 }
 

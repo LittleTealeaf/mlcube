@@ -1,12 +1,14 @@
 // "use client"
-import Link from 'next/link'
-import style from '@/styles/layout.module.scss';
 import './global.css'
+import NavBar from '@/components/navbar';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+
+
 	return (
 		<html lang="en">
 			<body>
+				<NavBar />
 				{children}
 			</body>
 		</html>
