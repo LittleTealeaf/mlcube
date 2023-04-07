@@ -18,11 +18,11 @@ export default function EpochTable({ ModelId }: EpochsTableParams) {
 
 	const [page, setPage] = useState(0);
 	const [perPage, setPerPage] = useState(10);
-	const [epochs, setEpochs] = useState<Epochs[]>([]);
+	const [epochs, setEpochs] = useState<Epochs[] | null>(null);
 
 
 	useEffect(() => {
-		setEpochs([]);
+		setEpochs(null);
 		fetchAPI("/api/epochs/table/paginated", 'GET', { per_page: perPage, page, model_id: ModelId }).then(jsonResponse).then(setEpochs)
 	}, [perPage, page])
 
@@ -44,28 +44,6 @@ export default function EpochTable({ ModelId }: EpochsTableParams) {
 
 	return (
 		<Paper>
-			<TableContainer>
-				<Table size="small">
-					<TableHead>
-						<TableRow>
-							<TableCell>Epoch</TableCell>
-							<TableCell>Loss</TableCell>
-							<TableCell>Reward</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{
-							epochs.map((epoch) => (
-								<TableRow key={epoch.EpochId}>
-									<TableCell>{epoch.Epoch}</TableCell>
-									<TableCell>{epoch.Loss}</TableCell>
-									<TableCell>{epoch.Reward}</TableCell>
-								</TableRow>
-							))
-						}
-					</TableBody>
-				</Table>
-			</TableContainer>
 			<TablePagination
 				rowsPerPageOptions={[10, 25, 50, 100, 200, 500, 1000]}
 				component="div"
@@ -75,6 +53,34 @@ export default function EpochTable({ ModelId }: EpochsTableParams) {
 				onRowsPerPageChange={handleChangePerPage}
 				onPageChange={handleChangePage}
 			/>
+			<TableContainer sx={{flexGrow: 1}}>
+				<Table size="small" stickyHeader>
+					<TableHead>
+						<TableRow>
+							<TableCell>Epoch</TableCell>
+							<TableCell>Loss</TableCell>
+							<TableCell>Reward</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{
+							epochs != null && epochs.map((epoch) => (
+								<TableRow key={epoch.EpochId}>
+									<TableCell>{epoch.Epoch}</TableCell>
+									<TableCell>{epoch.Loss}</TableCell>
+									<TableCell>{epoch.Reward}</TableCell>
+								</TableRow>
+							)) || Array(perPage).map((_, index) => (
+								<TableRow key={index}>
+									<TableCell></TableCell>
+									<TableCell></TableCell>
+									<TableCell></TableCell>
+								</TableRow>
+							))
+						}
+					</TableBody>
+				</Table>
+			</TableContainer>
 		</Paper>
 	)
 }
