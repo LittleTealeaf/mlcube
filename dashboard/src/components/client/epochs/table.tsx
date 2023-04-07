@@ -1,1 +1,80 @@
 'use client'
+
+import { fetchAPI, jsonResponse, requireStatus } from "@/utils/fetch";
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
+import { Epochs } from "@prisma/client";
+import React, { ChangeEvent, useCallback, useEffect } from "react";
+import { useState } from "react";
+import useSWR from 'swr';
+
+
+
+export type EpochsTableParams = {
+	ModelId: number
+}
+
+
+export default function EpochTable({ ModelId }: EpochsTableParams) {
+
+	const [page, setPage] = useState(0);
+	const [perPage, setPerPage] = useState(10);
+	const [epochs, setEpochs] = useState<Epochs[]>([]);
+
+
+	useEffect(() => {
+		setEpochs([]);
+		fetchAPI("/api/epochs/table/paginated", 'GET', { per_page: perPage, page, model_id: ModelId }).then(jsonResponse).then(setEpochs)
+	}, [perPage, page])
+
+	const { data: count, mutate, isValidating } = useSWR<number>(
+		'api/epochs/count',
+		() => fetchAPI('/api/epochs/count', 'GET', { ModelId })
+			.then(requireStatus(200))
+			.then(jsonResponse)
+	)
+
+	const handleChangePerPage = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+		const updatedRowsPerPage = parseInt(event.target.value, 10);
+		setPerPage(updatedRowsPerPage);
+	}, []);
+
+	const handleChangePage = useCallback((event: unknown, newPage: number) => {
+		setPage(newPage);
+	}, []);
+
+	return (
+		<Paper>
+			<TableContainer>
+				<Table size="small">
+					<TableHead>
+						<TableRow>
+							<TableCell>Epoch</TableCell>
+							<TableCell>Loss</TableCell>
+							<TableCell>Reward</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{
+							epochs.map((epoch) => (
+								<TableRow key={epoch.EpochId}>
+									<TableCell>{epoch.Epoch}</TableCell>
+									<TableCell>{epoch.Loss}</TableCell>
+									<TableCell>{epoch.Reward}</TableCell>
+								</TableRow>
+							))
+						}
+					</TableBody>
+				</Table>
+			</TableContainer>
+			<TablePagination
+				rowsPerPageOptions={[10, 25, 50, 100, 200, 500, 1000]}
+				component="div"
+				count={count || 0}
+				rowsPerPage={perPage}
+				page={page}
+				onRowsPerPageChange={handleChangePerPage}
+				onPageChange={handleChangePage}
+			/>
+		</Paper>
+	)
+}
