@@ -1,6 +1,6 @@
 'use client'
 
-import { AppBar, Box, Breadcrumbs, Button, Link as MuiLink, Toolbar, Typography } from "@mui/material"
+import { AppBar, Box, Breadcrumbs, Button, Toolbar, Typography } from "@mui/material"
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 
@@ -25,22 +25,26 @@ export default function NavBar({ }) {
 
 
 	return (
-		<Box sx={{ flexGrow: 1 }}>
-			<AppBar position="static">
+			<AppBar position="sticky">
 				<Toolbar>
 					<Breadcrumbs sx={{ flexGrow: 1 }}>
-						{path.map(({ path, link }) => (
-							<MuiLink href={link} color="inherit" underline="hover" component={Link}>
-								<Typography color="white" variant="h6">
+						{path.map(({ path, link }, index) => (
+							<Button key={index} component={Link} href={link} sx={{ color: 'white', padding: 0, margin: 0, width: 'fit-content' }}>
+								<Typography sx={{ fontSize: "15px", fontWeight: "bolder", width: 'fit-content', margin: 0, padding: 0 }}>
 									{path}
 								</Typography>
-							</MuiLink>
+							</Button>
 						))}
 					</Breadcrumbs>
 					<Button color="inherit" component={Link} href="/">Home</Button>
 					<Button color="inherit" component={Link} href="/models">Models</Button>
 				</Toolbar>
 			</AppBar>
-		</Box>
 	)
 }
+							// <MuiLink key={link} href={link} color="inherit" underline="hover" component={Link}>
+							// 	<Typography color="white" variant="h6">
+							// 		{path}
+							// 	</Typography>
+							// </MuiLink>
+	

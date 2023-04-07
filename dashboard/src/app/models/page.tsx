@@ -1,4 +1,4 @@
-import ModelTable from "@/components/modeltable";
+import { ModelTable } from "@/components/client/models/table";
 import { prisma } from "@/db"
 
 

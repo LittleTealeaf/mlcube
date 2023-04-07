@@ -8,7 +8,7 @@ export type ModelTableProps = {
 	models: Models[]
 }
 
-export default function ModelTable({ models }: ModelTableProps) {
+export function ModelTable({ models }: ModelTableProps) {
 
 	return (
 		<TableContainer component={Paper}>

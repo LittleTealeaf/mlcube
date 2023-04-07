@@ -1,4 +1,7 @@
 "use client"
+
+
+
 export type EpochGraphParams = {
 	ModelId: number
 }

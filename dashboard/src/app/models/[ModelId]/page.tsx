@@ -1,4 +1,3 @@
-import EpochGraph from "@/components/graphs/epochs";
 import { prisma } from "@/db";
 
 export default async function Page({ params }: { params: { ModelId: number } }) {
@@ -18,7 +17,6 @@ export default async function Page({ params }: { params: { ModelId: number } }) 
 	return (
 		<div>
 			{model.ModelName}
-			<EpochGraph ModelId={params.ModelId} />
 		</div>
 	)
 }
