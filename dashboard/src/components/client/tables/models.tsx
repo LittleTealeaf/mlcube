@@ -1,7 +1,7 @@
 'use client'
 
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
-import { ModelInfo, Models } from "@prisma/client"
+import { ModelInfo } from "@prisma/client"
 import { useRouter } from 'next/navigation'
 
 export type ModelsTableParams = {
@@ -13,7 +13,7 @@ export default function ModelsTable({ models }: ModelsTableParams) {
 	const router = useRouter()
 
 
-	const openModel = (model: Models) => (() => router.push(`/models/${model.ModelId}`))
+	const openModel = (model: ModelInfo) => (() => router.push(`/models/${model.ModelId}`))
 
 	return (
 		<TableContainer sx={{maxHeight: '100%'}}>
