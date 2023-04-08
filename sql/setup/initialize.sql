@@ -1,3 +1,4 @@
+-- TODO: Rename Tables to be singular instead of plural
 CREATE TABLE Models
 (
     ModelId   INT NOT NULL IDENTITY PRIMARY KEY,

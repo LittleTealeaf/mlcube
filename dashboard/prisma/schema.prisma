@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -43,4 +44,12 @@ model Models {
   CubeType    String?       @db.VarChar(50)
   Epochs      Epochs[]
   Evaluations Evaluations[]
+}
+
+view ModelInfo {
+  ModelId    Int     @unique
+  GitHash    String? @db.VarChar(40)
+  CubeType   String? @db.VarChar(50)
+  ModelName  String? @db.VarChar(100)
+  EpochCount Int?
 }
