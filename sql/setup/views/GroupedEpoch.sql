@@ -1,4 +1,4 @@
-CREATE VIEW GroupedEpoch AS
+ALTER VIEW GroupedEpoch AS
 SELECT
         ROW_NUMBER() OVER (ORDER BY ModelId, Epoch.Epoch - (Epoch.Epoch % 50)) GroupedId,
         Epoch.Epoch - (Epoch.Epoch % 50) EpochCategory,

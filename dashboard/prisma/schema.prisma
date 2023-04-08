@@ -54,6 +54,7 @@ view ModelInfo {
   EpochCount Int?
 }
 
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 view GroupedEpoch {
   GroupedId     BigInt @unique
   EpochCategory Int?

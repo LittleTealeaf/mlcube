@@ -17,6 +17,9 @@ export async function GET(request: Request) {
 		select: {
 			EpochCategory: true,
 			AvgReward: true
+		},
+		orderBy: {
+			EpochCategory: 'asc'
 		}
 	});
 

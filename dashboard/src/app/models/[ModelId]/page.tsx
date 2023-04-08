@@ -1,4 +1,4 @@
-import EpochGraph from "@/components/client/graphs/epochs";
+import { LossGraph } from "@/components/client/graphs/epochs";
 import { prisma } from "@/database"
 
 type PageParams = {
@@ -20,7 +20,7 @@ export default async function Page({ params }: PageParams) {
 	return (
 		<>
 			<title>{model.ModelName}</title>
-			<EpochGraph ModelId={model.ModelId} />
+			<LossGraph ModelId={[model.ModelId]} />
 		</>
 	)
 }

@@ -24,4 +24,3 @@ export function requireStatus(statusCode: number) {
 export function jsonResponse<T>(response: Response): Promise<T> {
 	return response.json()
 }
-
