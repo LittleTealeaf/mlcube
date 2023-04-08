@@ -7,3 +7,4 @@ GRANT SELECT ON Models TO Dashboard;
 GRANT SELECT ON EvaluationMoves TO Dashboard;
 GRANT SELECT ON Evaluations TO Dashboard;
 GRANT SELECT ON Epochs TO Dashboard;
+GRANT SELECT ON ModelInfo TO Dashboard;
