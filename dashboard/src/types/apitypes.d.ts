@@ -1,6 +1,9 @@
 
 export type GraphEpochParams = {
-	ModelId: number
+	modelid: number;
+	select: 'loss' | 'reward';
+	filter?: 'all' | 'recent';	
+	count?: number;
 }
 
 export type GraphEpochResult = {
