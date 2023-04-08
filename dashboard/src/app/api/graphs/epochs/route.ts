@@ -10,7 +10,7 @@ export async function GET(request: Request) {
 
 	const data = params.filter == 'recent' ? getRecent(params) : getAll(params);
 
-	const model = prisma.model.findFirstOrThrow({
+	const name = prisma.model.findFirstOrThrow({
 		where: {
 			ModelId: Number(params.modelid)
 		},
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
 	}).then(({ ModelName }) => ModelName);
 
 	return NextResponse.json({
-		id: await model,
+		id: await name,
 		data: await data
 	})
 }
