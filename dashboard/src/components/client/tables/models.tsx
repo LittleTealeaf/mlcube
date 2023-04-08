@@ -30,6 +30,7 @@ export default function ModelsTable({ models }: ModelsTableParams) {
 				<TableBody>
 					{models.map((model) => (
 						<TableRow
+							key={model.ModelId}
 							hover
 							onClick={openModel(model)}
 							sx={{cursor: 'pointer'}}

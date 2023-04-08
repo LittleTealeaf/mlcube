@@ -7,17 +7,18 @@ import { ResponsiveLine } from '@nivo/line';
 
 
 export type EpochGraphParams = {
-	ModelId: number[]
+	ModelId: number[],
+	type: 'reward' | 'loss'
 }
 
 
-export function LossGraph({ ModelId }: EpochGraphParams) {
+export function EpochGraph({ ModelId, type }: EpochGraphParams) {
 
 	const { data: fetch_data, mutate } = useSWR<GraphEpochResult[]>(
-		'/api/graphs/epochs/loss',
+		`/api/graphs/epochs/${type}`,
 		() => Promise.all(
 			ModelId.map(
-				(id) => getApi('/api/graphs/epochs/loss', { ModelId: id })
+				(id) => getApi(`/api/graphs/epochs/${type}`, { ModelId: id })
 					.then(requireStatus(200))
 					.then(jsonResponse<GraphEpochResult>))
 		)
@@ -26,13 +27,15 @@ export function LossGraph({ ModelId }: EpochGraphParams) {
 	const data = fetch_data || [];
 
 	return (
-		<div style={{height: '50vh'}}>
+		<div style={{ height: '50vh' }}>
 			<ResponsiveLine
 				data={data}
 				useMesh={true}
-				xScale={{type: 'linear', min: 0, max: 'auto'}}
-				yScale={{type: 'linear', min: 'auto', max: 'auto'}}
-				margin={{top: 30, left: 60, right: 30, bottom: 30}}
+				xScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+				yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+				margin={{ top: 30, left: 60, right: 30, bottom: 60 }}
+				axisBottom={{ legend: 'Epoch', legendPosition: 'middle', legendOffset: 50, tickRotation: 45 }}
+				axisLeft={{ legend: `Average ${type[0].toUpperCase().concat(type.substring(1))}`, legendPosition: 'middle', legendOffset: -52 }}
 			/>
 		</div>
 	)

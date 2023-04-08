@@ -15,11 +15,11 @@ export async function GET(request: Request) {
 			}
 		},
 		select: {
-			EpochCategory: true,
+			EpochGroup: true,
 			AvgReward: true
 		},
 		orderBy: {
-			EpochCategory: 'asc'
+			EpochGroup: 'asc'
 		}
 	});
 
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
 		}
 	})
 
-	const data = epochs.map(({ EpochCategory, AvgReward }) => ({ x: EpochCategory, y: AvgReward }));
+	const data = epochs.map(({ EpochGroup, AvgReward }) => ({ x: EpochGroup, y: AvgReward }));
 
 	return NextResponse.json({
 		id,
