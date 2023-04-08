@@ -5,8 +5,6 @@ import { jsonResponse, requireStatus, useApi } from '@/utils/app/apiConsumer';
 import { ResponsiveLine } from '@nivo/line';
 import { Paper, SxProps, Theme } from '@mui/material';
 
-
-
 export function EpochGraph({ sx, ...params }: GraphEpochParams & { sx?: SxProps<Theme> }) {
 
 	const { data } = useApi({

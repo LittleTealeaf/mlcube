@@ -67,7 +67,7 @@ async function getRecent({ modelid, select, count }: GraphEpochParams) {
 	});
 
 	return data.map(
-		({ Epoch, Reward, Loss }) => ({ x: Epoch, y: Loss || Reward })
+		({ Epoch, Reward, Loss }) => ({ x: Epoch, y: Loss || Reward || 0 })
 	);
 }
 
