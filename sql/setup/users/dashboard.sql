@@ -8,3 +8,4 @@ GRANT SELECT ON EvaluationMove TO Dashboard;
 GRANT SELECT ON Evaluation TO Dashboard;
 GRANT SELECT ON Epoch TO Dashboard;
 GRANT SELECT ON ModelInfo TO Dashboard;
+GRANT SELECT ON GroupedEpoch TO Dashboard;

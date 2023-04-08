@@ -47,9 +47,17 @@ model Model {
 }
 
 view ModelInfo {
-  ModelId    Int 		 @unique
+  ModelId    Int     @unique
   ModelName  String? @db.VarChar(100)
   GitHash    String? @db.VarChar(40)
   CubeType   String? @db.VarChar(50)
   EpochCount Int?
+}
+
+view GroupedEpoch {
+  GroupedId     BigInt @unique
+  EpochCategory Int?
+  ModelId       Int
+  AvgLoss       Float?
+  AvgReward     Float?
 }

@@ -1,3 +1,4 @@
+import EpochGraph from "@/components/client/graphs/epochs";
 import { prisma } from "@/database"
 
 type PageParams = {
@@ -7,12 +8,19 @@ type PageParams = {
 }
 
 export default async function Page({ params }: PageParams) {
-	const model = await prisma.model.findFirstOrThrow({ where: { ModelId: { equals: Number(params.ModelId) } } });
+	const model = await prisma.model.findFirstOrThrow({
+		where: {
+			ModelId: {
+				equals: Number(params.ModelId)
+			}
+		}
+	});
 
 
 	return (
 		<>
 			<title>{model.ModelName}</title>
+			<EpochGraph ModelId={model.ModelId} />
 		</>
 	)
 }
