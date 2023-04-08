@@ -33,12 +33,12 @@ class Epoch:
 def get_model_id(name: str):
     cursor = connection.cursor(as_dict=True)
 
-    cursor.execute(f'SELECT ModelId FROM Models WHERE ModelName = \'{name}\'')
+    cursor.execute(f'SELECT ModelId FROM Model WHERE ModelName = \'{name}\'')
 
     row = cursor.fetchone()
 
     if row is None:
-        cursor.execute(f'INSERT INTO Models (ModelName) OUTPUT Inserted.ModelId VALUES (\'{name}\')')
+        cursor.execute(f'INSERT INTO Model (ModelName) OUTPUT Inserted.ModelId VALUES (\'{name}\')')
         row = cursor.fetchone()
 
     cursor.close()
@@ -51,7 +51,7 @@ def load_historical_data(name: str, epochs: list[Epoch]):
     model_id = get_model_id(name)
 
     cursor = connection.cursor(as_dict=True)
-    cursor.execute(f'DELETE FROM Epochs WHERE ModelId = {model_id}')
+    cursor.execute(f'DELETE FROM Epoch WHERE ModelId = {model_id}')
 
     max_len = 500
 
@@ -64,7 +64,7 @@ def load_historical_data(name: str, epochs: list[Epoch]):
             for entry in entries:
                 entry.set_model_id(model_id)
 
-            cursor.execute('INSERT INTO Epochs (Modelid, Epoch, Loss, Reward) VALUES ' + ",".join([
+            cursor.execute('INSERT INTO Epoch (Modelid, Epoch, Loss, Reward) VALUES ' + ",".join([
                 f"({','.join([str(row.model_id), str(row.epoch), str(row.loss), str(row.reward)])})" for row in entries
             ]))
     cursor.close()
@@ -136,24 +136,24 @@ def load_historical_evaluations(model_name, evaluations):
 
     cursor.execute(f'''
     DELETE
-FROM EvaluationMoves
+FROM EvaluationMove
 WHERE EvaluationId IN (SELECT EvaluationId
-                       FROM Evaluations E
+                       FROM Evaluation E
                        WHERE E.ModelId = {model_id})
     ''')
-    cursor.execute(f'DELETE FROM Evaluations WHERE ModelId = {model_id}')
+    cursor.execute(f'DELETE FROM Evaluation WHERE ModelId = {model_id}')
 
     max_len = 500
 
     for evaluation in evaluations:
-        cursor.execute(f'''INSERT INTO Evaluations (ModelId, Epoch, Solved, MoveCount) OUTPUT Inserted.EvaluationId
+        cursor.execute(f'''INSERT INTO Evaluation (ModelId, Epoch, Solved, MoveCount) OUTPUT Inserted.EvaluationId
         VALUES ({str(model_id)}, {str(evaluation.epoch)}, {str(evaluation.solved)}, {str(evaluation.move_count)})''')
 
         eval_id = cursor.fetchone()['EvaluationId']
 
         if len(evaluation.moves) > 0:
             for index, move in enumerate(evaluation.moves):
-                cursor.execute(f'''INSERT INTO EvaluationMoves (EvaluationId, MoveIndex, MoveName, Reward) VALUES
+                cursor.execute(f'''INSERT INTO EvaluationMove (EvaluationId, MoveIndex, MoveName, Reward) VALUES
                 ({str(eval_id)}, {str(index)}, '{str(move)}', 0)''')
 
     cursor.close()

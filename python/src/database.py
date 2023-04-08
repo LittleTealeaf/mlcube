@@ -32,7 +32,7 @@ def create_model(name: str, cube_type: str, connection=None):
     connection, is_new = ensure_connection(connection)
 
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO Models (ModelName, GitHash, CubeType) OUTPUT inserted.ModelId VALUES (?, ?, ?)', name, git_commit, cube_type)
+    cursor.execute('INSERT INTO Model (ModelName, GitHash, CubeType) OUTPUT inserted.ModelId VALUES (?, ?, ?)', name, git_commit, cube_type)
     value = cursor.fetchone()
     connection.commit()
 
@@ -45,7 +45,7 @@ def get_model_id(name: str, connection=None):
     connection, is_new = ensure_connection(connection)
 
     cursor = connection.cursor()
-    cursor.execute('SELECT ModelId FROM Models WHERE ModelName = ?', name)
+    cursor.execute('SELECT ModelId FROM Model WHERE ModelName = ?', name)
     row = cursor.fetchone()
     cursor.close()
 
@@ -60,7 +60,7 @@ def get_nodes(model_id: int, connection=None):
     connection, is_new = ensure_connection(connection)
 
     cursor = connection.cursor()
-    cursor.execute('SELECT Layer, NodeIndex, Weight, Bias FROM Nodes WHERE ModelId = ?', model_id)
+    cursor.execute('SELECT Layer, NodeIndex, Weight, Bias FROM Node WHERE ModelId = ?', model_id)
     rows,  = cursor.fetchall()
 
     if is_new:
@@ -73,7 +73,7 @@ def insert_epoch(model_id: int, epoch: int, loss: np.float32, reward: np.float32
     connection, is_new = ensure_connection(connection)
 
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO Epochs (ModelId, Epoch, Loss, Reward) VALUES (?, ?, ?, ?)', model_id, epoch, loss, reward)
+    cursor.execute('INSERT INTO Epoch (ModelId, Epoch, Loss, Reward) VALUES (?, ?, ?, ?)', model_id, epoch, loss, reward)
     connection.commit()
 
     if is_new:
