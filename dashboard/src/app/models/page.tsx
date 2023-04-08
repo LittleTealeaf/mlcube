@@ -2,7 +2,7 @@ import ModelsTable from "@/components/client/tables/models";
 import { prisma } from "@/database"
 
 
-export default async function Page({ }) {
+export default async function Page({}) {
 
 	const models = await prisma.modelInfo.findMany({
 		orderBy: {
