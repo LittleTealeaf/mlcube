@@ -1,8 +1,7 @@
 'use client'
 
-import useSWR from 'swr';
 import { GraphEpochParams, GraphEpochResult } from '@/types/apitypes'
-import { getApi, jsonResponse, requireStatus, useApi } from '@/utils/app/apiConsumer';
+import { jsonResponse, requireStatus, useApi } from '@/utils/app/apiConsumer';
 import { ResponsiveLine } from '@nivo/line';
 import { Paper, SxProps, Theme } from '@mui/material';
 
