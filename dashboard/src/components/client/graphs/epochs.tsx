@@ -5,6 +5,9 @@ import { jsonResponse, requireStatus, useApi } from '@/utils/app/apiConsumer';
 import { ResponsiveLine } from '@nivo/line';
 import { Paper, SxProps, Theme } from '@mui/material';
 
+
+// TODO: Fetch more points, and only display as much as the screen can show?
+
 export function EpochGraph({ sx, ...params }: GraphEpochParams & { sx?: SxProps<Theme> }) {
 
 	const { data } = useApi({
