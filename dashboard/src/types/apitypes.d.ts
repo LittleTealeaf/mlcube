@@ -15,3 +15,10 @@ export type GraphEpochResult = {
 	}[]
 }
 
+export type TableEvalInfoParams = {
+	modelid: number;
+	page?: number;
+	perPage?: number;
+	sort?: 'asc' | 'desc';
+}
+

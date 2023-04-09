@@ -61,3 +61,16 @@ view GroupedEpoch {
   AvgLoss    Float?
   AvgReward  Float?
 }
+
+view EvaluationInfo {
+  EvaluationId Int      @unique
+  ModelId      Int
+  Epoch        Int
+  Seed         BigInt?
+  Solved       Boolean?
+  AvgReward    Float?
+  MaxReward    Float?
+  MinReward    Float?
+  FinalReward  Float?
+  MoveCount    Int?
+}
