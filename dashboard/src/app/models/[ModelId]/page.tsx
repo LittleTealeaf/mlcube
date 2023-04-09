@@ -20,8 +20,8 @@ export default async function Page({ params }: PageParams) {
 	return (
 		<>
 			<title>{model.ModelName}</title>
-			<EpochGraph sx={{ height: '40vh', m: '10px auto', width: '90%' }} modelid={model.ModelId} select={'loss'} />
-			<EpochGraph sx={{ height: '40vh', m: '10px auto', width: '90%' }} modelid={model.ModelId} select={'reward'} />
+			<EpochGraph sx={{ height: '400px', m: '10px auto', width: '90%' }} modelid={model.ModelId} select={'loss'} />
+			<EpochGraph sx={{ height: '400px', m: '10px auto', width: '90%' }} modelid={model.ModelId} select={'reward'} />
 		</>
 	)
 }

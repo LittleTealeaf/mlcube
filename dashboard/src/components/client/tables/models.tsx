@@ -1,6 +1,6 @@
 'use client'
 
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+import { SxProps, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme } from "@mui/material"
 import { ModelInfo } from "@prisma/client"
 import { useRouter } from 'next/navigation'
 
@@ -8,7 +8,7 @@ export type ModelsTableParams = {
 	models: ModelInfo[]
 }
 
-export default function ModelsTable({ models }: ModelsTableParams) {
+export default function ModelsTable({ sx, models }: ModelsTableParams & { sx?: SxProps<Theme> }) {
 
 	const router = useRouter()
 
@@ -16,7 +16,7 @@ export default function ModelsTable({ models }: ModelsTableParams) {
 	const openModel = (model: ModelInfo) => (() => router.push(`/models/${model.ModelId}`))
 
 	return (
-		<TableContainer sx={{maxHeight: '100%'}}>
+		<TableContainer sx={sx}>
 			<Table stickyHeader>
 				<TableHead>
 					<TableRow>
@@ -33,7 +33,7 @@ export default function ModelsTable({ models }: ModelsTableParams) {
 							key={model.ModelId}
 							hover
 							onClick={openModel(model)}
-							sx={{cursor: 'pointer'}}
+							sx={{ cursor: 'pointer' }}
 						>
 							<TableCell>{model.ModelId}</TableCell>
 							<TableCell>{model.ModelName}</TableCell>

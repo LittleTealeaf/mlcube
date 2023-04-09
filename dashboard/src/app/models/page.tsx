@@ -2,6 +2,8 @@ import ModelsTable from "@/components/client/tables/models";
 import { prisma } from "@/database"
 
 
+// TODO: Add search filter
+
 export default async function Page({ }) {
 
 	const models = await prisma.modelInfo.findMany({
@@ -13,9 +15,7 @@ export default async function Page({ }) {
 	return (
 		<>
 			<title>Models</title>
-			<div style={{ height: '500px' }}>
-				<ModelsTable {...{ models }} />
-			</div>
+			<ModelsTable {...{ models }} sx={{ flexGrow: 1 }} />
 		</>
 	)
 }
