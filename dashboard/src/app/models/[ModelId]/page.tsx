@@ -14,7 +14,7 @@ export default async function Page({ params }: PageParams) {
 				equals: Number(params.ModelId)
 			}
 		}
-	});
+	})
 
 
 	return (
