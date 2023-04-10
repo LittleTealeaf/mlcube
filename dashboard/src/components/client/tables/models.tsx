@@ -8,6 +8,9 @@ export type ModelsTableParams = {
 	models: ModelInfo[]
 }
 
+
+// TODO: Create API Endpoint instead of passing models directly in
+
 export default function ModelsTable({ sx, models }: ModelsTableParams & { sx?: SxProps<Theme> }) {
 
 	const router = useRouter()
