@@ -29,7 +29,7 @@ struct Epoch {
 }
 
 async fn get_epochs_for_model(connection: &Pool<Mssql>, model_id: i32) -> Vec<Epoch> {
-    sqlx::query_as("SELECT epoch, loss, reward FROM Epochs WHERE ModelId = $1")
+    sqlx::query_as("SELECT epoch, loss, reward FROM Epoch WHERE ModelId = $1")
         .bind(model_id)
         .fetch_all(connection)
         .await
