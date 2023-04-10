@@ -4,6 +4,7 @@ import { getParameters } from "@/utils/api/parameters";
 import { NextResponse } from "next/server";
 
 
+// TODO: Refactor this to a new api endpoint
 
 export async function GET(request: Request) {
 

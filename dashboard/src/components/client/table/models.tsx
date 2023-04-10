@@ -1,20 +1,18 @@
 'use client'
 
+import { jsonResponse, requireStatus, useApi } from "@/utils/app/apiConsumer";
 import { SxProps, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme } from "@mui/material"
 import { ModelInfo } from "@prisma/client"
 import { useRouter } from 'next/navigation'
 
-export type ModelsTableParams = {
-	models: ModelInfo[]
-}
 
+export default function ModelTable({ sx }: { sx?: SxProps<Theme> }) {
+	const router = useRouter();
 
-// TODO: Create API Endpoint instead of passing models directly in
-
-export default function ModelsTable({ sx, models }: ModelsTableParams & { sx?: SxProps<Theme> }) {
-
-	const router = useRouter()
-
+	const { data } = useApi({
+		url: '/api/table/modelinfo',
+		process: (response) => response.then(requireStatus(200)).then(jsonResponse<ModelInfo[]>)
+	});
 
 	const openModel = (model: ModelInfo) => (() => router.push(`/models/${model.ModelId}`))
 
@@ -23,7 +21,6 @@ export default function ModelsTable({ sx, models }: ModelsTableParams & { sx?: S
 			<Table stickyHeader>
 				<TableHead>
 					<TableRow>
-						<TableCell>id</TableCell>
 						<TableCell>Name</TableCell>
 						<TableCell>Cube Type</TableCell>
 						<TableCell>Epoch Count</TableCell>
@@ -31,14 +28,13 @@ export default function ModelsTable({ sx, models }: ModelsTableParams & { sx?: S
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{models.map((model) => (
+					{data?.map((model) => (
 						<TableRow
 							key={model.ModelId}
 							hover
 							onClick={openModel(model)}
 							sx={{ cursor: 'pointer' }}
 						>
-							<TableCell>{model.ModelId}</TableCell>
 							<TableCell>{model.ModelName}</TableCell>
 							<TableCell>{model.CubeType}</TableCell>
 							<TableCell>{model.EpochCount}</TableCell>

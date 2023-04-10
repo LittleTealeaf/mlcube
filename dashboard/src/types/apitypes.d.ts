@@ -21,4 +21,3 @@ export type TableEvalInfoParams = {
 	perPage?: number;
 	sort?: 'asc' | 'desc';
 }
-
