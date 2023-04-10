@@ -1,6 +1,7 @@
 'use client'
 
-import { jsonResponse, requireStatus, useApi } from "@/utils/app/apiConsumer";
+import { ApiTableModelInfo } from "@/types/api";
+import { useApi } from "@/utils/app/api";
 import { SxProps, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme } from "@mui/material"
 import { ModelInfo } from "@prisma/client"
 import { useRouter } from 'next/navigation'
@@ -9,9 +10,9 @@ import { useRouter } from 'next/navigation'
 export default function ModelTable({ sx }: { sx?: SxProps<Theme> }) {
 	const router = useRouter();
 
-	const { data } = useApi({
+	const { data } = useApi<ApiTableModelInfo>({
 		url: '/api/table/modelinfo',
-		process: (response) => response.then(requireStatus(200)).then(jsonResponse<ModelInfo[]>)
+		params: {}
 	});
 
 	const openModel = (model: ModelInfo) => (() => router.push(`/models/${model.ModelId}`))

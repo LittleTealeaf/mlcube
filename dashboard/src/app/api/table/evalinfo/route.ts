@@ -1,5 +1,5 @@
 import { prisma } from "@/database";
-import { TableEvalInfoParams } from "@/types/apitypes";
+import { ApiTableEvalInfo } from "@/types/api";
 import { getParameters } from "@/utils/api/parameters";
 import { NextResponse } from "next/server";
 
@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
 
-	const params = getParameters<TableEvalInfoParams>(request);
+	const params = getParameters<ApiTableEvalInfo>(request);
 
 	const page = params.page && Number(params.page);
 	const perPage = params.perPage && Number(params.perPage);

@@ -1,5 +1,5 @@
 import { prisma } from "@/database";
-import { GraphEpochParams } from "@/types/apitypes";
+import { ApiGraphEpoch } from "@/types/api";
 import { getParameters } from "@/utils/api/parameters";
 import { NextResponse } from "next/server";
 
@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
 
-	const params = getParameters<GraphEpochParams>(request);
+	const params = getParameters<ApiGraphEpoch>(request);
 
 	const datapromise = params.filter == 'recent' ? getRecent(params) : getAll(params);
 
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
 }
 
 
-async function getAll({ modelid, select }: GraphEpochParams) {
+async function getAll({ modelid, select }: ApiGraphEpoch['params']) {
 	try {
 		const data = await prisma.groupedEpoch.findMany({
 			where: {
@@ -61,7 +61,7 @@ async function getAll({ modelid, select }: GraphEpochParams) {
 	}
 }
 
-async function getRecent({ modelid, select, count }: GraphEpochParams) {
+async function getRecent({ modelid, select, count }: ApiGraphEpoch['params']) {
 	try {
 		const data = await prisma.epoch.findMany({
 			where: {

@@ -1,3 +1,4 @@
+import { ApiType } from '@/types/api';
 import useSWR from 'swr';
 
 export function buildURL(url: string, params?: { [k: string]: any }) {
@@ -26,13 +27,13 @@ export function jsonResponse<T>(response: Response): Promise<T> {
 	return response.json()
 }
 
-type UseApiParams<T> = {
-	url: string,
-	params?: { [key: string]: any },
-	init?: RequestInit,
-	process: (response: Promise<Response>) => Promise<T>
+export type UseApiParameters<T extends ApiType> = {
+	url: T['url'];
+	params: T['params'];
+	init?: RequestInit
 }
 
-export function useApi<T>({ url, params, init, process }: UseApiParams<T>) {
-	return useSWR(buildURL(url, params), () => process(getApi(url, params, init)))
+export function useApi<T extends ApiType>({ url, params, init }: UseApiParameters<T>) {
+	const fetch_url = buildURL(url, params);
+	return useSWR(fetch_url, () => fetch(fetch_url, init).then(requireStatus(200)).then(jsonResponse<T['response']>))
 }
