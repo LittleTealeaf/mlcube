@@ -14,7 +14,6 @@ const navElements = [
 ];
 
 export default function NavBar({ }) {
-
 	return (
 		<AppBar position="static">
 			<Container maxWidth="xl">
