@@ -15,8 +15,10 @@ export type ApiTableModelInfo = {
 export type ApiTableEvalInfo = {
 	url: '/api/table/evalinfo';
 	params: {
+		modelid: number;
 		page?: number;
 		perPage?: number;
+		sort?: 'asc' | 'desc';
 	};
 	response: EvaluationInfo[];
 }

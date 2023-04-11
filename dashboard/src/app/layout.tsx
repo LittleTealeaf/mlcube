@@ -4,7 +4,7 @@ import './global.css'
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
-			<body style={{ height: '100vh', maxWidth: '100vw', overflowX: 'hidden', display: 'flex', flexDirection: 'column' }}>
+			<body className={'overflow-x-hidden flex-col flex h-screen p-0 m-0'}>
 				<NavBar />
 				{children}
 			</body>

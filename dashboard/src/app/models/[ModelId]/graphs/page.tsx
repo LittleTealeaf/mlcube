@@ -1,7 +1,6 @@
 import { EpochGraph } from "@/components/client/graphs/epochs";
-import { prisma } from "@/database"
+import { prisma } from "@/database";
 import { ModelIdRoute, getModelRoute } from "@/utils/app/route_params";
-
 
 export default async function Page(params: ModelIdRoute) {
 	const model = await getModelRoute(params);

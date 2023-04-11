@@ -1,5 +1,5 @@
 import { ApiType } from '@/types/api';
-import useSWR from 'swr';
+import useSWR, { SWRConfiguration } from 'swr';
 
 export function buildURL(url: string, params?: { [k: string]: any }) {
 	const parameters = Object.entries(params || {}).map(([key, value]) => `${key}=${String(value)}`).join("&");
@@ -30,10 +30,15 @@ export function jsonResponse<T>(response: Response): Promise<T> {
 export type UseApiParameters<T extends ApiType> = {
 	url: T['url'];
 	params: T['params'];
-	init?: RequestInit
+	init?: RequestInit;
+	config?: SWRConfiguration;
 }
 
-export function useApi<T extends ApiType>({ url, params, init }: UseApiParameters<T>) {
+export function useApi<T extends ApiType>({ url, params, init, config }: UseApiParameters<T>) {
 	const fetch_url = buildURL(url, params);
-	return useSWR(fetch_url, () => fetch(fetch_url, init).then(requireStatus(200)).then(jsonResponse<T['response']>))
+	return useSWR(
+		fetch_url,
+		(url) => fetch(url, init).then(requireStatus(200)).then(jsonResponse<T['response']>),
+		config
+	)
 }

@@ -1,7 +1,11 @@
-body {
-	padding: 0px;
-	margin: 0px;
-	display: flex;
-	flex-direction: column;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* body { */
+/* 	padding: 0px; */
+/* 	margin: 0px; */
+/* 	display: flex; */
+/* 	flex-direction: column; */
+/* } */
 
