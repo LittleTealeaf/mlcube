@@ -1,4 +1,4 @@
-import ModelInfoTable from "@/components/static/table/modelinfo";
+import ModelInfoTable from "@/components/static/modelInfoTable";
 import { prisma } from "@/database"
 
 // TODO: Add search filter
