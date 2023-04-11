@@ -1,24 +1,22 @@
 'use client'
-
-import { ApiTableModelInfo } from "@/types/api";
-import { useApi } from "@/utils/app/api";
-import { SxProps, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme } from "@mui/material"
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import { ModelInfo } from "@prisma/client"
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
+export type ModelInfoProps = {
+	modelinfo: ModelInfo[];
+}
 
-export default function ModelTable({ sx }: { sx?: SxProps<Theme> }) {
+export default function ModelInfoTable({ modelinfo }: ModelInfoProps) {
+
 	const router = useRouter();
 
-	const { data } = useApi<ApiTableModelInfo>({
-		url: '/api/table/modelinfo',
-		params: {}
-	});
-
-	const openModel = (model: ModelInfo) => (() => router.push(`/models/${model.ModelId}`))
+	const openModel = (model: ModelInfo) => (
+		() => router.push(`/models/${model.ModelId}`)
+	);
 
 	return (
-		<TableContainer sx={sx}>
+		<TableContainer>
 			<Table stickyHeader>
 				<TableHead>
 					<TableRow>
@@ -29,7 +27,7 @@ export default function ModelTable({ sx }: { sx?: SxProps<Theme> }) {
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{data?.map((model) => (
+					{modelinfo.map((model) => (
 						<TableRow
 							key={model.ModelId}
 							hover
@@ -42,6 +40,7 @@ export default function ModelTable({ sx }: { sx?: SxProps<Theme> }) {
 							<TableCell>{model.GitHash}</TableCell>
 						</TableRow>
 					))}
+
 				</TableBody>
 			</Table>
 		</TableContainer>

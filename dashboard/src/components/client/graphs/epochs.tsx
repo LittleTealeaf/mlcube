@@ -9,7 +9,12 @@ import { WithSx } from '@/types/props';
 
 // TODO: Fetch more points, and only display as much as the screen can show?
 
-export function EpochGraph({ sx, ...params }: ApiGraphEpoch['params'] & WithSx) {
+
+export type EpochGraphProps = {
+	params: ApiGraphEpoch['params'];
+} & WithSx
+
+export function EpochGraph({ params, sx }: EpochGraphProps) {
 
 	const { data } = useApi<ApiGraphEpoch, GraphResponse[]>({
 		'url': '/api/graph/epoch',
