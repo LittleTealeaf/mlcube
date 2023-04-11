@@ -9,3 +9,4 @@ module.exports = {
   plugins: [],
 }
 
+// TODO: Transition away from Tailwindcss
