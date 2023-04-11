@@ -4,7 +4,7 @@ import { ModelInfo } from "@prisma/client"
 import { useRouter } from "next/navigation";
 
 export type ModelInfoProps = {
-	modelinfo: ModelInfo[];
+	modelinfo?: ModelInfo[];
 }
 
 export default function ModelInfoTable({ modelinfo }: ModelInfoProps) {
@@ -27,7 +27,7 @@ export default function ModelInfoTable({ modelinfo }: ModelInfoProps) {
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{modelinfo.map((model) => (
+					{modelinfo?.map((model) => (
 						<TableRow
 							key={model.ModelId}
 							hover
@@ -40,7 +40,6 @@ export default function ModelInfoTable({ modelinfo }: ModelInfoProps) {
 							<TableCell>{model.GitHash}</TableCell>
 						</TableRow>
 					))}
-
 				</TableBody>
 			</Table>
 		</TableContainer>
