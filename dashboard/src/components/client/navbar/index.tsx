@@ -1,8 +1,6 @@
 'use client'
 
-import { AppBar, Box, Button, Container, Divider, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material"
-import MenuIcon from '@mui/icons-material/Menu';
-import { useState } from "react";
+import { AppBar, Button, Container, Divider, Toolbar, Typography } from "@mui/material"
 
 const navElements = [
 	{
