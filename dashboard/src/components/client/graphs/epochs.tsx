@@ -1,25 +1,27 @@
 'use client'
 
 import { ResponsiveLine } from '@nivo/line';
-import { Paper, SxProps, Theme } from '@mui/material';
-import { ApiGraphEpoch } from '@/types/api';
+import { Paper } from '@mui/material';
+import { ApiGraphEpoch, GraphResponse } from '@/types/api';
 import { useApi } from '@/utils/app/api';
+import { WithSx } from '@/types/props';
 
 
 // TODO: Fetch more points, and only display as much as the screen can show?
 
-export function EpochGraph({ sx, ...params }: ApiGraphEpoch['params'] & { sx?: SxProps<Theme> }) {
+export function EpochGraph({ sx, ...params }: ApiGraphEpoch['params'] & WithSx) {
 
-	const { data } = useApi<ApiGraphEpoch>({
+	const { data } = useApi<ApiGraphEpoch, GraphResponse[]>({
 		'url': '/api/graph/epoch',
 		params,
+		postProcess: (data) => [data]
 	});
 
 
 	return (
 		<Paper sx={sx}>
 			<ResponsiveLine
-				data={data ? [data] : []}
+				data={data || []}
 				useMesh={true}
 				xScale={{ type: 'linear', min: 'auto', max: 'auto' }}
 				yScale={{ type: 'linear', min: 'auto', max: 'auto' }}

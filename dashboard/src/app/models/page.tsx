@@ -1,6 +1,4 @@
 import ModelTable from "@/components/client/table/models"
-import { prisma } from "@/database"
-
 
 // TODO: Add search filter
 

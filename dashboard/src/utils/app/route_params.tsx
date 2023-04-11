@@ -8,7 +8,7 @@ export type ModelIdRoute = {
 
 
 export async function getModelRoute(params: ModelIdRoute) {
-	return await prisma.model.findFirstOrThrow({
+	return await prisma.model.findFirst({
 		where: {
 			ModelId: {
 				equals: Number(params.params.ModelId)

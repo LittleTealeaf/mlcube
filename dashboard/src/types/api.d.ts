@@ -8,7 +8,11 @@ export type ApiType = {
 
 export type ApiTableModelInfo = {
 	url: '/api/table/modelinfo';
-	params: {};
+	params: {
+		page?: number;
+		perPage?: number;
+		sort?: 'asc';
+	};
 	response: ModelInfo[]
 }
 

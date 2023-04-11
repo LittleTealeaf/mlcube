@@ -27,18 +27,18 @@ export function jsonResponse<T>(response: Response): Promise<T> {
 	return response.json()
 }
 
-export type UseApiParameters<T extends ApiType> = {
+export type UseApiParameters<T extends ApiType, O> = {
 	url: T['url'];
 	params: T['params'];
 	init?: RequestInit;
 	config?: SWRConfiguration;
+	postProcess?: (data: T['response']) => O
 }
 
-export function useApi<T extends ApiType>({ url, params, init, config }: UseApiParameters<T>) {
-	const fetch_url = buildURL(url, params);
+export function useApi<T extends ApiType, O = T['response']>({ url, params, init, config, postProcess }: UseApiParameters<T, O>) {
 	return useSWR(
-		fetch_url,
-		(url) => fetch(url, init).then(requireStatus(200)).then(jsonResponse<T['response']>),
+		buildURL(url, params),
+		(url) => fetch(url, init).then(requireStatus(200)).then(jsonResponse<T['response']>).then(postProcess || ((data) => data)),
 		config
 	)
 }
