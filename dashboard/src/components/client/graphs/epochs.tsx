@@ -9,6 +9,9 @@ import { WithSx } from '@/types/props';
 
 // TODO: Fetch more points, and only display as much as the screen can show?
 
+// TODO: Remove the option for "Reward"? since that's a less useful statistic?
+
+// TODO: Add in a "scale" to allow the user to modify the view window. Maybe do this with better control over data points (increasing to 500 points and reducing client side? maybe even 1000?)
 
 export type EpochGraphProps = {
 	params: ApiGraphEpoch['params'];
