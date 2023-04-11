@@ -6,7 +6,11 @@ import { prisma } from "@/database"
 export const revalidate = 60;
 
 async function getModelInfo() {
-	const models = await prisma.modelInfo.findMany();
+	const models = await prisma.modelInfo.findMany({
+		orderBy: {
+			ModelId: 'desc'
+		}
+	});
 	return models;
 }
 
