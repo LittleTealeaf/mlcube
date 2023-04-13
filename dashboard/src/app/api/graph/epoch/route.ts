@@ -21,7 +21,7 @@ export async function GET(request: Request) {
 		}
 	})
 		.then(({ ModelName }) => ModelName)
-		.catch(() => null);
+		.catch(() => undefined);
 
 	const data = await datapromise;
 	const name = await namepromise;
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 		id: name,
 		data
 	}, {
-		status: data && name ? 200 : 500
+		status: data != undefined && name != undefined ? 200 : 500
 	})
 }
 
