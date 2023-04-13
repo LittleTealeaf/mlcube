@@ -1,6 +1,2 @@
 
 
-
-export async function ModelsNavBar({}: ) {
-
-}
