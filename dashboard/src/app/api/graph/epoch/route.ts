@@ -39,29 +39,29 @@ export async function GET(request: Request) {
 
 async function getAll({ modelid, select }: ApiGraphEpoch["params"]) {
   try {
-    const data = await prisma.groupedEpoch.findMany({
-      where: {
-        ModelId: {
-          equals: Number(modelid),
-        },
-      },
-      select: {
-        EpochGroup: true,
-        AvgReward: select == "reward",
-        AvgLoss: select == "loss",
-      },
-      orderBy: {
-        EpochGroup: "asc",
-      },
-    });
-
-    return data.map(({ EpochGroup, AvgReward, AvgLoss }) => ({
-      x: EpochGroup || -1,
-      y: AvgReward || AvgLoss || 0,
-    }));
-  } catch {
-    return null;
-  }
+		const data = await prisma.groupedEpoch
+			.findMany({
+				where: {
+					ModelId: {
+						equals: Number(modelid),
+					},
+				},
+				select: {
+					EpochGroup: true,
+					AvgLoss: select == "loss",
+					AvgReward: select == "reward",
+				},
+				orderBy: {
+					EpochGroup: "asc",
+				},
+			});
+		return data.map(({ EpochGroup, AvgReward, AvgLoss }) => ({
+			x: EpochGroup || -1,
+			y: AvgLoss || AvgReward || 0,
+		}));
+	} catch {
+		return null;
+	}
 }
 
 async function getRecent({ modelid, select, count }: ApiGraphEpoch["params"]) {
