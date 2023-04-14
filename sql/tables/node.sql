@@ -3,5 +3,6 @@ CREATE TABLE Node (
     Bias float(53),
     Layer int not null,
     NodeIndex int not null,
-    ModelId int not null foreign key references Model (ModelId)
+    ModelId int not null foreign key references Model (ModelId),
+    TargetNetwork bit not null default 0
 )
