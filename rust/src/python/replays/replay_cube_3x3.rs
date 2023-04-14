@@ -74,4 +74,8 @@ impl PyReplay3x3 {
     fn get_name(&self) -> String {
         String::from("Cube3x3")
     }
+
+    fn get_action_name(&self, action: usize) -> String {
+        Cube3x3::get_action_name(action).unwrap_or(String::from(""))
+    }
 }

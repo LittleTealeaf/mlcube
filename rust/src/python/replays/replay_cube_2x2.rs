@@ -74,6 +74,10 @@ impl PyReplay2x2 {
     fn get_name(&self) -> String {
         String::from("Cube2x2")
     }
+
+    fn get_action_name(&self, action: usize) -> String {
+        Cube2x2::get_action_name(action).unwrap_or(String::from(""))
+    }
 }
 
 impl Default for PyReplay2x2 {

@@ -30,6 +30,8 @@ class Puzzle:
     def get_name(self) -> str:
         "Returns the name of the cube"
         ...
+    def get_action_name(self, action: int) -> str:
+        ...
 
 
 class PyCube2x2(Puzzle):

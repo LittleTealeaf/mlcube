@@ -51,12 +51,16 @@ impl PyCube2x2 {
         self.cube.scramble_with_seed(steps, seed);
     }
 
-    fn get_reward(&mut self) -> f64 {
+    fn get_reward(&self) -> f64 {
         self.cube.get_reward()
     }
 
     fn get_name(&self) -> String {
         String::from("Cube2x2")
+    }
+
+    fn get_action_name(&self, action: usize) -> String {
+        Cube2x2::get_action_name(action).unwrap_or(String::from(""))
     }
 }
 
