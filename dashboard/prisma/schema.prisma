@@ -74,3 +74,22 @@ view EvaluationInfo {
   FinalReward  Float?
   MoveCount    Int?
 }
+
+view EvaluationRewardChange {
+  EvaluationMoveId Int @unique
+  EvaluationId     Int?
+  MoveIndex        Int?
+  ChangeInReward   Float?
+  Reward           Float?
+
+}
+
+view PublicNode {
+  NodeId  BigInt @unique
+  ModelId Int
+  Layer   Int
+  X       Int
+  Y       Int
+  Weight  Float?
+  Bias    Float?
+}
