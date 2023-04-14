@@ -3,24 +3,12 @@ pub use replay_cube_2x2::*;
 mod replay_cube_3x3;
 pub use replay_cube_3x3::*;
 
-pub(crate) type PyReplayEntry = (Vec<u8>, usize, f64, Vec<u8>);
 
 pub(crate) type PyReplaySample = (Vec<Vec<u8>>, Vec<usize>, Vec<f64>, Vec<Vec<u8>>);
 
 use pyo3::{exceptions::PyValueError, PyErr};
 
 use crate::replay::{ReplayEntry, SampleReplayError};
-
-impl From<ReplayEntry> for PyReplayEntry {
-    fn from(value: ReplayEntry) -> Self {
-        (
-            value.current_state,
-            value.action,
-            value.reward,
-            value.next_state,
-        )
-    }
-}
 
 impl From<SampleReplayError> for PyErr {
     fn from(value: SampleReplayError) -> Self {
