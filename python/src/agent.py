@@ -17,3 +17,6 @@ class Agent:
             values = self.network.apply(self.replay.get_observations())
             choice = tf.argmax(values, axis=1)
             self.replay.apply_action(choice.numpy()[0])
+
+    def train(self, learning_rate: float):
+        ...

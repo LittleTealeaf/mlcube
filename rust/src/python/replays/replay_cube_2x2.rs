@@ -5,7 +5,7 @@ use crate::{
     replay::Replay,
 };
 
-use super::PyReplayEntry;
+use super::{sample_from_set, PyReplaySample};
 
 type Replay2x2 = Replay<Cube2x2>;
 
@@ -39,13 +39,8 @@ impl PyReplay2x2 {
         Ok(())
     }
 
-    fn sample_replay(&mut self, count: usize) -> PyResult<Vec<PyReplayEntry>> {
-        Ok(self
-            .replay
-            .sample_replay(count)?
-            .into_iter()
-            .map(PyReplayEntry::from)
-            .collect())
+    fn sample_replay(&mut self, count: usize) -> PyResult<PyReplaySample> {
+        Ok(sample_from_set(self.replay.sample_replay(count)?))
     }
 
     fn scramble(&mut self, steps: usize) -> u64 {
