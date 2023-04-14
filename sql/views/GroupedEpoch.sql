@@ -5,7 +5,7 @@ SELECT ROW_NUMBER() OVER (ORDER BY Epoch.ModelId, Epoch.Epoch - (Epoch.Epoch % G
        -- GroupedId is used as an id column, which is required so that prisma can read this table
        Epoch.Epoch - (Epoch.Epoch % GroupSize.GroupSize)                                             EpochGroup,
        -- The EpochGroup squishes all epochs down to groups based on the group size. Data is grouped by this value
-       Epoch.ModelId                                                                                 ModelId,
+       Epoch.ModelId,
        -- The model id, data is also grouped by this value
        AVG(Loss)                                                                                     AvgLoss,
        -- Average loss in each group
