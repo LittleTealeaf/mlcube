@@ -3,7 +3,6 @@ pub use replay_cube_2x2::*;
 mod replay_cube_3x3;
 pub use replay_cube_3x3::*;
 
-
 pub(crate) type PyReplaySample = (Vec<Vec<u8>>, Vec<usize>, Vec<f64>, Vec<Vec<u8>>);
 
 use pyo3::{exceptions::PyValueError, PyErr};
@@ -32,6 +31,36 @@ pub fn sample_from_set(sample: Vec<ReplayEntry>) -> PyReplaySample {
         next_state.push(entry.next_state);
     }
 
-
     (current_state, action, reward, next_state)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        puzzle::{puzzles::Cube3x3, Puzzle},
+        replay::Replay,
+    };
+
+    use super::*;
+
+    #[test]
+    fn sample_from_set_keeps_minimum_capacity() {
+        let mut replay = Replay::<Cube3x3>::with_capacity(1000);
+        for i in 0..1000 {
+            replay.apply_action(i % 18).unwrap();
+        }
+        let sample = {
+            match replay.sample_replay(500) {
+                Ok(t) => t,
+                Err(_) => panic!(),
+            }
+        };
+
+        let (current, action, reward, next) = sample_from_set(sample);
+
+        assert_eq!(current.capacity(), 500);
+        assert_eq!(action.capacity(), 500);
+        assert_eq!(reward.capacity(), 500);
+        assert_eq!(next.capacity(), 500);
+    }
 }
