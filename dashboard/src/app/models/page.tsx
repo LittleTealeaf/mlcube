@@ -1,21 +1,26 @@
-import ModelsTable from "@/components/client/tables/models";
-import { prisma } from "@/database"
-
+import ModelInfoTable from "@/components/static/modelInfoTable";
+import { prisma } from "@/database";
 
 // TODO: Add search filter
 
-export default async function Page({ }) {
+export const revalidate = 60;
 
-	const models = await prisma.modelInfo.findMany({
-		orderBy: {
-			ModelId: 'desc'
-		}
-	});
+async function getModelInfo() {
+  const models = await prisma.modelInfo.findMany({
+    orderBy: {
+      ModelId: "desc",
+    },
+  });
+  return models;
+}
 
-	return (
-		<>
-			<title>Models</title>
-			<ModelsTable {...{ models }} sx={{ flexGrow: 1 }} />
-		</>
-	)
+export default async function Page({}) {
+  const modelinfo = await getModelInfo();
+
+  return (
+    <>
+      <title>Models</title>
+      <ModelInfoTable modelinfo={modelinfo} />
+    </>
+  );
 }

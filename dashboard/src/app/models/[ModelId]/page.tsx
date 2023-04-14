@@ -1,33 +1,24 @@
 import { EpochGraph } from "@/components/client/graphs/epochs";
-import { prisma } from "@/database"
+import { prisma } from "@/database";
+import { ModelIdRoute, getModelRoute } from "@/utils/app/route_params";
+import { notFound } from "next/navigation";
 
-type PageParams = {
-	params: {
-		ModelId: string
-	}
-}
+export default async function Page(params: ModelIdRoute) {
+  const model = (await getModelRoute(params)) || notFound();
 
-export default async function Page({ params }: PageParams) {
-	const model = await prisma.model.findFirstOrThrow({
-		where: {
-			ModelId: {
-				equals: Number(params.ModelId)
-			}
-		}
-	})
-
-
-	return (
-		<>
-			<title>{model.ModelName}</title>
-			<EpochGraph sx={{ height: '400px', m: '10px auto', width: '90%' }} modelid={model.ModelId} select={'loss'} />
-			<EpochGraph sx={{ height: '400px', m: '10px auto', width: '90%' }} modelid={model.ModelId} select={'reward'} />
-		</>
-	)
+  return (
+    <>
+      <title>{model.ModelName}</title>
+      <EpochGraph
+        sx={{ height: "400px", m: "10px auto", width: "90%" }}
+        params={{ modelid: model.ModelId, select: "loss" }}
+      />
+    </>
+  );
 }
 
 export async function generateStaticParams() {
-	const models = await prisma.model.findMany();
+  const models = await prisma.model.findMany();
 
-	return models.map(({ ModelId }) => ({ ModelId: String(ModelId) }));
+  return models.map(({ ModelId }) => ({ ModelId: String(ModelId) }));
 }
