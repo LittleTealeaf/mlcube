@@ -68,6 +68,8 @@ pub trait Puzzle: Default {
     }
 
     fn get_reward(&self) -> f64;
+
+    fn get_action_name(action: usize) -> Option<String>;
 }
 
 #[derive(Debug)]

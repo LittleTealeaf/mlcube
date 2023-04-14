@@ -93,6 +93,32 @@ impl Puzzle for Cube3x3 {
 
         total
     }
+
+    fn get_action_name(action: usize) -> Option<String> {
+        let move_name = match action / 3 {
+            0 => Some('U'),
+            1 => Some('L'),
+            2 => Some('F'),
+            3 => Some('R'),
+            4 => Some('D'),
+            5 => Some('B'),
+            _ => None,
+        };
+        let move_type = match action % 3 {
+            0 => Some(""),
+            1 => Some("'"),
+            2 => Some("2"),
+            _ => None,
+        };
+
+        match move_name {
+            Some(name) => match move_type {
+                Some(move_type) => Some(format!("{}{}", name, move_type)),
+                None => None,
+            },
+            None => None,
+        }
+    }
 }
 
 /// The initial coded state of the cube
@@ -160,6 +186,8 @@ const PERMUTATIONS: [[[usize; 4]; 5]; 6] = [
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
 
     #[test]
@@ -358,5 +386,21 @@ mod tests {
         let reward_2 = cube.get_reward();
 
         assert!(reward_1 > reward_2);
+    }
+
+    #[test]
+    fn action_names_are_unique() {
+        let mut values = HashSet::new();
+
+        for i in 0..Cube3x3::ACTION_SIZE {
+            assert!(match Cube3x3::get_action_name(i) {
+                Some(value) => {
+                    assert!(!values.contains(&value));
+                    values.insert(value);
+                    true
+                },
+                None => false,
+            });
+        }
     }
 }

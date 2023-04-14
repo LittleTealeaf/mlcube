@@ -92,6 +92,29 @@ impl Puzzle for Cube2x2 {
 
         total
     }
+
+    fn get_action_name(action: usize) -> Option<String> {
+        let move_name = match action / 3 {
+            0 => Some('U'),
+            1 => Some('F'),
+            2 => Some('R'),
+            _ => None,
+        };
+        let move_type = match action % 3 {
+            0 => Some(""),
+            1 => Some("'"),
+            2 => Some("2"),
+            _ => None,
+        };
+
+        match move_name {
+            Some(name) => match move_type {
+                Some(move_type) => Some(format!("{}{}", name, move_type)),
+                None => None,
+            },
+            None => None,
+        }
+    }
 }
 
 const DEFAULT_STATE: [usize; 24] = [
@@ -109,6 +132,8 @@ const PERMUTATIONS: [[[usize; 4]; 3]; 3] = [
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
 
     #[test]
@@ -346,5 +371,21 @@ mod tests {
         let reward_2 = cube.get_reward();
 
         assert!(reward_1 > reward_2);
+    }
+
+    #[test]
+    fn action_names_are_unique() {
+        let mut values = HashSet::new();
+
+        for i in 0..Cube2x2::ACTION_SIZE {
+            assert!(match Cube2x2::get_action_name(i) {
+                Some(value) => {
+                    assert!(!values.contains(&value));
+                    values.insert(value);
+                    true
+                },
+                None => false,
+            });
+        }
     }
 }

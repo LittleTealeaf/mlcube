@@ -87,16 +87,20 @@ impl<T: Puzzle> Puzzle for Replay<T> {
         self.puzzle.is_solved()
     }
 
-    fn get_reward(&self) -> f64 {
-        self.puzzle.get_reward()
+    fn scramble_with_seed(&mut self, steps: usize, seed: u64) {
+        self.puzzle.scramble_with_seed(steps, seed);
     }
 
     fn scramble(&mut self, steps: usize) -> u64 {
         self.puzzle.scramble(steps)
     }
 
-    fn scramble_with_seed(&mut self, steps: usize, seed: u64) {
-        self.puzzle.scramble_with_seed(steps, seed);
+    fn get_reward(&self) -> f64 {
+        self.puzzle.get_reward()
+    }
+
+    fn get_action_name(action: usize) -> Option<String> {
+        T::get_action_name(action)
     }
 }
 
@@ -265,6 +269,8 @@ mod tests {
     }
 
     mod puzzle_trait {
+        use std::collections::HashSet;
+
         use crate::puzzle::puzzles::Cube2x2;
 
         use super::*;
@@ -422,6 +428,22 @@ mod tests {
                     seed
                 );
                 visited_seeds.push(seed);
+            }
+        }
+
+        #[test]
+        fn action_names_are_unique() {
+            let mut values = HashSet::new();
+
+            for i in 0..Replay::<Cube2x2>::ACTION_SIZE {
+                assert!(match Replay::<Cube2x2>::get_action_name(i) {
+                    Some(value) => {
+                        assert!(!values.contains(&value));
+                        values.insert(value);
+                        true
+                    }
+                    None => false,
+                });
             }
         }
     }
