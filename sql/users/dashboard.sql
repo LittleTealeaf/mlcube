@@ -11,3 +11,4 @@ GRANT SELECT ON ModelInfo TO Dashboard;
 GRANT SELECT ON GroupedEpoch TO Dashboard;
 GRANT SELECT ON EvaluationInfo TO Dashboard;
 GRANT SELECT on EvaluationRewardChange TO Dashboard;
+GRANT SELECT ON PublicNode TO Dashboard;
