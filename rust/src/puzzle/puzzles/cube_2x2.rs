@@ -383,7 +383,7 @@ mod tests {
                     assert!(!values.contains(&value));
                     values.insert(value);
                     true
-                },
+                }
                 None => false,
             });
         }
