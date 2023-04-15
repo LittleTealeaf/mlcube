@@ -54,13 +54,16 @@ class Database:
         cursor.close()
         return value[0] if value else None
 
-    def create_network(self, modelid: int):
+    def create_network(self, modelid: int, is_target: bool):
         epoch = self.get_current_epoch(modelid)
+        if epoch == None:
+            epoch = 0
         cursor = self.connection.cursor()
         cursor.execute(
-            "INSERT INTO Network (ModelId, Epoch) OUTPUT inserted.NetworkId VALUES (?,?)",
+            "INSERT INTO Network (ModelId, Epoch, IsTarget) OUTPUT inserted.NetworkId VALUES (?,?,?)",
             modelid,
             epoch,
+            is_target,
         )
 
         value = cursor.fetchone()
@@ -81,10 +84,9 @@ class Database:
                 values.append(layer)
                 values.append(x)
                 values.append(y)
-                values.append(item)
+                values.append(float(item))
 
                 if len(values) == MAX_INSERT_COUNT * 5:
-                    print(len(values))
                     cursor.execute(max_insert_query, tuple(values))
                     values = []
 
@@ -109,9 +111,8 @@ class Database:
             values.append(networkid)
             values.append(layer)
             values.append(x)
-            values.append(item)
+            values.append(float(item))
             if len(values) == MAX_INSERT_COUNT * 4:
-                print(len(values))
                 cursor.execute(max_insert_query, tuple(values))
                 values = []
 
@@ -125,8 +126,66 @@ class Database:
         cursor.close()
         self.connection.commit()
 
+    def get_bias(self, networkid: int, layer: int):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT Bias from Bias WHERE NetworkID = ? AND Layer = ? ORDER BY X",
+            networkid,
+            layer,
+        )
+        data = cursor.fetchall()
+        cursor.close()
+        return np.array([i[0] for i in data])
 
+    def get_weights(self, networkid: int, layer: int, width: int):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT Weight FROM Weight WHERE NetworkId = ? AND Layer = ? ORDER BY X, Y",
+            networkid,
+            layer,
+        )
+        data = cursor.fetchall()
+        cursor.close()
 
+        data = np.array([i[0] for i in data])
+        data.resize((len(data) // width, width))
+        return data
+
+    def get_network_layer(self, networkid: int, layer: int):
+        bias = self.get_bias(networkid, layer)
+        weights = self.get_weights(networkid, layer, len(bias))
+        return weights, bias
+
+    def get_latest_network(self, modelid: int, is_target: bool = False):
+        cursor = self.connection.cursor()
+
+        cursor.execute(
+            "SELECT TOP 1 NetworkId FROM Network WHERE ModelId = ? AND IsTarget = ? ORDER BY Epoch, NetworkId DESC",
+            modelid,
+            1 if is_target else 0,
+        )
+        data = cursor.fetchone()
+
+        cursor.close()
+        return data[0] if data else None
+
+    def keep_latest_networks(self, modelid: int, count: int, is_target: bool = False):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT NetworkId FROM Network WHERE ModelId = ? AND IsTarget = ? ORDER BY Epoch",
+            modelid,
+            1 if is_target else 0,
+        )
+        data = cursor.fetchall()
+        data = [i[0] for i in data]
+        cursor.close()
+        delete_count = len(data) - count
+        if delete_count > 0:
+            for i in range(delete_count):
+                cursor = self.connection.cursor()
+                cursor.execute("delete_network ?", data[i])
+                cursor.close()
+            self.connection.commit()
 
     def close(self):
         self.connection.close()

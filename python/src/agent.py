@@ -2,13 +2,32 @@ from network import Network
 from mlcube import PyReplay2x2
 import tensorflow as tf
 import random
+from database import Database
 
 class Agent:
-    def __init__(self, name: str, replay: PyReplay2x2, hidden_layers: list[int]) -> None:
+    def __init__(self, name: str, replay: PyReplay2x2, hidden_layers: list[int], database: Database, max_saved_network: int = 1) -> None:
         self.name = name
         self.replay = replay
-        self.network = Network(replay.observation_length, replay.action_size, hidden_layers = hidden_layers)
-        self.target = Network(replay.observation_length, replay.action_size, clone_variables=self.network.layers)
+        self.database = database
+
+        self.model_id = database.get_model_id(name)
+        if self.model_id == None:
+            self.model_id = database.create_model(name, replay.get_name())
+
+
+        network_id = database.get_latest_network(self.model_id, False)
+        if network_id != None:
+            self.network = Network(replay.observation_length, replay.action_size, hidden_layers = hidden_layers, from_database=(database, network_id))
+        else:
+            self.network = Network(replay.observation_length, replay.action_size, hidden_layers = hidden_layers)
+            self.network.save_to_database(database, self.model_id, False)
+
+        target_id = database.get_latest_network(self.model_id, True)
+        if target_id != None:
+            self.network = Network(replay.observation_length, replay.action_size, hidden_layers = hidden_layers, from_database=(database, target_id))
+        else:
+            self.target = Network(replay.observation_length, replay.action_size, clone_variables=self.network.layers)
+            self.target.save_to_database(database, self.model_id, True)
 
     def step_experience(self, epsilon: float):
         if random.uniform(0,1) < epsilon:
@@ -49,3 +68,9 @@ class Agent:
 
             optimizer.apply_gradients(zip(gradient, self.network.trainable_variables))
 
+
+    def save(self):
+        self.network.save_to_database(self.database, self.model_id, False)
+        self.target.save_to_database(self.database,self.model_id, True)
+        self.database.keep_latest_networks(self.model_id, 1, is_target=False)
+        self.database.keep_latest_networks(self.model_id, 1, is_target=True)
