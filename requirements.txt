@@ -3,6 +3,6 @@ pandas==2.0.0
 pymssql==2.2.7
 pyodbc==4.0.34
 python-dotenv==1.0.0
-pytest==7.3.0
+pytest==7.3.1
 maturin==0.14.17
 GitPython == 3.1.31
