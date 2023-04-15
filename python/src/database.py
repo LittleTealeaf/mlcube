@@ -1,82 +1,191 @@
 from os import getenv
-import numpy as np
 from dotenv import load_dotenv
 from git import repo
+import numpy as np
 import pyodbc
 
 
 repo = repo.Repo(search_parent_directories=True)
 git_commit = repo.head.object.hexsha
 
+MAX_INSERT_COUNT = 400
+
 load_dotenv()
 
 
-def create_database_connection():
-    server = getenv("SQL_SERVER")
-    port = getenv("SQL_PORT")
-    database = getenv("SQL_DATABASE")
-    username = getenv("SQL_USERNAME")
-    password = getenv("SQL_PASSWORD")
-    driver = "ODBC Driver 17 for SQL Server"
-    return pyodbc.connect(
-        f"DRIVER={driver};SERVER={server},{port};DATABASE={database};UID={username};PWD={password}"
-    )
+class Database:
+    def __init__(self):
+        server = getenv("SQL_HOST")
+        port = getenv("SQL_PORT")
+        database = getenv("SQL_DATABASE")
+        username = getenv("SQL_USER")
+        password = getenv("SQL_PASSWORD")
+        driver = "ODBC Driver 17 for SQL Server"
 
-def ensure_connection(connection):
-    if connection == None:
-        return (create_database_connection(), True)
-    else:
-        return (connection, False)
+        self.connection = pyodbc.connect(
+            f"DRIVER={driver};SERVER={server},{port};DATABASE={database};UID={username};PWD={password}"
+        )
 
-def create_model(name: str, cube_type: str, connection=None):
-    connection, is_new = ensure_connection(connection)
+    def create_model(self, name: str, cube_type: str):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO Model (ModelName, GitHash, CubeType) OUTPUT inserted.ModelId VALUES (?,?,?)",
+            name,
+            git_commit,
+            cube_type,
+        )
 
-    cursor = connection.cursor()
-    cursor.execute('INSERT INTO Model (ModelName, GitHash, CubeType) OUTPUT inserted.ModelId VALUES (?, ?, ?)', name, git_commit, cube_type)
-    value = cursor.fetchone()
-    connection.commit()
+        value = cursor.fetchone()
+        cursor.close()
+        self.connection.commit()
+        return value[0] if value else None
 
-    if is_new:
-        connection.close()
+    def get_model_id(self, name: str):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT ModelId FROM Model WHERE ModelName = ?", name)
+        value = cursor.fetchone()
+        cursor.close()
+        return value[0] if value else None
 
-    return value[0]
+    def get_current_epoch(self, modelid: int):
+        cursor = self.connection.cursor()
+        cursor.execute("get_current_epoch ?", modelid)
+        value = cursor.fetchone()
+        cursor.close()
+        return value[0] if value else None
 
-def get_model_id(name: str, connection=None):
-    connection, is_new = ensure_connection(connection)
+    def create_network(self, modelid: int, is_target: bool):
+        epoch = self.get_current_epoch(modelid)
+        if epoch == None:
+            epoch = 0
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO Network (ModelId, Epoch, IsTarget) OUTPUT inserted.NetworkId VALUES (?,?,?)",
+            modelid,
+            epoch,
+            is_target,
+        )
 
-    cursor = connection.cursor()
-    cursor.execute('SELECT ModelId FROM Model WHERE ModelName = ?', name)
-    row = cursor.fetchone()
-    cursor.close()
+        value = cursor.fetchone()
+        cursor.close()
+        self.connection.commit()
+        return value[0] if value else None
 
+    def insert_weights(self, networkid: int, layer: int, weights: list[list[float]]):
+        cursor = self.connection.cursor()
 
-    if is_new:
-        connection.commit()
-        connection.close()
+        values = []
 
-    return row[0] if row else None
+        max_insert_query = f'INSERT INTO Weight (NetworkId, Layer, X, Y, Weight) VALUES {", ".join(MAX_INSERT_COUNT * ["(?,?,?,?,?)"])}'
 
-def get_nodes(model_id: int, connection=None):
-    connection, is_new = ensure_connection(connection)
+        for x, row in enumerate(weights):
+            for y, item in enumerate(row):
+                values.append(networkid)
+                values.append(layer)
+                values.append(x)
+                values.append(y)
+                values.append(float(item))
 
-    cursor = connection.cursor()
-    cursor.execute('SELECT Layer, NodeIndex, Weight, Bias FROM Node WHERE ModelId = ?', model_id)
-    rows,  = cursor.fetchall()
+                if len(values) == MAX_INSERT_COUNT * 5:
+                    cursor.execute(max_insert_query, tuple(values))
+                    values = []
 
-    if is_new:
-        connection.commit()
-        connection.close()
+        count = len(values) // 5
 
-    return rows
+        if count > 0:
+            query = f'INSERT INTO Weight (NetworkId, Layer, X, Y, Weight) VALUES {", ".join(count * ["(?,?,?,?,?)"])}'
 
-def insert_epoch(model_id: int, epoch: int, loss: np.float32, reward: np.float32, connection = None):
-    connection, is_new = ensure_connection(connection)
+            cursor.execute(query, tuple(values))
 
-    cursor = connection.cursor()
-    cursor.execute('INSERT INTO Epoch (ModelId, Epoch, Loss, Reward) VALUES (?, ?, ?, ?)', model_id, epoch, loss, reward)
-    connection.commit()
+        cursor.close()
+        self.connection.commit()
 
-    if is_new:
-        connection.close()
+    def insert_bias(self, networkid: int, layer: int, bias: list[float]):
+        cursor = self.connection.cursor()
 
-print(create_model('HI_WORLD_TESTING_PYTHON','Cube3x3'))
+        values = []
+
+        max_insert_query = f'INSERT INTO Bias (NetworkId, Layer, X, Bias) VALUES {", ".join(MAX_INSERT_COUNT * ["(?,?,?,?)"])}'
+
+        for x, item in enumerate(bias):
+            values.append(networkid)
+            values.append(layer)
+            values.append(x)
+            values.append(float(item))
+            if len(values) == MAX_INSERT_COUNT * 4:
+                cursor.execute(max_insert_query, tuple(values))
+                values = []
+
+        count = len(values) // 4
+
+        if count > 0:
+            query = f'INSERT INTO Bias (NetworkId, Layer, X, Bias) VALUES {", ".join(count * ["(?,?,?,?)"])}'
+
+            cursor.execute(query, tuple(values))
+
+        cursor.close()
+        self.connection.commit()
+
+    def get_bias(self, networkid: int, layer: int):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT Bias from Bias WHERE NetworkID = ? AND Layer = ? ORDER BY X",
+            networkid,
+            layer,
+        )
+        data = cursor.fetchall()
+        cursor.close()
+        return np.array([i[0] for i in data])
+
+    def get_weights(self, networkid: int, layer: int, width: int):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT Weight FROM Weight WHERE NetworkId = ? AND Layer = ? ORDER BY X, Y",
+            networkid,
+            layer,
+        )
+        data = cursor.fetchall()
+        cursor.close()
+
+        data = np.array([i[0] for i in data])
+        data.resize((len(data) // width, width))
+        return data
+
+    def get_network_layer(self, networkid: int, layer: int):
+        bias = self.get_bias(networkid, layer)
+        weights = self.get_weights(networkid, layer, len(bias))
+        return weights, bias
+
+    def get_latest_network(self, modelid: int, is_target: bool = False):
+        cursor = self.connection.cursor()
+
+        cursor.execute(
+            "SELECT TOP 1 NetworkId FROM Network WHERE ModelId = ? AND IsTarget = ? ORDER BY Epoch, NetworkId DESC",
+            modelid,
+            1 if is_target else 0,
+        )
+        data = cursor.fetchone()
+
+        cursor.close()
+        return data[0] if data else None
+
+    def keep_latest_networks(self, modelid: int, count: int, is_target: bool = False):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT NetworkId FROM Network WHERE ModelId = ? AND IsTarget = ? ORDER BY Epoch",
+            modelid,
+            1 if is_target else 0,
+        )
+        data = cursor.fetchall()
+        data = [i[0] for i in data]
+        cursor.close()
+        delete_count = len(data) - count
+        if delete_count > 0:
+            for i in range(delete_count):
+                cursor = self.connection.cursor()
+                cursor.execute("delete_network ?", data[i])
+                cursor.close()
+            self.connection.commit()
+
+    def close(self):
+        self.connection.close()
