@@ -4,5 +4,6 @@ CREATE TABLE Weight
     Layer     INT NOT NULL,
     X         INT NOT NULL,
     Y         INT NOT NULL,
-    Weight    FLOAT(53)
+    Weight    FLOAT(53),
+    PRIMARY KEY (NetworkId, Layer, X, Y)
 )
