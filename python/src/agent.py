@@ -24,7 +24,7 @@ class Agent:
 
         target_id = database.get_latest_network(self.model_id, True)
         if target_id != None:
-            self.network = Network(replay.observation_length, replay.action_size, hidden_layers = hidden_layers, from_database=(database, target_id))
+            self.target = Network(replay.observation_length, replay.action_size, hidden_layers = hidden_layers, from_database=(database, target_id))
         else:
             self.target = Network(replay.observation_length, replay.action_size, clone_variables=self.network.layers)
             self.target.save_to_database(database, self.model_id, True)
