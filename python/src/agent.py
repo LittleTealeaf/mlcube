@@ -9,6 +9,7 @@ class Agent:
         self.name = name
         self.replay = replay
         self.database = database
+        self.max_saved_network = max_saved_network
 
         self.model_id = database.get_model_id(name)
         if self.model_id == None:
@@ -39,19 +40,19 @@ class Agent:
 
     def train(self, sample_size: int, learning_rate: float, gamma: float):
         (first_state, action, reward, next_state) = self.replay.sample_replay(sample_size)
-        first_state = tf.constant(first_state);
+        first_state = tf.constant(first_state, dtype=tf.float32);
         action = tf.constant(action)
-        reward = tf.constant(reward)
-        next_state = tf.constant(next_state)
+        reward = tf.constant(reward, dtype=tf.float32)
+        next_state = tf.constant(next_state, dtype=tf.float32)
 
 
         with tf.GradientTape() as tape:
 
             tape.watch(self.network.trainable_variables)
 
-            output_1 = self.network.apply(first_state)
+            output_1 = self.network.apply(first_state, count = sample_size)
             output_1_gathered = tf.gather(output_1, action, batch_dims=1)
-            output_2 = self.target.apply(next_state)
+            output_2 = self.target.apply(next_state, count = sample_size)
             output_2_gathered = tf.reduce_max(output_2, axis=1)
 
             output_2_gathered_scaled = tf.multiply(output_2_gathered, gamma)
@@ -68,9 +69,11 @@ class Agent:
 
             optimizer.apply_gradients(zip(gradient, self.network.trainable_variables))
 
+            self.database.insert_epoch(self.model_id, loss_mean, None)
+
 
     def save(self):
         self.network.save_to_database(self.database, self.model_id, False)
         self.target.save_to_database(self.database,self.model_id, True)
-        self.database.keep_latest_networks(self.model_id, 1, is_target=False)
-        self.database.keep_latest_networks(self.model_id, 1, is_target=True)
+        self.database.keep_latest_networks(self.model_id, self.max_saved_network, is_target=False)
+        self.database.keep_latest_networks(self.model_id, self.max_saved_network, is_target=True)

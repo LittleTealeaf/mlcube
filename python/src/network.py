@@ -31,8 +31,8 @@ class Network:
             database, network_id = from_database
             for layer in range(len(hidden_layers) + 1):
                 weight, bias = database.get_network_layer(network_id, layer)
-                W = tf.Variable(weight)
-                b = tf.Variable(bias)
+                W = tf.Variable(weight, dtype=tf.float32)
+                b = tf.Variable(bias, dtype=tf.float32)
 
                 self.trainable_variables.append(W)
                 self.trainable_variables.append(b)
@@ -61,8 +61,8 @@ class Network:
                 self.trainable_variables.append(W)
                 self.trainable_variables.append(b)
 
-    def apply(self, values):
-        observations = tf.constant(values, dtype=tf.float32, shape=(1, 144))
+    def apply(self, values, count = 1):
+        observations = tf.constant(values, dtype=tf.float32, shape=(count, 144))
         for weight, bias in self.layers:
             observations = tf.matmul(observations, weight)
             observations = tf.add(observations, bias)

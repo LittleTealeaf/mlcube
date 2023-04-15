@@ -52,7 +52,7 @@ class Database:
         cursor.execute("get_current_epoch ?", modelid)
         value = cursor.fetchone()
         cursor.close()
-        return value[0] if value else None
+        return value[0] if value else 0
 
     def create_network(self, modelid: int, is_target: bool):
         epoch = self.get_current_epoch(modelid)
@@ -186,6 +186,15 @@ class Database:
                 cursor.execute("delete_network ?", data[i])
                 cursor.close()
             self.connection.commit()
+
+    def insert_epoch(self, modelid: int, loss: float, reward: float):
+        epoch = self.get_current_epoch(modelid) + 1
+        cursor = self.connection.cursor()
+        cursor.execute("INSERT INTO Epoch (ModelId, Epoch, Loss, Reward) VALUES (?,?,?,?)", modelid, epoch, float(loss), float(reward) if reward else None)
+        cursor.close()
+        self.connection.commit()
+
+
 
     def close(self):
         self.connection.close()
