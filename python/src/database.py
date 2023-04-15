@@ -1,82 +1,132 @@
 from os import getenv
-import numpy as np
 from dotenv import load_dotenv
 from git import repo
+import numpy as np
 import pyodbc
 
 
 repo = repo.Repo(search_parent_directories=True)
 git_commit = repo.head.object.hexsha
 
+MAX_INSERT_COUNT = 400
+
 load_dotenv()
 
 
-def create_database_connection():
-    server = getenv("SQL_SERVER")
-    port = getenv("SQL_PORT")
-    database = getenv("SQL_DATABASE")
-    username = getenv("SQL_USERNAME")
-    password = getenv("SQL_PASSWORD")
-    driver = "ODBC Driver 17 for SQL Server"
-    return pyodbc.connect(
-        f"DRIVER={driver};SERVER={server},{port};DATABASE={database};UID={username};PWD={password}"
-    )
+class Database:
+    def __init__(self):
+        server = getenv("SQL_HOST")
+        port = getenv("SQL_PORT")
+        database = getenv("SQL_DATABASE")
+        username = getenv("SQL_USER")
+        password = getenv("SQL_PASSWORD")
+        driver = "ODBC Driver 17 for SQL Server"
 
-def ensure_connection(connection):
-    if connection == None:
-        return (create_database_connection(), True)
-    else:
-        return (connection, False)
+        self.connection = pyodbc.connect(
+            f"DRIVER={driver};SERVER={server},{port};DATABASE={database};UID={username};PWD={password}"
+        )
 
-def create_model(name: str, cube_type: str, connection=None):
-    connection, is_new = ensure_connection(connection)
+    def create_model(self, name: str, cube_type: str):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO Model (ModelName, GitHash, CubeType) OUTPUT inserted.ModelId VALUES (?,?,?)",
+            name,
+            git_commit,
+            cube_type,
+        )
 
-    cursor = connection.cursor()
-    cursor.execute('INSERT INTO Model (ModelName, GitHash, CubeType) OUTPUT inserted.ModelId VALUES (?, ?, ?)', name, git_commit, cube_type)
-    value = cursor.fetchone()
-    connection.commit()
+        value = cursor.fetchone()
+        cursor.close()
+        self.connection.commit()
+        return value[0] if value else None
 
-    if is_new:
-        connection.close()
+    def get_model_id(self, name: str):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT ModelId FROM Model WHERE ModelName = ?", name)
+        value = cursor.fetchone()
+        cursor.close()
+        return value[0] if value else None
 
-    return value[0]
+    def get_current_epoch(self, modelid: int):
+        cursor = self.connection.cursor()
+        cursor.execute("get_current_epoch ?", modelid)
+        value = cursor.fetchone()
+        cursor.close()
+        return value[0] if value else None
 
-def get_model_id(name: str, connection=None):
-    connection, is_new = ensure_connection(connection)
+    def create_network(self, modelid: int):
+        epoch = self.get_current_epoch(modelid)
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO Network (ModelId, Epoch) OUTPUT inserted.NetworkId VALUES (?,?)",
+            modelid,
+            epoch,
+        )
 
-    cursor = connection.cursor()
-    cursor.execute('SELECT ModelId FROM Model WHERE ModelName = ?', name)
-    row = cursor.fetchone()
-    cursor.close()
+        value = cursor.fetchone()
+        cursor.close()
+        self.connection.commit()
+        return value[0] if value else None
+
+    def insert_weights(self, networkid: int, layer: int, weights: list[list[float]]):
+        cursor = self.connection.cursor()
+
+        values = []
+
+        max_insert_query = f'INSERT INTO Weight (NetworkId, Layer, X, Y, Weight) VALUES {", ".join(MAX_INSERT_COUNT * ["(?,?,?,?,?)"])}'
+
+        for x, row in enumerate(weights):
+            for y, item in enumerate(row):
+                values.append(networkid)
+                values.append(layer)
+                values.append(x)
+                values.append(y)
+                values.append(item)
+
+                if len(values) == MAX_INSERT_COUNT * 5:
+                    print(len(values))
+                    cursor.execute(max_insert_query, tuple(values))
+                    values = []
+
+        count = len(values) // 5
+
+        if count > 0:
+            query = f'INSERT INTO Weight (NetworkId, Layer, X, Y, Weight) VALUES {", ".join(count * ["(?,?,?,?,?)"])}'
+
+            cursor.execute(query, tuple(values))
+
+        cursor.close()
+        self.connection.commit()
+
+    def insert_bias(self, networkid: int, layer: int, bias: list[float]):
+        cursor = self.connection.cursor()
+
+        values = []
+
+        max_insert_query = f'INSERT INTO Bias (NetworkId, Layer, X, Bias) VALUES {", ".join(MAX_INSERT_COUNT * ["(?,?,?,?)"])}'
+
+        for x, item in enumerate(bias):
+            values.append(networkid)
+            values.append(layer)
+            values.append(x)
+            values.append(item)
+            if len(values) == MAX_INSERT_COUNT * 4:
+                print(len(values))
+                cursor.execute(max_insert_query, tuple(values))
+                values = []
+
+        count = len(values) // 4
+
+        if count > 0:
+            query = f'INSERT INTO Bias (NetworkId, Layer, X, Bias) VALUES {", ".join(count * ["(?,?,?,?)"])}'
+
+            cursor.execute(query, tuple(values))
+
+        cursor.close()
+        self.connection.commit()
 
 
-    if is_new:
-        connection.commit()
-        connection.close()
 
-    return row[0] if row else None
 
-def get_nodes(model_id: int, connection=None):
-    connection, is_new = ensure_connection(connection)
-
-    cursor = connection.cursor()
-    cursor.execute('SELECT Layer, NodeIndex, Weight, Bias FROM Node WHERE ModelId = ?', model_id)
-    rows,  = cursor.fetchall()
-
-    if is_new:
-        connection.commit()
-        connection.close()
-
-    return rows
-
-def insert_epoch(model_id: int, epoch: int, loss: np.float32, reward: np.float32, connection = None):
-    connection, is_new = ensure_connection(connection)
-
-    cursor = connection.cursor()
-    cursor.execute('INSERT INTO Epoch (ModelId, Epoch, Loss, Reward) VALUES (?, ?, ?, ?)', model_id, epoch, loss, reward)
-    connection.commit()
-
-    if is_new:
-        connection.close()
-
-print(create_model('HI_WORLD_TESTING_PYTHON','Cube3x3'))
+    def close(self):
+        self.connection.close()
