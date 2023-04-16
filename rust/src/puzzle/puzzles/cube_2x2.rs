@@ -12,6 +12,12 @@ impl Default for Cube2x2 {
     }
 }
 
+impl Cube2x2 {
+    pub fn get_state(&self) -> [usize; 24] {
+        self.state.clone()
+    }
+}
+
 impl Puzzle for Cube2x2 {
     const OBSERVATION_SIZE: usize = 4 * 6 * 6;
     const ACTION_SIZE: usize = 9;

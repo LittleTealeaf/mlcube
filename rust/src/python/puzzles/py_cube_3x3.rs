@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use pyo3::{pyclass, pymethods, PyResult};
 
 use crate::puzzle::{puzzles::Cube3x3, Puzzle};
@@ -5,6 +7,7 @@ use crate::puzzle::{puzzles::Cube3x3, Puzzle};
 #[pyclass]
 pub struct PyCube3x3 {
     cube: Cube3x3,
+    prior_states: HashSet<[usize; 54]>,
 }
 
 #[pymethods]
@@ -37,8 +40,13 @@ impl PyCube3x3 {
     }
 
     fn apply_action(&mut self, action: usize) -> PyResult<()> {
+        self.prior_states.insert(self.cube.get_state());
         self.cube.apply_action(action)?;
         Ok(())
+    }
+
+    fn has_looped(&self) -> bool {
+        self.prior_states.contains(&self.cube.get_state())
     }
 
     fn scramble(&mut self, steps: usize) -> u64 {
@@ -66,6 +74,7 @@ impl Default for PyCube3x3 {
     fn default() -> Self {
         Self {
             cube: Default::default(),
+            prior_states: HashSet::new(),
         }
     }
 }

@@ -13,6 +13,12 @@ impl Default for Cube3x3 {
     }
 }
 
+impl Cube3x3 {
+    pub fn get_state(&self) -> [usize; 54] {
+        self.state.clone()
+    }
+}
+
 impl Puzzle for Cube3x3 {
     const OBSERVATION_SIZE: usize = 9 * 6 * 6;
     const ACTION_SIZE: usize = 18;

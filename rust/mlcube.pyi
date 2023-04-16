@@ -36,9 +36,13 @@ class Puzzle:
 
 class PyCube2x2(Puzzle):
     ...
+    def has_looped(self) -> bool:
+        ...
 
 class PyCube3x3(Puzzle):
     ...
+    def has_looped(self) -> bool:
+        ...
 
 class Replay(Puzzle):
     def __init__(self, capacity: int = 100_000):
