@@ -2,7 +2,7 @@ use pyo3::{pyclass, pymethods, PyResult};
 
 use crate::{
     puzzle::{puzzles::Cube2x2, Puzzle},
-    replay::Replay,
+    replay::Replay, python::PyCube2x2,
 };
 
 use super::{sample_from_set, PyReplaySample};
@@ -77,6 +77,10 @@ impl PyReplay2x2 {
 
     fn get_action_name(&self, action: usize) -> String {
         Cube2x2::get_action_name(action).unwrap_or(String::from(""))
+    }
+
+    fn create_evaluation_target(&self) -> PyCube2x2 {
+        PyCube2x2::default()
     }
 }
 
