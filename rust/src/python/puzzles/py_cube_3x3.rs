@@ -49,12 +49,12 @@ impl PyCube3x3 {
         self.prior_states.contains(&self.cube.get_state())
     }
 
-    fn scramble(&mut self, steps: usize) -> u64 {
-        self.cube.scramble(steps)
+    fn scramble(&mut self) -> u64 {
+        self.cube.scramble(100)
     }
 
-    fn scramble_with_seed(&mut self, seed: u64, steps: usize) {
-        self.cube.scramble_with_seed(steps, seed);
+    fn scramble_with_seed(&mut self, seed: u64) {
+        self.cube.scramble_with_seed(100, seed);
     }
 
     fn get_reward(&self) -> f64 {

@@ -43,12 +43,12 @@ impl PyReplay2x2 {
         Ok(sample_from_set(self.replay.sample_replay(count)?))
     }
 
-    fn scramble(&mut self, steps: usize) -> u64 {
-        self.replay.scramble(steps)
+    fn scramble(&mut self) -> u64 {
+        self.replay.scramble(100)
     }
 
-    fn scramble_with_seed(&mut self, steps: usize, seed: u64) {
-        self.replay.scramble_with_seed(steps, seed)
+    fn scramble_with_seed(&mut self, seed: u64) {
+        self.replay.scramble_with_seed(100, seed)
     }
 
     fn reset(&mut self) {

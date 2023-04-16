@@ -18,10 +18,10 @@ class Puzzle:
     def apply_action(self, action: int):
         "Applies an action to the puzzle, valid action indices are within the range `0 <= {action} < action_size`"
         ...
-    def scramble(self, steps: int) -> int:
+    def scramble(self) -> int:
         "Scrambles the cube randomly for `steps` steps, and returns the seed used to scramble the cube"
         ...
-    def scramble_with_seed(self, steps: int, seed: int):
+    def scramble_with_seed(self, seed: int):
         "Scrambles the cube randomly for `steps` steps using the provided seed."
         ...
     def get_reward(self) -> float:

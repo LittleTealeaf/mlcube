@@ -190,11 +190,58 @@ class Database:
     def insert_epoch(self, modelid: int, loss: float, reward: float):
         epoch = self.get_current_epoch(modelid) + 1
         cursor = self.connection.cursor()
-        cursor.execute("INSERT INTO Epoch (ModelId, Epoch, Loss, Reward) VALUES (?,?,?,?)", modelid, epoch, float(loss), float(reward) if reward else None)
+        cursor.execute(
+            "INSERT INTO Epoch (ModelId, Epoch, Loss, Reward) VALUES (?,?,?,?)",
+            modelid,
+            epoch,
+            float(loss),
+            float(reward) if reward else None,
+        )
         cursor.close()
         self.connection.commit()
 
+    def upload_evaluation(
+        self, modelid: int, seed: int, solved: bool, moves: list[tuple[str, float]]
+    ):
+        epoch = self.get_current_epoch(modelid)
 
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO Evaluation (ModelId, Epoch, Solved, MoveCount, Seed) OUTPUT inserted.EvaluationId VALUES (?,?,?,?,?)",
+            modelid,
+            epoch,
+            1 if solved else 0,
+            len(moves),
+            int(np.int64(seed).astype('int')),
+        )
+        data = cursor.fetchone()
+        cursor.close()
+        id = data[0]
+
+        cursor = self.connection.cursor()
+
+        values = []
+
+        max_insert_query = f'INSERT INTO EvaluationMove (EvaluationId, MoveIndex, MoveName, Reward) VALUES {", ".join(MAX_INSERT_COUNT * ["(?,?,?,?)"])}'
+
+        for index, (name, reward) in enumerate(moves):
+            values.append(id)
+            values.append(index)
+            values.append(name)
+            values.append(reward)
+
+            if len(values) == MAX_INSERT_COUNT * 4:
+                cursor.execute(max_insert_query, tuple(values))
+
+        count = len(values) // 4
+
+        if count > 0:
+            query = f'INSERT INTO EvaluationMove (EvaluationId, MoveIndex, MoveName, Reward) VALUES {", ".join(count * ["(?,?,?,?)"])}'
+
+            cursor.execute(query, tuple(values))
+
+        cursor.close()
+        self.connection.commit()
 
     def close(self):
         self.connection.close()
