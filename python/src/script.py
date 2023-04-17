@@ -14,7 +14,7 @@ SAVE_INTERVAL = 100
 GAMMA = 0.9
 TRAIN_SAMPLE_SIZE = 2000
 
-agent = Agent('Rust-Agent-1', replay,[300,300,300], database=Database())
+agent = Agent('Rust-Agent-Test-4', replay,[300,300,300], database=Database())
 
 while not os.path.exists("./stop"):
     replay.reset()
