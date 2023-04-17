@@ -21,6 +21,9 @@ export function EpochGraph({ params, sx }: EpochGraphProps) {
     url: "/api/graph/epoch",
     params,
     postProcess: (data) => [data],
+    config: {
+      refreshInterval: 60000,
+    },
   });
 
   return (
