@@ -14,15 +14,16 @@ import { WithSx } from "@/types/props";
 
 export type EpochGraphProps = {
   params: ApiGraphEpoch["params"];
+	refresh_interval?: number;
 } & WithSx;
 
-export function EpochGraph({ params, sx }: EpochGraphProps) {
+export function EpochGraph({ params, sx, refresh_interval }: EpochGraphProps) {
   const { data } = useApi<ApiGraphEpoch, GraphResponse[]>({
     url: "/api/graph/epoch",
     params,
     postProcess: (data) => [data],
     config: {
-      refreshInterval: 60000,
+      refreshInterval: refresh_interval || 60000,
     },
   });
 
