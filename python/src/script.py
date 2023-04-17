@@ -25,7 +25,7 @@ while not os.path.exists("./stop"):
 
     print("Epoch ", epoch)
 
-    for _ in range(1000):
+    for _ in range(100):
         agent.step_experience(EPSILON)
 
     agent.train(TRAIN_SAMPLE_SIZE, 0.001 * 0.99 ** (epoch / UPDATE_TARGET_INTERVAL), GAMMA)
