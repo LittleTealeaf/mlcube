@@ -1,8 +1,10 @@
+import math
 from os import getenv
 from dotenv import load_dotenv
 from git import repo
 import numpy as np
 import pyodbc
+import sys
 
 
 repo = repo.Repo(search_parent_directories=True)
@@ -70,6 +72,9 @@ class Database:
         cursor.close()
         self.connection.commit()
         return value[0] if value else None
+
+
+    # TODO: FIX THE FACT THAT THESE INSERT INVALID FLOAT VALUES.. ALSO WE GOT AN ISSUE WITH THE NETWORK BLOATING TOO MUCH
 
     def insert_weights(self, networkid: int, layer: int, weights: list[list[float]]):
         cursor = self.connection.cursor()
@@ -187,15 +192,19 @@ class Database:
                 cursor.close()
             self.connection.commit()
 
-    def insert_epoch(self, modelid: int, loss: float, reward: float):
+    def insert_epoch(self, modelid: int, loss: float):
         epoch = self.get_current_epoch(modelid) + 1
         cursor = self.connection.cursor()
+        if math.isinf(loss):
+            loss = sys.float_info.max
+        if math.isnan(loss):
+            loss = 0
+
         cursor.execute(
-            "INSERT INTO Epoch (ModelId, Epoch, Loss, Reward) VALUES (?,?,?,?)",
+            "INSERT INTO Epoch (ModelId, Epoch, Loss) VALUES (?,?,?)",
             modelid,
             epoch,
-            float(loss),
-            float(reward) if reward else None,
+            loss
         )
         cursor.close()
         self.connection.commit()
@@ -212,7 +221,7 @@ class Database:
             epoch,
             1 if solved else 0,
             len(moves),
-            int(np.int64(seed).astype('int')),
+            str(seed),
         )
         data = cursor.fetchone()
         cursor.close()

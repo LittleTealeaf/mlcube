@@ -58,9 +58,9 @@ def test_scramble_unsolves_cube():
 def test_scramble_seeds_repeatable():
     seed = 34546
     a = PyCube3x3()
-    a.scramble_with_seed(seed, 100)
+    a.scramble_with_seed(seed)
     b = PyCube3x3()
-    b.scramble_with_seed(seed, 100)
+    b.scramble_with_seed(seed)
 
     obs_a = a.get_observations()
     obs_b = b.get_observations()
@@ -70,10 +70,10 @@ def test_scramble_seeds_repeatable():
 
 def test_scramble_returns_correct_seed():
     cube_a = PyCube3x3()
-    seed = cube_a.scramble(100)
+    seed = cube_a.scramble()
 
     cube_b = PyCube3x3()
-    cube_b.scramble_with_seed(seed, 100)
+    cube_b.scramble_with_seed(seed)
 
     obs_a = cube_a.get_observations()
     obs_b = cube_b.get_observations()

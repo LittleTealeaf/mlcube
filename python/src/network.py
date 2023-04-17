@@ -1,4 +1,5 @@
 import tensorflow as tf
+from keras.activations import relu
 from keras.initializers.initializers import VarianceScaling
 from database import Database
 
@@ -47,13 +48,13 @@ class Network:
 
                 W = tf.Variable(
                     VarianceScaling(
-                        scale=1.0, mode="fan_in", distribution="truncated_normal"
+                        scale=0.1, mode="fan_in", distribution="truncated_normal"
                     )(shape=(length_prev, length_cur), dtype=tf.float32)
                 )
 
                 b = tf.Variable(
                     VarianceScaling(
-                        scale=1.0, mode="fan_in", distribution="truncated_normal"
+                        scale=0.1, mode="fan_in", distribution="truncated_normal"
                     )(shape=(length_cur,), dtype=tf.float32)
                 )
 
@@ -63,9 +64,12 @@ class Network:
 
     def apply(self, values, count = 1):
         observations = tf.constant(values, dtype=tf.float32, shape=(count, 144))
-        for weight, bias in self.layers:
+        for index, (weight, bias) in enumerate(self.layers):
             observations = tf.matmul(observations, weight)
             observations = tf.add(observations, bias)
+
+            # if index != len(self.layers) - 1:
+            #     observations = relu(observations)
 
         return observations
 

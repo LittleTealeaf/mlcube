@@ -52,15 +52,15 @@ def test_get_observations_are_unique():
 
 def test_scramble_unsolves_cube():
     cube = PyCube2x2()
-    cube.scramble(100)
+    cube.scramble()
     assert not cube.is_solved()
 
 def test_scramble_seeds_repeatable():
     seed = 34546
     a = PyCube2x2()
-    a.scramble_with_seed(seed, 100)
+    a.scramble_with_seed(seed,)
     b = PyCube2x2()
-    b.scramble_with_seed(seed, 100)
+    b.scramble_with_seed(seed,)
 
     obs_a = a.get_observations()
     obs_b = b.get_observations()
@@ -70,10 +70,10 @@ def test_scramble_seeds_repeatable():
 
 def test_scramble_returns_correct_seed():
     cube_a = PyCube2x2()
-    seed = cube_a.scramble(100)
+    seed = cube_a.scramble()
 
     cube_b = PyCube2x2()
-    cube_b.scramble_with_seed(seed, 100)
+    cube_b.scramble_with_seed(seed)
 
     obs_a = cube_a.get_observations()
     obs_b = cube_b.get_observations()

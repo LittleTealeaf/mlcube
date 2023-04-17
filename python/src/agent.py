@@ -100,7 +100,7 @@ class Agent:
 
             optimizer.apply_gradients(zip(gradient, self.network.trainable_variables))
 
-            self.database.insert_epoch(self.model_id, loss_mean, None)
+            self.database.insert_epoch(self.model_id, loss_mean.numpy().astype('float64'))
 
     def evaluation(self, max_steps=1000):
         cube = self.replay.create_evaluation_target()
