@@ -23,7 +23,7 @@ model Evaluation {
   Epoch          Int
   Solved         Boolean?
   MoveCount      Int?
-  Seed           BigInt?
+  Seed           String?          @db.VarChar(50)
   Model          Model            @relation(fields: [ModelId], references: [ModelId], onUpdate: NoAction, map: "FK__Evaluatio__Model__4CA06362")
   EvaluationMove EvaluationMove[]
 }
@@ -76,20 +76,9 @@ view EvaluationInfo {
 }
 
 view EvaluationRewardChange {
-  EvaluationMoveId Int @unique
+  EvaluationMoveId Int    @unique
   EvaluationId     Int?
   MoveIndex        Int?
   ChangeInReward   Float?
   Reward           Float?
-
-}
-
-view PublicNode {
-  NodeId  BigInt @unique
-  ModelId Int
-  Layer   Int
-  X       Int
-  Y       Int
-  Weight  Float?
-  Bias    Float?
 }
