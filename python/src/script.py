@@ -5,7 +5,7 @@ import os
 
 
 
-replay = PyReplay2x2(100_000)
+replay = PyReplay2x2(1_000_000)
 
 
 UPDATE_TARGET_INTERVAL = 1000
@@ -25,7 +25,7 @@ while not os.path.exists("./stop"):
 
     print("Epoch ", epoch)
 
-    for _ in range(100):
+    for _ in range(1000):
         agent.step_experience(EPSILON)
 
     agent.train(TRAIN_SAMPLE_SIZE, 0.001 * 0.99 ** (epoch / UPDATE_TARGET_INTERVAL), GAMMA)
