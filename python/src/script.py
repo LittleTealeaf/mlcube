@@ -12,7 +12,7 @@ UPDATE_TARGET_INTERVAL = 1000
 EVALUATION_INTERVAL = 250
 SAVE_INTERVAL = 100
 GAMMA = 0.9
-TRAIN_SAMPLE_SIZE = 5000
+TRAIN_SAMPLE_SIZE = 2000
 
 agent = Agent('Rust-Agent-1', replay,[300,300,300], database=Database())
 
@@ -21,7 +21,7 @@ while not os.path.exists("./stop"):
     replay.scramble()
     epoch = agent.database.get_current_epoch(agent.model_id)
 
-    EPSILON = 1 - ((epoch % UPDATE_TARGET_INTERVAL) / 100)
+    EPSILON = 1 - ((epoch % UPDATE_TARGET_INTERVAL) / UPDATE_TARGET_INTERVAL)
 
     print("Epoch ", epoch)
 
