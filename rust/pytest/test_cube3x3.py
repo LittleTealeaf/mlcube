@@ -52,7 +52,7 @@ def test_get_observations_are_unique():
 
 def test_scramble_unsolves_cube():
     cube = PyCube3x3()
-    cube.scramble(100)
+    cube.scramble()
     assert not cube.is_solved()
 
 def test_scramble_seeds_repeatable():
