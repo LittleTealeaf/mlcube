@@ -5,16 +5,17 @@ import os
 
 
 
-replay = PyReplay2x2(10_000)
+replay = PyReplay2x2(100_000)
 
 
-UPDATE_TARGET_INTERVAL = 500
-EVALUATION_INTERVAL = 100
-SAVE_INTERVAL = 50
-GAMMA = 0.8
+UPDATE_TARGET_INTERVAL = 1000
+EVALUATION_INTERVAL = 250
+SAVE_INTERVAL = 100
+GAMMA = 0.9
+EPSILON = 0.25
 TRAIN_SAMPLE_SIZE = 1000
 
-agent = Agent('Rust-Agent-Test-2', replay,[400,300,300], database=Database())
+agent = Agent('Rust-Agent-Test-3', replay,[300,300,300], database=Database())
 
 while not os.path.exists("./stop"):
     replay.reset()
@@ -24,7 +25,7 @@ while not os.path.exists("./stop"):
     print("Epoch ", epoch)
 
     for _ in range(1000):
-        agent.step_experience(0.2)
+        agent.step_experience(EPSILON)
 
     agent.train(TRAIN_SAMPLE_SIZE, 0.001 * 0.99 ** (epoch / UPDATE_TARGET_INTERVAL), GAMMA)
 
