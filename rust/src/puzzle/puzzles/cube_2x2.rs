@@ -100,13 +100,13 @@ impl Puzzle for Cube2x2 {
     }
 
     fn get_action_name(action: usize) -> Option<String> {
-        let move_name = match action / 3 {
+        let move_name = match action % 3 {
             0 => Some('U'),
             1 => Some('F'),
             2 => Some('R'),
             _ => None,
         };
-        let move_type = match action % 3 {
+        let move_type = match action / 3 {
             0 => Some(""),
             1 => Some("'"),
             2 => Some("2"),
