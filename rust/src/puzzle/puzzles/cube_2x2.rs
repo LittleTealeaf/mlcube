@@ -1,6 +1,7 @@
 use crate::puzzle::{ApplyActionError, Puzzle};
 
 pub struct Cube2x2 {
+    /// The current state of the 2x2 Cube
     state: [usize; 24],
 }
 
@@ -392,6 +393,33 @@ mod tests {
                 }
                 None => false,
             });
+        }
+    }
+
+    #[test]
+    fn action_names_have_correct_value() {
+        let correct_values = [
+            (0, "U"),
+            (1, "F"),
+            (2, "R"),
+            (3, "U'"),
+            (4, "F'"),
+            (5, "R'"),
+            (6, "U2"),
+            (7, "F2"),
+            (8, "R2"),
+        ];
+
+        for (index, value) in correct_values {
+            let found_value = Cube2x2::get_action_name(index).unwrap();
+            assert_eq!(
+                found_value,
+                String::from(value),
+                "Index {} returns {}, expected {}",
+                index,
+                found_value,
+                value
+            );
         }
     }
 }

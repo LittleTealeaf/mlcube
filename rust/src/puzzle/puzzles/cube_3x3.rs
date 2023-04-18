@@ -409,4 +409,40 @@ mod tests {
             });
         }
     }
+
+    #[test]
+    fn action_names_are_correct() {
+        let correct_values = [
+            (0, "U"),
+            (1, "L"),
+            (2, "F"),
+            (3, "R"),
+            (4, "D"),
+            (5, "B"),
+            (6, "U'"),
+            (7, "L'"),
+            (8, "F'"),
+            (9, "R'"),
+            (10, "D'"),
+            (11, "B'"),
+            (12, "U2"),
+            (13, "L2"),
+            (14, "F2"),
+            (15, "R2"),
+            (16, "D2"),
+            (17, "B2"),
+        ];
+
+        for (index, value) in correct_values {
+            let found_value = Cube3x3::get_action_name(index).unwrap();
+            assert_eq!(
+                found_value,
+                String::from(value),
+                "Index {} returns {}, expected {}",
+                index,
+                found_value,
+                value
+            );
+        }
+    }
 }
