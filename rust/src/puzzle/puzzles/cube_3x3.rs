@@ -101,7 +101,7 @@ impl Puzzle for Cube3x3 {
     }
 
     fn get_action_name(action: usize) -> Option<String> {
-        let move_name = match action / 3 {
+        let move_name = match action % 6 {
             0 => Some('U'),
             1 => Some('L'),
             2 => Some('F'),
@@ -110,7 +110,7 @@ impl Puzzle for Cube3x3 {
             5 => Some('B'),
             _ => None,
         };
-        let move_type = match action % 3 {
+        let move_type = match action / 6 {
             0 => Some(""),
             1 => Some("'"),
             2 => Some("2"),
