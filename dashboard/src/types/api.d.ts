@@ -15,5 +15,5 @@ export type GraphEpochGrouped = {
       x: number;
       y: number;
     }[];
-  }[];
+  };
 };
