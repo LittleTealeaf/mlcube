@@ -19,7 +19,7 @@ export default function ModelNavBar({ model }: Props) {
       <Typography variant="h6" sx={{ flexGrow: 1 }}>
         {model.ModelName}
       </Typography>
-      <Button href={`/models/${model.ModelId}`}>Home</Button>
+      <Button href={`/models/${model.ModelId}`}>Dashboard</Button>
       {model.GitHash && (
         <IconButton
           href={`https://www.github.com/LittleTealeaf/mlcube/tree/${model.GitHash}`}
