@@ -112,7 +112,7 @@ class Agent:
 
         while len(steps) < max_steps and not cube.is_solved() and not cube.has_looped():
             network_output = self.network.apply(cube.get_observations())
-            choice = tf.math.argmax(network_output, axis = 1)
+            choice = tf.math.argmax(network_output, axis = 1)[0]
             cube.apply_action(choice)
             name = cube.get_action_name(choice)
             reward = cube.get_reward()
