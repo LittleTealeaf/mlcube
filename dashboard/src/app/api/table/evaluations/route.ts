@@ -28,7 +28,7 @@ export async function GET(request: Request) {
           FinalReward: true,
           MoveCount: true,
           Solved: true,
-        ,
+        },
         take: perPage,
         skip: page * perPage,
       })
