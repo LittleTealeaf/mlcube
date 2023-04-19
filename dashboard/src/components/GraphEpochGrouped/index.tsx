@@ -1,16 +1,16 @@
 "use client";
 import { useApi } from "@/client/api";
-import { GraphEpochGrouped } from "@/types/api";
+import { ApiGraphEpochGrouped } from "@/types/api";
 import { WithSx } from "@/types/props";
 import { Paper } from "@mui/material";
 import { ResponsiveLine } from "@nivo/line";
 
 export type Props = {
-	params: GraphEpochGrouped["params"];
+	params: ApiGraphEpochGrouped["params"];
 } & WithSx;
 
 export default function GraphEpochGrouped({ params, sx }: Props) {
-	const { data } = useApi<GraphEpochGrouped, GraphEpochGrouped["response"][]>({
+	const { data } = useApi<ApiGraphEpochGrouped, ApiGraphEpochGrouped["response"][]>({
 		url: "/api/graph/epoch/grouped",
 		params,
 		postProcess: (data) => [data],

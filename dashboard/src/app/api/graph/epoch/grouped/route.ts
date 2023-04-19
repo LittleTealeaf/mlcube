@@ -1,10 +1,10 @@
 import { prisma } from "@/database";
 import { getParameters } from "@/server/api/params";
-import { GraphEpochGrouped } from "@/types/api";
+import { ApiGraphEpochGrouped } from "@/types/api";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const { ModelId } = getParameters<GraphEpochGrouped>(request);
+  const { ModelId } = getParameters<ApiGraphEpochGrouped>(request);
 
   const id = await prisma.model
     .findFirstOrThrow({
