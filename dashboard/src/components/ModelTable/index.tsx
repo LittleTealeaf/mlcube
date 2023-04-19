@@ -29,9 +29,9 @@ export default function ModelTable({ models }: Props) {
       <Table stickyHeader>
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Cube Type</TableCell>
-            <TableCell>Epoch Count</TableCell>
+            <TableCell sx={{fontWeight: 'bold'}}>Name</TableCell>
+            <TableCell sx={{fontWeight: 'bold'}}>Cube Type</TableCell>
+            <TableCell sx={{fontWeight: 'bold'}}>Epoch Count</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

@@ -29,12 +29,13 @@ model Evaluation {
 }
 
 model EvaluationMove {
-  EvaluationMoveId Int         @id(map: "PK__Evaluati__772CA240D89BB96E") @default(autoincrement())
-  EvaluationId     Int?
-  MoveIndex        Int?
-  MoveName         String?     @db.VarChar(10)
-  Reward           Float?
-  Evaluation       Evaluation? @relation(fields: [EvaluationId], references: [EvaluationId], onDelete: NoAction, onUpdate: NoAction, map: "FK__Evaluatio__Evalu__4F7CD00D")
+  EvaluationId Int
+  MoveIndex    Int
+  MoveName     String?    @db.VarChar(10)
+  Reward       Float?
+  Evaluation   Evaluation @relation(fields: [EvaluationId], references: [EvaluationId], onUpdate: NoAction, map: "FK__Evaluatio__Evalu__4F7CD00D")
+
+  @@id([EvaluationId, MoveIndex], map: "PK__Evaluati__35E013E4E199BDFF")
 }
 
 model Model {
