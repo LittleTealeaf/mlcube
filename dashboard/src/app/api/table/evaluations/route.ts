@@ -28,7 +28,7 @@ export async function GET(request: Request) {
           FinalReward: true,
           MoveCount: true,
           Solved: true,
-        },
+        ,
         take: perPage,
         skip: page * perPage,
       })
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
             .then((moves) => moves.map((move) => move.MoveName))
             .then((moves) => ({
               ...entry,
-							EvaluationId: undefined,
+              EvaluationId: undefined,
               moves,
             }))
         )
