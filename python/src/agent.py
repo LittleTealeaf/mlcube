@@ -126,11 +126,14 @@ class Agent:
     def save(self):
         self.network.save_to_database(self.database, self.model_id, False)
         self.target.save_to_database(self.database, self.model_id, True)
+
+    def purge_networks(self, keep_count: int = 1):
+        assert keep_count >= 1
         self.database.keep_latest_networks(
-            self.model_id, self.max_saved_network, is_target=False
+            self.model_id, keep_count, is_target=False
         )
         self.database.keep_latest_networks(
-            self.model_id, self.max_saved_network, is_target=True
+            self.model_id, keep_count, is_target=True
         )
 
     def update_target(self):
