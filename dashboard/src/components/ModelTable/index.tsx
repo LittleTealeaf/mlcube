@@ -1,6 +1,5 @@
 "use client";
 
-import { GitHub } from "@mui/icons-material";
 import {
   Table,
   TableBody,
