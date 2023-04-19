@@ -1,4 +1,4 @@
-use crate::puzzle::{ApplyActionError, Puzzle};
+use crate::puzzle::{ApplyActionError, ParseActionError, Puzzle};
 
 pub struct Cube2x2 {
     /// The current state of the 2x2 Cube
@@ -115,6 +115,28 @@ impl Puzzle for Cube2x2 {
         };
 
         Some(format!("{}{}", move_name?, move_type?))
+    }
+
+    fn parse_action_name(name: &str) -> Result<usize, ParseActionError> {
+        let mut chars = name.chars();
+        let name = chars.next().ok_or(ParseActionError::StringParseError)?;
+        let modifier = chars.next();
+
+        let name_index = match name {
+            'U' => Ok(0),
+            'F' => Ok(1),
+            'R' => Ok(2),
+            _ => Err(ParseActionError::InvalidActionName),
+        }?;
+
+        let type_index = match modifier {
+            None => Ok(0),
+            Some('\'') => Ok(1),
+            Some('2') => Ok(2),
+            _ => Err(ParseActionError::InvalidModifier),
+        }?;
+
+        Ok(type_index * 3 + name_index)
     }
 }
 

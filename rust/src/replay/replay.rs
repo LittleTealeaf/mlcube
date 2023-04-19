@@ -1,6 +1,6 @@
 use rand::Rng;
 
-use crate::puzzle::{ApplyActionError, Puzzle};
+use crate::puzzle::{ApplyActionError, ParseActionError, Puzzle};
 
 #[derive(Clone)]
 pub struct ReplayEntry {
@@ -101,6 +101,10 @@ impl<T: Puzzle> Puzzle for Replay<T> {
 
     fn get_action_name(action: usize) -> Option<String> {
         T::get_action_name(action)
+    }
+
+    fn parse_action_name(name: &str) -> Result<usize, ParseActionError> {
+        T::parse_action_name(name)
     }
 }
 

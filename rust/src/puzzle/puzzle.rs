@@ -70,9 +70,18 @@ pub trait Puzzle: Default {
     fn get_reward(&self) -> f64;
 
     fn get_action_name(action: usize) -> Option<String>;
+
+    fn parse_action_name(name: &str) -> Result<usize, ParseActionError>;
+
 }
 
 #[derive(Debug)]
 pub enum ApplyActionError {
     InvalidActionIndex,
+}
+
+pub enum ParseActionError {
+    StringParseError,
+    InvalidActionName,
+    InvalidModifier
 }
