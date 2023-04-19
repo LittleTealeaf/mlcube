@@ -1,8 +1,8 @@
 "use client";
 import { useApi } from "@/client/api";
 import { GraphEpochGrouped } from "@/types/api";
-import { WithStyle, WithSx } from "@/types/props";
-import { Box, Paper } from "@mui/material";
+import { WithSx } from "@/types/props";
+import { Paper } from "@mui/material";
 import { ResponsiveLine } from "@nivo/line";
 
 export type Props = {
