@@ -1,8 +1,8 @@
 CREATE TABLE EvaluationMove
 (
-    EvaluationMoveId INT NOT NULL IDENTITY PRIMARY KEY,
-    EvaluationId     INT FOREIGN KEY REFERENCES Evaluation (EvaluationId),
-    MoveIndex        INT,
-    MoveName         VARCHAR(10),
-    Reward           FLOAT(53)
+    EvaluationId INT NOT NULL FOREIGN KEY REFERENCES Evaluation (EvaluationId),
+    MoveIndex    INT NOT NULL,
+    MoveName     VARCHAR(10),
+    Reward       FLOAT(53),
+    PRIMARY KEY (EvaluationId, MoveIndex)
 )
