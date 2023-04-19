@@ -9,7 +9,10 @@ export default async function Page({ params: { ModelId } }: WithModelId) {
 	return (
 		<>
 			<title>{model.ModelName}</title>
-			<GraphEpochGrouped params={{ ModelId: String(model.ModelId) }} sx={{height: '300px', width: '100%'}}/>
+			<GraphEpochGrouped
+				params={{ ModelId: String(model.ModelId) }}
+				sx={{ height: "300px", width: "100%" }}
+			/>
 		</>
 	);
 }
