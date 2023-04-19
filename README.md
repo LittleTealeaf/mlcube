@@ -1,5 +1,7 @@
 # MlCube
 
+[![wakatime](https://wakatime.com/badge/user/43f89a04-70f6-4908-a781-88d28f52091e/project/3c0f9c2e-36fa-4672-9025-1195c24a59fa.svg)](https://wakatime.com/badge/user/43f89a04-70f6-4908-a781-88d28f52091e/project/3c0f9c2e-36fa-4672-9025-1195c24a59fa)
+
 An attempt to use Deep-Q Learning to solve a rubik's cube.
 
 Yes, this README is partially completed. :)
