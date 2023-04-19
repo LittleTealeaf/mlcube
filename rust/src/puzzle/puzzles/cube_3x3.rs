@@ -117,13 +117,7 @@ impl Puzzle for Cube3x3 {
             _ => None,
         };
 
-        match move_name {
-            Some(name) => match move_type {
-                Some(move_type) => Some(format!("{}{}", name, move_type)),
-                None => None,
-            },
-            None => None,
-        }
+        Some(format!("{}{}", move_name?, move_type?))
     }
 }
 
