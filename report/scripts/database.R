@@ -21,19 +21,3 @@ connectToDatabase <- function() {
 
   return(conn)
 }
-
-
-# dotenv::load_dot_env()
-# library(RJDBC)
-#
-
-#
-# rs <- dbSendQuery(conn, "SELECT * FROM Epoch WHERE ModelId = 2043")
-# df <- dbFetch(rs, n = -1)
-# View(df)
-#
-#
-#
-#
-# dbDisconnect(conn)
-#
