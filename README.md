@@ -26,12 +26,6 @@ This directory contains all of the setup scripts used for SQL configuration. I a
 
 You might be asking, _why?!_. Well, first of all I got tired of using `.json` files to store everything. I didn't know what I would do until I decided to take an Advanced Database Course in the Spring 2023 Semester. In the course, we needed to pick a large project to implement in a database, and I decided that it was the perfect excuse to get back to working on this project. Thus, I ported all of the data from json to a Microsoft SQL Server Database.
 
-### `dashboard/`
-
-Similar to the `sql/` directory, I needed to create an "application" that consumes and displays the data into reports (or a dashboard as I've done here). Is it leagues more work than what is asked in the course? Yes. Have I spent hours upon hours on it? Also yes. Is it worth it? _Probably not but I wouldn't be writing this README if we only did things that were worth it._
-
-This part of the project is basically as [Next.js](https://nextjs.org/) website written in Typescript that uses [Prisma](https://www.prisma.io/) to connect to the database. I decided to use this stack because I've had prior experiences with Next.js (however, Next.js 13 threw me a curveball), Prisma was the only ORM that seemed to comply with the project requirements (specifically that string concatenation is not allowed for building SQL queries with user input).
-
 ### `rust/`
 
 Let's get this out of the way: **WHY RUST?!**
