@@ -97,7 +97,7 @@ impl Puzzle for Cube2x2 {
             }
         }
 
-        total
+        total - 3f64
     }
 
     fn get_action_name(action: usize) -> Option<String> {
