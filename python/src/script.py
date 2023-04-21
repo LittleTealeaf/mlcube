@@ -58,3 +58,5 @@ while not os.path.exists("./stop"):
 
 agent.save()
 agent.purge_networks(keep_count=1)
+
+os.remove("./stop")
