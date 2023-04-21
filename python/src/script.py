@@ -42,6 +42,10 @@ while not os.path.exists("./stop"):
     for _ in range(EXPERIENCE_GATHER_SIZE):
         agent.step_experience(EPSILON)
 
+        if replay.is_solved():
+            replay.scramble()
+
+
     agent.train(TRAIN_SAMPLE_SIZE, LEARNING_RATE, GAMMA)
 
     if epoch % UPDATE_TARGET_INTERVAL == 0:
