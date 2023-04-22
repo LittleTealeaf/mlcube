@@ -86,8 +86,8 @@ class Agent:
                 tf.reshape(
                     output_2_gathered_scaled, (output_2_gathered_scaled.shape[0], 1)
                 )
+                + reward
                 - output_1_gathered
-                - reward
             )
 
             loss = tf.math.square(loss_raw)
