@@ -100,7 +100,9 @@ class Agent:
 
             optimizer.apply_gradients(zip(gradient, self.network.trainable_variables))
 
-            self.database.insert_epoch(self.model_id, loss_mean.numpy().astype('float64'))
+            self.database.insert_epoch(
+                self.model_id, tf.math.sqrt(loss_mean).numpy().astype("float64")
+            )
 
     def evaluation(self, max_steps=1000):
         cube = self.replay.create_evaluation_target()
@@ -112,7 +114,7 @@ class Agent:
 
         while len(steps) < max_steps and not cube.is_solved() and not cube.has_looped():
             network_output = self.network.apply(cube.get_observations())
-            choice = tf.math.argmax(network_output, axis = 1)[0]
+            choice = tf.math.argmax(network_output, axis=1)[0]
             cube.apply_action(choice)
             name = cube.get_action_name(choice)
             reward = cube.get_reward()
@@ -129,12 +131,8 @@ class Agent:
 
     def purge_networks(self, keep_count: int = 1):
         assert keep_count >= 1
-        self.database.keep_latest_networks(
-            self.model_id, keep_count, is_target=False
-        )
-        self.database.keep_latest_networks(
-            self.model_id, keep_count, is_target=True
-        )
+        self.database.keep_latest_networks(self.model_id, keep_count, is_target=False)
+        self.database.keep_latest_networks(self.model_id, keep_count, is_target=True)
 
     def update_target(self):
         self.target = Network(
