@@ -2,7 +2,6 @@ use rand::prelude::Rng;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 
-
 // TODO: Add methods to get "named" versions of actions (ex: get_action_name(action))
 
 /// Exposes variables and functions generalized for any puzzle
@@ -52,10 +51,7 @@ pub trait Puzzle: Default {
     fn is_solved(&self) -> bool;
 
     fn scramble_with_seed(&mut self, steps: usize, seed: u64) {
-        let mut rnd = ChaCha8Rng::seed_from_u64(seed);
-
-        for _ in 0..steps {
-            let action = rnd.gen_range(0..Self::ACTION_SIZE);
+        for action in Self::generate_scramble_actions(steps, seed) {
             self.apply_action(action).unwrap();
         }
     }
@@ -73,6 +69,23 @@ pub trait Puzzle: Default {
 
     fn parse_action_name(name: &str) -> Result<usize, ParseActionError>;
 
+    fn generate_scramble_actions(steps: usize, seed: u64) -> Vec<usize> {
+        let mut rnd = ChaCha8Rng::seed_from_u64(seed);
+        let mut actions = Vec::with_capacity(steps);
+        for _ in 0..steps {
+            let action = rnd.gen_range(0..Self::ACTION_SIZE);
+            actions.push(action);
+        }
+        actions
+    }
+
+    fn get_scramble_names(steps: usize, seed: u64) -> Vec<String> {
+        Self::generate_scramble_actions(steps, seed)
+            .into_iter()
+            .map(Self::get_action_name)
+            .map(Option::unwrap)
+            .collect()
+    }
 }
 
 #[derive(Debug)]
@@ -83,5 +96,5 @@ pub enum ApplyActionError {
 pub enum ParseActionError {
     StringParseError,
     InvalidActionName,
-    InvalidModifier
+    InvalidModifier,
 }

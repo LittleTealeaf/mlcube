@@ -71,8 +71,14 @@ impl PyCube2x2 {
         String::from("Cube2x2")
     }
 
-    fn get_action_name(&self, action: usize) -> String {
+    #[staticmethod]
+    fn get_action_name(action: usize) -> String {
         Cube2x2::get_action_name(action).unwrap_or(String::from(""))
+    }
+
+    #[staticmethod]
+    fn get_scramble_moves(seed: u64) -> Vec<String> {
+        Cube2x2::get_scramble_names(100, seed)
     }
 }
 
