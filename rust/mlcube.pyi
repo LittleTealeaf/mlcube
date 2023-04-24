@@ -30,7 +30,13 @@ class Puzzle:
     def get_name(self) -> str:
         "Returns the name of the cube"
         ...
-    def get_action_name(self, action: int) -> str:
+
+    @staticmethod
+    def get_action_name(action: int) -> str:
+        ...
+
+    @staticmethod
+    def get_scramble_moves(seed: int) -> str:
         ...
 
 
