@@ -65,8 +65,14 @@ impl PyCube3x3 {
         String::from("Cube3x3")
     }
 
-    fn get_action_name(&self, action: usize) -> String {
+    #[staticmethod]
+    fn get_action_name(action: usize) -> String {
         Cube3x3::get_action_name(action).unwrap_or(String::from(""))
+    }
+
+    #[staticmethod]
+    fn get_scramble_moves(seed: u64) -> Vec<String> {
+        Cube3x3::get_scramble_names(100, seed)
     }
 }
 
