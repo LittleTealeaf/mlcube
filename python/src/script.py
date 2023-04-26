@@ -4,7 +4,7 @@ from database import Database
 import os
 
 
-replay = PyReplay2x2(2_000)
+replay = PyReplay2x2(10_000)
 
 
 UPDATE_TARGET_INTERVAL = 500
@@ -25,9 +25,9 @@ def calculate_epsilon(epoch):
 
 
 def calculate_learning_rate(epoch):
-    return 0.001 * (0.9 ** (epoch / UPDATE_TARGET_INTERVAL) )
+    return 0.001 * (0.95 ** (epoch / UPDATE_TARGET_INTERVAL) )
 
-agent = Agent("Rust-Agent-8.1", replay, [300,300,300], database=Database())
+agent = Agent("Rust-Agent-8.2", replay, [288,144,100,50], database=Database())
 
 while not os.path.exists("./stop"):
     replay.reset()
