@@ -4,7 +4,7 @@ from database import Database
 import os
 
 
-replay = PyReplay2x2(1_000)
+replay = PyReplay2x2(100_000)
 
 
 UPDATE_TARGET_INTERVAL = 500
@@ -15,7 +15,7 @@ PURGE_INTERVAL = 1000
 KEEP_COUNT = 2
 
 GAMMA = 0.5
-EXPERIENCE_GATHER_SIZE = 100
+EXPERIENCE_GATHER_SIZE = 1_000
 TRAIN_SAMPLE_SIZE = 500
 
 
