@@ -31,3 +31,13 @@ get_epochs <- function(modelId) {
 
   return(df)
 }
+
+get_evaluation_moves <- function(modelId) {
+  conn <- connectToDatabase()
+
+  rs <- dbSendQuery(conn,"SELECT * FROM EvaluationData WHERE ModelId = ?", modelId)
+  df <- dbFetch(rs, n = -1)
+  dbDisconnect(conn)
+
+  return(df)
+}

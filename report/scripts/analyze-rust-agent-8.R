@@ -1,6 +1,6 @@
 library(ggplot2)
 library(tidyverse)
-source("database.R")
+source("src/database.R")
 
 df <- rbind(get_epochs(2044), get_epochs(2045), get_epochs(2046)) %>%
   mutate(Model = factor(ModelId)) %>%

@@ -1,6 +1,6 @@
 library(ggplot2)
 library(tidyverse)
-source("database.R")
+source("src/database.R")
 
 
 df <- get_epochs(2043) %>% mutate(AvgLoss = sqrt(Loss))
