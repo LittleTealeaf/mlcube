@@ -24,7 +24,7 @@ The following sections describe each used directory / sub-project of this projec
 
 This directory contains all of the setup scripts used for SQL configuration. I am using a Microsoft SQL Server to store both the training data, as well as (regrettably) the network weights and biases.
 
-You might be asking, _why?!_. Well, first of all I got tired of using `.json` files to store everything. I didn't know what I would do until I decided to take an Advanced Database Course in the Spring 2023 Semester. In the course, we needed to pick a large project to implement in a database, and I decided that it was the perfect excuse to get back to working on this project. Thus, I ported all of the data from json to a Microsoft SQL Server Database.
+You might be asking, _why?!_. Well, first of all I got tired of using `.json` files to store everything. I didn't know what I would do until I decided to take an Advanced Database Programming Course in the Spring 2023 Semester. In the course, we needed to pick a large project to implement in a database, and I decided that it was the perfect excuse to get back to working on this project. Thus, I ported all the data from json to a Microsoft SQL Server Database.
 
 ### `rust/`
 
@@ -51,3 +51,7 @@ This is the directory where it really gets fun. Kind-of. This basically contians
 - The best python script you have ever seen that runs it all. 
 
 The scripts in `python/` are primarily going to be run in a dev-environment, described in the `.devcontainer/` directory. However, I suppose it could be used elsewhere.
+
+### `report/`
+
+The `report/` directory contains files used in analysis and compiling a report for my Advanced Database Programming Course. For analysis and building graphs, I use R with `ggplot2`, and the report itself is written in LaTeX.
