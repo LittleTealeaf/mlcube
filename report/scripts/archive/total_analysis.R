@@ -1,4 +1,4 @@
-source("src/database.R")
+source("../src/database.R")
 library(tidyverse)
 library(ggplot2)
 

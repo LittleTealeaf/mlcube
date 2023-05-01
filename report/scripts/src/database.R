@@ -22,22 +22,34 @@ connectToDatabase <- function() {
   return(conn)
 }
 
-get_epochs <- function(modelId) {
+get_epochs <- function(...) {
+  args <- list(...)
   conn <- connectToDatabase()
 
-  rs <- dbSendQuery(conn, "SELECT * FROM Epoch WHERE ModelId = ?", modelId)
-  df <- dbFetch(rs, n = -1)
+  dataframes <- lapply(args, function(modelId) {
+    rs <- dbSendQuery(conn, "SELECT * FROM Epoch WHERE ModelId = ?", modelId)
+    df <- dbFetch(rs, n = -1)
+    return(df)
+  })
   dbDisconnect(conn)
 
-  return(df)
+  joined_df <- do.call(rbind, dataframes)
+
+  return(joined_df)
 }
 
-get_evaluation_moves <- function(modelId) {
+get_evaluation_data <- function(...) {
+  args <- list(...)
   conn <- connectToDatabase()
 
-  rs <- dbSendQuery(conn,"SELECT * FROM EvaluationData WHERE ModelId = ?", modelId)
-  df <- dbFetch(rs, n = -1)
+  dataframes <- lapply(args, function(modelId) {
+    rs <- dbSendQuery(conn,"SELECT * FROM EvaluationData WHERE ModelId = ?", modelId)
+    df <- dbFetch(rs, n = -1)
+    return(df)
+  })
   dbDisconnect(conn)
 
-  return(df)
+  joined_df <- do.call(rbind, dataframes)
+
+  return(joined_df)
 }
