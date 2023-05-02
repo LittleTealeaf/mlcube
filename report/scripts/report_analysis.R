@@ -17,5 +17,5 @@ df_epochs %>%
   theme(legend.position = "none")
 
 
-get_epochs(2051) %>% ggplot(aes(x = Epoch, y = Loss)) +
+get_epochs(2052) %>% ggplot(aes(x = Epoch, y = Loss)) +
   geom_point()
