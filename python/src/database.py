@@ -212,7 +212,7 @@ class Database:
     def upload_evaluation(
         self, modelid: int, seed: int, solved: bool, moves: list[tuple[str, float]]
     ):
-        epoch = self.get_current_epoch(modelid)
+        epoch = self.get_current_epoch(modelid) - 1
 
         cursor = self.connection.cursor()
         cursor.execute(
