@@ -21,13 +21,13 @@ TRAIN_SAMPLE_SIZE = 500
 
 
 def calculate_epsilon(epoch):
-    return (1 - ((epoch % UPDATE_TARGET_INTERVAL) / UPDATE_TARGET_INTERVAL)) * 0.5
+    return (1 - ((epoch % UPDATE_TARGET_INTERVAL) / UPDATE_TARGET_INTERVAL)) * 0.7
 
 
 def calculate_learning_rate(epoch):
-    return 0.01 * (0.9 ** (epoch / UPDATE_TARGET_INTERVAL) ) * (0.99 ** (epoch % UPDATE_TARGET_INTERVAL))
+    return 0.01 * (0.95 ** (epoch / UPDATE_TARGET_INTERVAL) ) * (0.99 ** (epoch % UPDATE_TARGET_INTERVAL))
 
-agent = Agent("Rust-Agent-Test-9", replay, [300,300,300,200,200], database=Database())
+agent = Agent("Rust-Agent-10-0", replay, [300,300,300,200,200], database=Database())
 
 while not os.path.exists("./stop"):
     replay.reset()
