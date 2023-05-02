@@ -25,9 +25,9 @@ def calculate_epsilon(epoch):
 
 
 def calculate_learning_rate(epoch):
-    return 0.1 * (0.8 ** (epoch / UPDATE_TARGET_INTERVAL) )
+    return 0.1 * (0.9 ** (epoch / UPDATE_TARGET_INTERVAL) ) * (0.99 ** (epoch % UPDATE_TARGET_INTERVAL))
 
-agent = Agent("Rust-Agent-Test-7", replay, [300,300,200,200,100], database=Database())
+agent = Agent("Rust-Agent-10-0", replay, [300,300,300,200,200], database=Database())
 
 while not os.path.exists("./stop"):
     replay.reset()
