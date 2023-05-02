@@ -6,7 +6,7 @@ source("src/database.R")
 
 df_epochs <- rbind(
   get_epochs(2043) %>% mutate(Loss = sqrt(Loss)),
-  get_epochs(2044, 2045, 2046, 2048)
+  get_epochs(2044, 2045, 2046, 2048, 2052)
 ) %>% mutate(Model = factor(ModelId))
 
 df_epochs %>%
@@ -18,4 +18,4 @@ df_epochs %>%
 
 
 get_epochs(2052) %>% ggplot(aes(x = Epoch, y = Loss)) +
-  geom_point()
+  geom_point(size=0.1)
