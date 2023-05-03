@@ -16,26 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         name: Checkout Repository
-      - uses: actions/cache@v3
-        name: Rust Cache
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-          key: ${{ runner.os }}-rust-cargo-${{ hashFiles('rust/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-cargo-
-      - uses: actions/cache@v3
-        name: Rust Target Cache
-        with:
-          path: |
-            rust/target/
-          key: ${{ runner.os }}-rust-target-${{ hashFiles('rust/Cargo.lock') }}-${{ hashFiles('rust/**/*.rs') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-target-${{ hashFiles('rust/Cargo.lock') }}-
-            ${{ runner.os }}-rust-target-
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - name: Run Tests
         run: cd rust && cargo test
   rust_python_test:
@@ -52,26 +34,8 @@ jobs:
         with:
           python-version: 3.9
           activate-conda: true
-      - uses: actions/cache@v3
-        name: Rust Cache
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-          key: ${{ runner.os }}-rust-cargo-${{ hashFiles('rust/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-cargo-
-      - uses: actions/cache@v3
-        name: Rust Target Cache
-        with:
-          path: |
-            rust/target/
-          key: ${{ runner.os }}-rust-target-${{ hashFiles('rust/Cargo.lock') }}-${{ hashFiles('rust/**/*.rs') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-target-${{ hashFiles('rust/Cargo.lock') }}-
-            ${{ runner.os }}-rust-target-
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - uses: actions/cache@v3
         name: Rust Pytest Cache
         with:
