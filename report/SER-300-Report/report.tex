@@ -34,7 +34,7 @@ Neural Networks are one of the core pieces of machine learning. Neural Networks 
 
 In short, a Neural Network is a function approximator. It achieves this through use of gradient descent with its many variables. Neural Networks may have upwards to $100,000$s of variables, consisting of weights and biases. To train these weights and biases, you need to provide pre-labeled data, or data that already has a predetermined answer.
 
-First, the input data is fed into the network. The network will pass the data through the layers, and eventually output what it thinks the answer is. You then compare the result to the expected value, and square the result. The result will be your ``loss'' for that observation. Loss tracks how badly the network did in this scenario. 
+First, the input data is fed into the network. The network will pass the data through the layers, and eventually output what it thinks the answer is. You then compare the result to the expected value, and square the result. The result will be your ``loss'' for that observation. Loss tracks how badly the network did in this scenario.
 
 With loss, and the loss function, we can calculate the gradient for the entire function. The gradient consists of the partial derivatives for every single weight and bias in the network. Recall that these weights and biases are what determines the output. By finding the partial derivative of each variable as it relates to loss, we can take use the negative gradient to nudge each variable so that the loss decreases.
 
@@ -43,221 +43,58 @@ By performing this sequence multiple times, the network will start figuring out 
 \subsection{Deep Q-Learning}
 
 
-Deep Q-Learning is a form of Reinforcement Learning that utilizes a Q-Function to train the model against. 
+Deep Q-Learning is a form of Reinforcement Learning that utilizes a Q-Function to train the model against. The goal of Deep Q-Learning is to explore an unknown environment with a clear goal, learning from prior experience to maximize reward.
+
+Deep Q-Learning requires the user of an environment. In short, an environment contains observations, actions the agent can take, and some form of a reward system that drives the user towards the end goal. For this project, the environment is simply a Rubik's cube\footnote{Originally the environment was a standard 3x3 Rubik's Cube, however to simplify things I've recently switched over to a 2x2 Rubik's Cube, with intentions of returning to a 3x3 once I create a model that solves a 2x2 Rubik's Cube}. The observations consist of an array of values representing each tile face of the cube\footnote{On a 3x3 Rubik's Cube, this would be each of the 9 smaller squares on each side of the cube}, the actions are each of the possible moves that can be performed on the cube, and the reward is the number of correct squares on each face of the cube\footnote{The reward function has been a tough point to figure out with this project. For now this method will work, but there are surely better reward systems out there}.
+
+In Deep Q-Learning, the logic that chooses the answer is called a Q-Function. The Q-Function consumes the current state of the cube,m and returns the predicted reward it thinks each move will give it. For example, if the cube is one move away from being solved, the reward for the move that solves the cube will be higher than all other moves.
+
+In standard Q-Learning practice, the Q-Function is a table that records all states that the agent has seen, what actions they took, and what the resulting reward actually was. However, this is unfeasable for environments such as the Rubik's Cube. It is estimated that the Rubik's Cube has 43 Quintillion possible states. To make sense of that number, if you scramble the cube randomly, it is statistically impossible to reach a state that has already been reached before. Thus, a table isn't effective.
+
+That's where Neural Networks come in! Neural Networks are great at approximating functions, like Q-Functions! In our implementation of Q-Learning we will use 2 Neural Networks. One is called the Q-Network, and the other will be called the Target network.
+
+But why 2 networks? Aren't we only training one? Yes. We are only training one, but one of the problems with reinforcement learning is that there is no ``answer'' that we can train the network on. Thus, we need to make that answer. The goal with training is to make the Q-Network approximate the predicted reward of taking an action at State A to be equal to the reward of State B plus the Target Network's approximation for the best move from State B.
+
+That... probably didn't make sense. It's a very complicated subject, and it took me a long time to figure out. Imagine you're playing chess, and you're looking 2 moves ahead. You then associate the first move with the reward you get after the following move. Similarly, we are training the Q-Network to associate an action with the actual reward plus the predicted future reward of that state\footnote{And if there are people who are still confused at this point, I don't know how else to word it.}.
+
+In order to keep the target network up to date, every so often we take the target network and update it with the values of the Q-Network. In a perfect world, where the Q-Network perfectly predicts the future target network's result, every time we update the target network, the Q-Network will be looking one more step ahead.
+
+There is a lot I left out in this background section, and a lot that was probably confusing. However, much of the analysis relies on some basic knowledge included here, but shouldn't be too difficult to understand once you figure out the basics.
+
+
+\newpage
+
+\section{Project Structure}
+
+Currently, the project is split up into individual components. The following sections discusses the uses for each component and how they fit into the bigger picture. Originally, this project was just a large project written in python, but I have since split it up during a complete re-write that started at the beginning of the Spring 2023 Semester.
+
+\subsection{Rust}
+
+In prior iterations of the project, I was never quite satisfied with how efficient the emulation of the Rubik's Cube was in python. Many times it ended up being a bottle-neck for the entire system. Thus, I decided that I would write the environment in Rust. 
+
+This project uses the PyO3 library for Rust, which provides the ability to compile Rust into a Python module, allowing me to simply import and use it directly in python. The benefit of this is that all of the logic performed with the cube is done in a memory-save, type-safe, efficient language that runs at the speed of C. 
+
+Furthermore, I decided to also implement the replay database in Rust, giving me even more optimizations when it comes to storing and fetching samples to train on.
+
+\subsection{SQL}
+
+I made some mistakes in the original implementation. Originally, I was using large JSON files to store all of the collected data for analysis. This had a few negative effects. Firstly, the data was unoptimized. Secondly, it required me to load the entire file into ram every time I wanted to add another value\footnote{This quickly built up over time, especially when I started leaving the program running overnight and throughout all of my classes}. Lastly, there were some additional constraints with the storage of numbers within data file.
+
+Thus, to solve these problems I decided to use SQL to store everything. I set up and configured a Microsoft SQL Server running on a Docker Container. This solved many of the problems above, and also had the additional benefit of being accessible by any of my devices\footnote{This is achieved through the use of Tailscale, which creates a private virutal network between all of your registered devices}.
+
+\subsection{Python}
+
+The last and most important part: Python. This project uses the Tensorflow library to simplify many of the machine learning and neural network functions. However, I avoided the use of Keras or other all-encompassing modules as I wanted to learn how it works before using someone else's code. 
+
 
 \newpage
 
 \section{Analysis}
 
 
-\subsection{Historical Attempts}
-
-This project has been a work in progress for about a year, and I have collected data from prior models I tried. Before stepping into the models I created recently, it helps to look at what it used to be like.
-
-For obvious reasons, only the last few historical models will be accounted for, as they are the closest to the most recent models.
-
-\subsubsection{Model 31}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics{assets/ model_31.png}
-	\caption{The Loss graph of main-6}
-\end{figure}
-
-
-This graph represents the average loss of the model at each epoch that it was trained on. The lower the loss, the better the result is. As described in the background, the model is being tested against the target's predicted reward of the following move. What this means is that while the graph at points may be very close to $0$, it does not mean that the model is anywhere close to being able to solve a rubik's cube, but simply that it has gotten good at predicting what it would evaluate the next move in the sequence.
-
-One of the first things to note is that the dotted lines indicate model updates. That is, each dotted line states that the target network was updated with values in the Q-Network at that point. The spikes confirm this, as whenever the target gets updated, the model is no longer being tested against the same thing.
-
-However, what we see is that this particular model doesn't tend to update. It quickly reduces its loss to very close to 0, and then stagnates for the rest of the cycle. This type of behavior is indifferent to the overall success. It just means that the target must be so simple that it takes almost no time to learn how to replicate it. One possible reason for this could be that it assumes the reward of any move will be $0$, so each move might be equally as good.
-
-\subsubsection{Model 39}
-
-Going forward a few iterations, I was trying out sequential models instead of trying to parallelize everything I could. In doing so, I got only slight differences from prior models.
-
-\begin{figure}[h]
-	\centering
-	\includegraphics{assets/ model_39.png}
-	\caption{Loss Graph of sequential-6}
-\end{figure}
-
-
-There was definitely some variation, but now we see a lack of major spikes whenever the model was updated. Now, I don't remember what the configuration was at that point\footnote{I had some very interesting ways of tracking models. This is totally not the reason that there are many branches on the GitHub repository.}, but with the way the trend looks, it wasn't doing much.
-
-\subsubsection{Overall Conclusions of Historical Data}
-
-There isn't much to conclude with my historical attempts. The only important parts to note is that the code wasn't set up in the most optimized way. I found that python had a difficult time emulating a rubik's cube, and dumping all of the data into JSON files was not the best use of system ram.
 
 \newpage
 
-\subsection{The great rewrite of Spring 2023}
-
-In the spring semester of 2023, I decided to try and tackle this project again. I couldn't bear the old code, so I decided to scrap everything and start from scratch. In doing so, I made the choice to include different languages for what they do best.
-
-For emulating the rubik's cube, I used the Rust Programming Language, particulary using py03 to compile Rust code into a Python module. This allows me to emulate the cube using memory-efficient code.
-
-For storing data, I decided to use a Microsoft SQL Server database run from a Docker Container. Using SQL allowed me to not worry about managing JSON files, and also gave me the ability to access the data from anywhere\footnote{This was achieved through the use of Tailscale, which creates a private virtual network between your devices}.
-
-Because I used Microsoft SQL Server, I was able to use R for analyzing, as it has better graphing and reporting features than many other languages like Python. All of the graphs and data tables in this report are made using R and R libraries.
-
-Lastly, I used python for the model itself. I am used to working with the Tensorflow library, and to change things up would not be the best idea. I am using pyodbc to connect to the database, and the Rust library mentioned earlier to emulate the cube.
-
-\subsubsection{The Replay Database}
-
-The rust implementation not only emulates the cube, but also stores the history to be used as a replay database. As opposed to prior implementations in python, using Rust for the replay database made sense, as Rust handles memory efficiency much better than python.
-
-The replay database implementation consists of a list of entries. Each entry contains the initial cube state, the chosen move, the next cube state, and the reward of the next cube state. When the model builds up the replay database, it populates this list until it reaches its capacity, where it will then start randomly replacing values already in the set. When the model needs to train, a random sample of data points will be returned from the set. No items are physically removed from the replay, so it is possible for an entry to be pulled more than once for a training session.
-
-\newpage
-
-\subsection{Model 2043}
-
-\href{https://www.github.com/LittleTealeaf/mlcube/tree/33486dc0e1b074dd91d75fec95c8f1bcea5e8b59}{Git Commit 33486dc0e1b074dd91d75fec95c8f1bcea5e8b59}
-
-
-Model 2043\footnote{Note that the number jump does not mean there were 2000 models. Many of the indexes in the database were used for testing, and actual model tests did not start until index 2032} is the first actual model that I ran after rewriting the entire program. One of the things I forgot to do when building this model was to square-root the average loss values when collecting and storing data. For the graphs below, average loss has been square-rooted in order to keep consistency with the other model graphs.
-
-\subsubsection{First 10,000 Epochs}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics{assets/ model_2043_1000.png}
-	\caption{First 10,000 epoch entries of Model 2043}
-\end{figure}
-
-Notice that many of the spikes are accurately seen as a result of the target updating. These are good signs, meaning that the difference between models for each cycle are different.
-
-One of the major differences between historical data and the data in Model 2043 is the reward system. Calculating reward can be one of many different methods, and it is unclear the results of that choice. For these models, I decided to define the reward of a state as the total sum of correct tiles on the cube. That is, a fully solved 2x2 Rubik's Cube will have a reward of $24$. In further implementations, this is slightly changed so that the minimum possible reward is $0.0$, but it doesn't fundamentally change the meaning behind reward.
-
-When looking deeper into the first 10,000 epochs, I noticed that some of the spikes happened \textit{before} the target update.
-
-\subsubsection{Odd Behaviour}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics{assets/ model_2043_1.png}
-	\caption{Epochs 7750 - 9750 for Model 2043}
-\end{figure}
-
-As seen, the model seemed to spike in loss right before some of the target updates. This type of behaviour is highly irregular, and stumped me for a great deal of time. Even now, I have no mathematical reasoning behind this phenomenon. I tried a few attempts and soon found out that it was an issue with the code. 
-
-\newpage
-
-\subsubsection{Code Errors}
-
-The loss of the model for a training set uses the sum of squares method. The full equation used to calcualte the average loss is as follows:
-
-$$\text{Loss} = \sum_{i}{(\text{Q-Network}_{\text{Choice}_i}(\text{Initial State}_i) - \text{Reward}_i - \gamma \cdot \max{(\text{Target}(\text{Next State}_i))})^2}$$
-
-
-However, the implementation in python read as 
-
-\begin{minted}{python}
-loss_raw = (
-	tf.reshape(
-  	output_2_gathered_scaled, (output_2_gathered_scaled.shape[0], 1)
- 	)
- 	- output_1_gathered
- 	- reward
-)
-
-loss = tf.math.square(loss_raw)
-\end{minted}
-
-The error lied in the fact that I had seemingly swapped the first two variables. This issue meant that the network wasn't at all trying to reduce the loss between the Q-network and the Target network. This has a high possibility of being correlated to why the model had odd behaviours. In the following model, I corrected the code to be as follows:
-
-
-
-\begin{minted}{python}
-loss_raw = (
-	tf.reshape(
-  	output_2_gathered_scaled, (output_2_gathered_scaled.shape[0], 1)
- 	)
- 	- output_1_gathered
- 	+ reward
-)
-
-loss = tf.math.square(loss_raw)
-\end{minted}
-
-
-\newpage
-
-
-\subsection{Models 2044-2046}
-
-Models 2044 and 2046 are similar models that followed Model 2043. After fixing the issues found with Model 2043, multiple models with slightly different configuration were ran in quick succession before making any serious changes.
-
-\subsubsection{Overview of Configurations}
-
-The following table summarizes the differences between each of the models.
-
-\begin{center}
-	\begin{tabular}{| c | c | c | c |}
-		\hline
-		& Model 2044 & Model 2045 & Model 2046 \\
-		\hline
-		\hline
-		Hidden Layer Sizes & $300,250,200,100,50$ & $300,300,300$ & $288, 144, 100, 50$ \\
-		\hline
-		Replay Size & $10,000$ & $2,000$ & $10,000$ \\
-		\hline
-		Gamma & $0.9$ & $0.7$ & $0.7$ \\
-		\hline
-		Update Interval & $1000$ & $500$ & $500$ \\
-		\hline
-		Learning Rate & No Change & No Change & Decreases slower \\
-		\hline
-	\end{tabular}
-
-\end{center}
-
-The full configuration of each model can be found at the following links to the GitHub repository commits for each model.
-
-
-\begin{itemize}
-	\item \href{https://www.github.com/LittleTealeaf/mlcube/tree/7e2b15fd3c30c8333ba9d5192990ff7fc0fc6eea}{Model 2044: 7e2b15fd3c30c8333ba9d5192990ff7fc0fc6eea}
-	\item \href{https://www.github.com/LittleTealeaf/mlcube/tree/b2f7631d70db228bc0676e63e3d1790094f55684}{Model 2045: b2f7631d70db228bc0676e63e3d1790094f55684}
-	\item \href{https://www.github.com/LittleTealeaf/mlcube/tree/fd3300675f662864be00a3378dbba0d470933472}{Model 2046: fd3300675f662864be00a3378dbba0d470933472}
-\end{itemize}
-
-\newpage
-
-\subsubsection{First 10,000 Epochs}
-
-
-\begin{figure}[h]
-	\centering
-	\includegraphics{assets/ models_2044_2046_0.png}
-	\caption{First 10,000 Epochs for models 2044, 2045, and 2046}
-\end{figure}
-
-It's important to note that model 2044 had a target update cycle of $1000$, while models 2045 and 2046 had udpate cycles of only $500$. For that reason, the vertical lines were not included in the graph above. To get a better sense of trends between the models, we can scale 2045 and 2046 by $2$ so that the target updates line up at every $1000$ epochs.
-
-\newpage
-
-\begin{figure}[h]
-	\centering
-	\includegraphics{assets/ models_2044_2046_1.png}
-	\caption{First 10,000 Epochs for models 2044, 2045, and 2046, scaled to syncronize target updates}
-\end{figure}
-
-With the target updates aligned, we can look at the differences in the patterns between each model. Notice how in 2044, the pattern seems to flatten out between each target update, almost to the point where a target udpate doesn't cause an increase in loss. However, in 2045 and 2046 we see the pattern where the loss jumps up momentarily after each target update, and then slowly descends back down to the lower value.
-
-A potential explanation to this could be the fact that 2044 had a target update interval of $1000$, while 2045 and 2046 had an interval of $500$. With the shorter cycle period, the model might not have a chance to get close to the target network before the target network gets updated. This means that it's a game of cat and mouse between the Q-network and target network. It's not obvious if this is efficient or if this has little impact on the training.
-
-\newpage
-
-\subsubsection{Evaluation Statistics}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics{assets/ models_2044_2046_2.png}
-	\caption{Evaluations during the first 10,000 epochs for models 2044, 2045, and 2046}
-\end{figure}
-
-The above graph summarizes each of the evaluations during the first 10,000 epochs. Evaluations were taken every 50 epochs, and the graph above shows the minimum, average, and maximum reward trend for each of the models\footnote{A point graph or line graph would not suffice as numbers are all over the place and messy otherwise. Thus, we show the general trends using ggplot2's geom\_smooth function}.
-\newpage
 
 \section{Conclusions}
 
@@ -356,6 +193,4 @@ The following is the source code used to create the graphs
 
 All source files, including the ones found in prior appendixes, can be found on the GitHub Repository. \url{https://www.github.com/LittleTealeaf/mlcube}
 
-
 \end{document}
-
