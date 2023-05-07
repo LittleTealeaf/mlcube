@@ -24,6 +24,12 @@
 
 \section{Abstract}
 
+Deep-Q Learning is a form of Reinforcement Learning that utilizes a Q-Function and a Target Function to make an agent explore and learn within an environment with a set goal. In my project, I am using Neural Networks as the Q-Function, training them to learn how to solve a Rubik's Cube.
+
+This particular project is about a year in the making, and has had many failed attempts. Build a neural network isn't a one and done deal, and takes lots of time and thought to make one work. Thus, this report consists of some discussion, analysis, and thoughts I have with a few of the models I created during my most recent rewrite of the program.
+
+Through these models, I was able to discover mistakes in my code, and make assumptions as to which hyperparameters have more of an impact than others. My conclusion is the fact that there is no conclusion to be made at this point in time for the project, as a successful model has yet to be built.
+
 \newpage
 
 \section{Background}
@@ -70,9 +76,9 @@ Currently, the project is split up into individual components. The following sec
 
 \subsection{Rust}
 
-In prior iterations of the project, I was never quite satisfied with how efficient the emulation of the Rubik's Cube was in python. Many times it ended up being a bottle-neck for the entire system. Thus, I decided that I would write the environment in Rust. 
+In prior iterations of the project, I was never quite satisfied with how efficient the emulation of the Rubik's Cube was in python. Many times it ended up being a bottle-neck for the entire system. Thus, I decided that I would write the environment in Rust.
 
-This project uses the PyO3 library for Rust, which provides the ability to compile Rust into a Python module, allowing me to simply import and use it directly in python. The benefit of this is that all of the logic performed with the cube is done in a memory-save, type-safe, efficient language that runs at the speed of C. 
+This project uses the PyO3 library for Rust, which provides the ability to compile Rust into a Python module, allowing me to simply import and use it directly in python. The benefit of this is that all of the logic performed with the cube is done in a memory-save, type-safe, efficient language that runs at the speed of C.
 
 Furthermore, I decided to also implement the replay database in Rust, giving me even more optimizations when it comes to storing and fetching samples to train on.
 
@@ -84,19 +90,170 @@ Thus, to solve these problems I decided to use SQL to store everything. I set up
 
 \subsection{Python}
 
-The last and most important part: Python. This project uses the Tensorflow library to simplify many of the machine learning and neural network functions. However, I avoided the use of Keras or other all-encompassing modules as I wanted to learn how it works before using someone else's code. 
+The last and most important part: Python. This project uses the Tensorflow library to simplify many of the machine learning and neural network functions. However, I avoided the use of Keras or other all-encompassing modules as I wanted to learn how it works before using someone else's code.
 
 
 \newpage
 
 \section{Analysis}
 
+This analysis will walk through each of the models I created within the last month. I will present and describe graphs discussing the training history, and the conclusions I came to for each model or group of models.
+
+\subsection{Model 2043}
+
+Model 2043 was the first model after many test attempts that I was able to run. While it wasn't anywhere near successful, it provided me insight into what kinds of data and efficiency I could expect.
+
+\subsubsection{All Epochs}
+
+\begin{figure}[h]
+	\centering
+	\caption{Average Loss vs Epochs for Model 2043}
+	\includegraphics{assets/ 2043_0.png}
+\end{figure}
+
+Figure 1 displays a complete graph of the loss of each epoch training cycle for Mode 2043. We can use this to look at overall trends within the training. Once again, the loss is the average difference between what the Q-Function obtained for the current state versus the reward for the next state and the target network's predicted evaluation of the next move.
+
+Note that in Figure 1, there is a lot of spikes towards the beginning, but smooth out later on. This tells us that there is a point where the model cannot learn anything more with it's current configuration.
+
+
+\subsubsection{First 10,000 Epochs}
+
+Let's take a look at the first $10,000$ epochs to see what we can learn from the repeating spikes in loss.
+
+\begin{figure}[h]
+	\centering
+	\caption{First 10,000 Epochs for Model 2043}
+	\includegraphics{assets/ 2043_1.png}
+\end{figure}
+
+The dotted lines in Figure 2 indicate when the target network is updated. That would explain why we have large spikes in loss righ after each one. By upating the target network, we are changing what the Q-Network is being trained against. This means that the Q-Network needs to start training towards a new goal all over again.
+
+This also makes sense why these spikes eventually dwindle down. As the model trains more and more, we can assume that it will hit a cap for its ability to think about the complex nature of the rubik's cube. This doesn't mean that it has learned how to solve a rubik's cube, but rather that it's learned as much as it possibly can.
+
+\newpage
+
+\subsubsection{Odd Behavior}
+
+If you look closely towards the tail end of Figure 2, you might notice that some of the spikes do \textit{not} correspond with the update interval. Let's take a closer look.
+
+
+\begin{figure}[h]
+	\centering
+	\caption{Epochs 8250 - 9750 for Model 2043}
+	\includegraphics{assets/ 2043_2.png}
+\end{figure}
+
+This is odd behavior indeed. In Figure 3, we see multiple instances where the loss spiked up \textit{before} the target was updated. This shouldn't make sense because the network has no idea when the target is going to be updted, nor have any ability to act on it. Something in the code must be wrong.
+
+\newpage
+
+\subsubsection{Incorrect Code}
+
+After some investigation, I found that the code I wrote for calculating Loss was incorrect. For review, our general equation for loss is as follows:
+
+$$\text{Q-Network}(\text{State A})_{\text{Choice}} - \text{Reward} - \gamma \cdot \text{Target}(\text{State B})_{\text{max}}$$
+
+When I looked in the code, however, I found the following snippet:
+
+
+\begin{minted}{python}
+loss_raw = (
+	tf.reshape(
+		output_2_gathered_scaled, (output_2_gathered_scaled.shape[0], 1)
+	)
+	- output_1_gathered
+	- reward
+)
+\end{minted}
+
+The simple fix that I implemented for the following models is as follows
+
+\begin{minted}{python}
+loss_raw = (
+	tf.reshape(
+		output_2_gathered_scaled, (output_2_gathered_scaled.shape[0], 1)
+	)
+	- output_1_gathered
+	+ reward
+)
+\end{minted}
+
+
+With this discover, we can conclude that Model 2043 is not doing anything correctly, as far as we know.
 
 
 \newpage
 
+\subsection{Models 2044-2046}
+
+Models 2044, 2045, and 2046 all have similar traits. The only differences between them were small changes with the hyperparameters. Therefore, we will combine them and look at their collective information to try and pull some data out.
+
+\subsubsection{Inter-Model Changes}
+
+The following table shows us some of the changes made to hyperparameters between each model, giving us a sense of what differences might arise from.
+
+
+\begin{center}
+	\begin{tabular}{| c | c | c | c |}
+		\hline
+		                   & Model 2044           & Model 2045    & Model 2046          \\
+		\hline
+		\hline
+		Hidden Layer Sizes & $300,250,200,100,50$ & $300,300,300$ & $288, 144, 100, 50$ \\
+		\hline
+		Replay Size        & $10,000$             & $2,000$       & $10,000$            \\
+		\hline
+		Gamma              & $0.9$                & $0.7$         & $0.7$               \\
+		\hline
+		Update Interval    & $1000$               & $500$         & $500$               \\
+		\hline
+		Learning Rate      & No Change            & No Change     & Decreases slower    \\
+		\hline
+	\end{tabular}
+
+\end{center}
+
+We will be referencing changes noted in this table as we compare each model in the following graphs.
+
+
+\newpage
+
+\subsubsection{All Epochs}
+
+Let's take a look at all of each model's data.
+
+\begin{figure}[h]
+	\centering
+	\caption{Epochs vs Loss for Models 2044, 2045, and 2046}
+	\includegraphics{assets/ 2044-2046_0.png}
+\end{figure}
+
+Some initial observations that can be made is that all three models eventually started repeating some cycle. This cycle is most likely related to the target update intervals. Apart from that, not much insight can be drawn from this information.
+
+\newpage
+
+\subsubsection{First 10,000 Epochs}
+
+Now, let's take just the first 10,000 Epochs of each model so we can better see the similarities and differences. The only caveat is that not all of the models have the same target update frequency. Model 2044 updates its target every $1000$ epochs, while Models 2045 and 2046 update every $500$. In order to better relate the cycles, Models 2045 and 2046 both have their Epochs doubled so that their cycle lines up with 2044.
+
+
+\begin{figure}[h]
+	\centering
+	\caption{First 10,000 Epochs of Models 2044, 2045, and 2046}
+	\includegraphics{assets/ 2044-2046_1.png}
+\end{figure}
+
+All three of the models have very similar initial patterns. They all have significant downward momentum until the first epoch. This process repeats every target update, but the range shortens every time. Notice how Model 2044 doesn't even seem to have the spikes in loss after 5 target updates. 
+
+Model 2044 had more layers and a higher $\gamma$ than 2045 and 2046. Therefore, we could assume that those two attributes might have an impact on how it ended up learning. I predict that the change in $\gamma$ had the most profound effect, as $\gamma$ dictates how much the network weighs the ``future expected reward'' returned from the target network. 
 
 \section{Conclusions}
+
+
+
+This\footnote{Some models have been omitted from this report in the interest of not spending many more hours dissecting the information, and also to keep this report from being 30-40 pages. You're welcome.} project isn't the kind that a final conclusion can be had at any point in the middle. While I discussed a lot of my thoughts about what things \textit{could} mean, there is absolutely no way of knowing for sure if my conclusions are correct. Neural networks are black-box items, so there is no definitive way to crack open the box and understand what it's doing. However, we can learn about the impact levels that different hyperparameters have, such as gamma ($\gamma$), or the size of the neural network\footnote{This summer I am going to literally crank this up till my computer cries to see what will happen}.
+
+This summer I plan to continue my research into hyper-parameters, trying out different things such as larger network sizes or different setups to see if I could try to inch my way closer to having a network that can solve a 2x2 Rubik's Cube.
 
 
 \newpage
@@ -183,7 +340,7 @@ Returns the current epoch for a specified model. Calculates by grabbing the last
 
 \section{Report Graph Source Code}
 
-The following is the source code used to create the graphs
+The following is the source code used to create the graphs found within this report.
 
 \inputminted{R}{../scripts/SER-300-Report.R}
 
@@ -194,3 +351,4 @@ The following is the source code used to create the graphs
 All source files, including the ones found in prior appendixes, can be found on the GitHub Repository. \url{https://www.github.com/LittleTealeaf/mlcube}
 
 \end{document}
+
