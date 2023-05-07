@@ -24,20 +24,26 @@
 
 \section{Abstract}
 
-The rubik's cube can be a really perplexing puzzle. It's just a 3x3 cube with each side a different color, letting you rotate each side to scramble or attempt to solve it. Studies have found that a typical 3x3 Rubik's cube has 43 quintillion possible states. Therefore, it can be assumed that any truly scrambled state of the cube has never been seen before by anyone. Despite this, many people solve them incredibly fast, or in incredibly small number of moves. This project is an attempt to create a neural network that can solve such cube in as few moves as possible, using a method called Deep-Q Learning.
-
-Deep-Q learning is a form of reinforcement learning that uses a Q-function to estimate the predicted reward for each possible action taken. In this project, I am using a neural network to estimate the Q-function, training it over many iterations to try and make it solve a rubik's cube. This particular report focuses on the solving of a 2x2 rubik's cube, which reduces the complexity of the problem as I tweak the agent and model. Once I get models that can solve the 2x2 rubik's cube without issues, I plan to set my model loose on a 3x3 rubik's cube.
-
-
 \newpage
 
 \section{Background}
 
 \subsection{Neural Networks}
 
-Neural Networks are one of the core components to machine learning. They are large complex formulas set up in a way that we can use derivatives to ``train'' them.
+Neural Networks are one of the core pieces of machine learning. Neural Networks are complex formulas that you are able to train by providing inputs and expected outputs, and the model will try to best identify patterns in the data. Neural Networks are often used to classify images, text, and many other applications.
+
+In short, a Neural Network is a function approximator. It achieves this through use of gradient descent with its many variables. Neural Networks may have upwards to $100,000$s of variables, consisting of weights and biases. To train these weights and biases, you need to provide pre-labeled data, or data that already has a predetermined answer.
+
+First, the input data is fed into the network. The network will pass the data through the layers, and eventually output what it thinks the answer is. You then compare the result to the expected value, and square the result. The result will be your ``loss'' for that observation. Loss tracks how badly the network did in this scenario. 
+
+With loss, and the loss function, we can calculate the gradient for the entire function. The gradient consists of the partial derivatives for every single weight and bias in the network. Recall that these weights and biases are what determines the output. By finding the partial derivative of each variable as it relates to loss, we can take use the negative gradient to nudge each variable so that the loss decreases.
+
+By performing this sequence multiple times, the network will start figuring out patterns in the data. Eventually, we can throw ``unlabeled data'' and see what it thinks about it. Additionally, there are some configurations that we can make with this process. We call these parameters ``hyperparameters''. Hyperparameters are parameters that appear to be arbitrary. In truth, many times we can't fully understand the effects of one hyperparameter on the overall process. As such, very little specific guidance is provided regarding how to set these variables. For a basic neural network, for example, hyperparameters could be the number of layers it has, how many nodes the network has in each layer, or the rate at which it learns\footnote{The value we multiple the negative gradient by before applying it to all of the variables}.
 
 \subsection{Deep Q-Learning}
+
+
+Deep Q-Learning is a form of Reinforcement Learning that utilizes a Q-Function to train the model against. 
 
 \newpage
 
@@ -182,6 +188,75 @@ loss = tf.math.square(loss_raw)
 
 Models 2044 and 2046 are similar models that followed Model 2043. After fixing the issues found with Model 2043, multiple models with slightly different configuration were ran in quick succession before making any serious changes.
 
+\subsubsection{Overview of Configurations}
+
+The following table summarizes the differences between each of the models.
+
+\begin{center}
+	\begin{tabular}{| c | c | c | c |}
+		\hline
+		& Model 2044 & Model 2045 & Model 2046 \\
+		\hline
+		\hline
+		Hidden Layer Sizes & $300,250,200,100,50$ & $300,300,300$ & $288, 144, 100, 50$ \\
+		\hline
+		Replay Size & $10,000$ & $2,000$ & $10,000$ \\
+		\hline
+		Gamma & $0.9$ & $0.7$ & $0.7$ \\
+		\hline
+		Update Interval & $1000$ & $500$ & $500$ \\
+		\hline
+		Learning Rate & No Change & No Change & Decreases slower \\
+		\hline
+	\end{tabular}
+
+\end{center}
+
+The full configuration of each model can be found at the following links to the GitHub repository commits for each model.
+
+
+\begin{itemize}
+	\item \href{https://www.github.com/LittleTealeaf/mlcube/tree/7e2b15fd3c30c8333ba9d5192990ff7fc0fc6eea}{Model 2044: 7e2b15fd3c30c8333ba9d5192990ff7fc0fc6eea}
+	\item \href{https://www.github.com/LittleTealeaf/mlcube/tree/b2f7631d70db228bc0676e63e3d1790094f55684}{Model 2045: b2f7631d70db228bc0676e63e3d1790094f55684}
+	\item \href{https://www.github.com/LittleTealeaf/mlcube/tree/fd3300675f662864be00a3378dbba0d470933472}{Model 2046: fd3300675f662864be00a3378dbba0d470933472}
+\end{itemize}
+
+\newpage
+
+\subsubsection{First 10,000 Epochs}
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics{assets/ models_2044_2046_0.png}
+	\caption{First 10,000 Epochs for models 2044, 2045, and 2046}
+\end{figure}
+
+It's important to note that model 2044 had a target update cycle of $1000$, while models 2045 and 2046 had udpate cycles of only $500$. For that reason, the vertical lines were not included in the graph above. To get a better sense of trends between the models, we can scale 2045 and 2046 by $2$ so that the target updates line up at every $1000$ epochs.
+
+\newpage
+
+\begin{figure}[h]
+	\centering
+	\includegraphics{assets/ models_2044_2046_1.png}
+	\caption{First 10,000 Epochs for models 2044, 2045, and 2046, scaled to syncronize target updates}
+\end{figure}
+
+With the target updates aligned, we can look at the differences in the patterns between each model. Notice how in 2044, the pattern seems to flatten out between each target update, almost to the point where a target udpate doesn't cause an increase in loss. However, in 2045 and 2046 we see the pattern where the loss jumps up momentarily after each target update, and then slowly descends back down to the lower value.
+
+A potential explanation to this could be the fact that 2044 had a target update interval of $1000$, while 2045 and 2046 had an interval of $500$. With the shorter cycle period, the model might not have a chance to get close to the target network before the target network gets updated. This means that it's a game of cat and mouse between the Q-network and target network. It's not obvious if this is efficient or if this has little impact on the training.
+
+\newpage
+
+\subsubsection{Evaluation Statistics}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics{assets/ models_2044_2046_2.png}
+	\caption{Evaluations during the first 10,000 epochs for models 2044, 2045, and 2046}
+\end{figure}
+
+The above graph summarizes each of the evaluations during the first 10,000 epochs. Evaluations were taken every 50 epochs, and the graph above shows the minimum, average, and maximum reward trend for each of the models\footnote{A point graph or line graph would not suffice as numbers are all over the place and messy otherwise. Thus, we show the general trends using ggplot2's geom\_smooth function}.
 \newpage
 
 \section{Conclusions}
@@ -266,6 +341,16 @@ A collected table from both the Evaluation and EvaluationMove tables. Used for f
 Returns the current epoch for a specified model. Calculates by grabbing the last epoch recorded for that model.
 
 \inputminted{SQL}{../../sql/procedures/get_current_epoch.sql}
+
+\newpage
+
+\section{Report Graph Source Code}
+
+The following is the source code used to create the graphs
+
+\inputminted{R}{../scripts/SER-300-Report.R}
+
+\newpage
 
 \section{GitHub Repository}
 
