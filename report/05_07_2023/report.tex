@@ -1,0 +1,276 @@
+\documentclass[12pt]{article}
+\usepackage{minted}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\title{Deep Q-Learning with Rubik's Cubes}
+\author{Thomas Kwashnak}
+
+\setminted{breaklines}
+
+\begin{document}
+
+\begin{titlepage}
+
+	\maketitle
+
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+
+\section{Abstract}
+
+The rubik's cube can be a really perplexing puzzle. It's just a 3x3 cube with each side a different color, letting you rotate each side to scramble or attempt to solve it. Studies have found that a typical 3x3 Rubik's cube has 43 quintillion possible states. Therefore, it can be assumed that any truly scrambled state of the cube has never been seen before by anyone. Despite this, many people solve them incredibly fast, or in incredibly small number of moves. This project is an attempt to create a neural network that can solve such cube in as few moves as possible, using a method called Deep-Q Learning.
+
+Deep-Q learning is a form of reinforcement learning that uses a Q-function to estimate the predicted reward for each possible action taken. In this project, I am using a neural network to estimate the Q-function, training it over many iterations to try and make it solve a rubik's cube. This particular report focuses on the solving of a 2x2 rubik's cube, which reduces the complexity of the problem as I tweak the agent and model. Once I get models that can solve the 2x2 rubik's cube without issues, I plan to set my model loose on a 3x3 rubik's cube.
+
+
+\newpage
+
+\section{Background}
+
+\subsection{Neural Networks}
+
+Neural Networks are one of the core components to machine learning. They are large complex formulas set up in a way that we can use derivatives to ``train'' them.
+
+\subsection{Deep Q-Learning}
+
+\newpage
+
+\section{Analysis}
+
+
+\subsection{Historical Attempts}
+
+This project has been a work in progress for about a year, and I have collected data from prior models I tried. Before stepping into the models I created recently, it helps to look at what it used to be like.
+
+For obvious reasons, only the last few historical models will be accounted for, as they are the closest to the most recent models.
+
+\subsubsection{Model 31}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics{assets/ model_31.png}
+	\caption{The Loss graph of main-6}
+\end{figure}
+
+
+This graph represents the average loss of the model at each epoch that it was trained on. The lower the loss, the better the result is. As described in the background, the model is being tested against the target's predicted reward of the following move. What this means is that while the graph at points may be very close to $0$, it does not mean that the model is anywhere close to being able to solve a rubik's cube, but simply that it has gotten good at predicting what it would evaluate the next move in the sequence.
+
+One of the first things to note is that the dotted lines indicate model updates. That is, each dotted line states that the target network was updated with values in the Q-Network at that point. The spikes confirm this, as whenever the target gets updated, the model is no longer being tested against the same thing.
+
+However, what we see is that this particular model doesn't tend to update. It quickly reduces its loss to very close to 0, and then stagnates for the rest of the cycle. This type of behavior is indifferent to the overall success. It just means that the target must be so simple that it takes almost no time to learn how to replicate it. One possible reason for this could be that it assumes the reward of any move will be $0$, so each move might be equally as good.
+
+\subsubsection{Model 39}
+
+Going forward a few iterations, I was trying out sequential models instead of trying to parallelize everything I could. In doing so, I got only slight differences from prior models.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics{assets/ model_39.png}
+	\caption{Loss Graph of sequential-6}
+\end{figure}
+
+
+There was definitely some variation, but now we see a lack of major spikes whenever the model was updated. Now, I don't remember what the configuration was at that point\footnote{I had some very interesting ways of tracking models. This is totally not the reason that there are many branches on the GitHub repository.}, but with the way the trend looks, it wasn't doing much.
+
+\subsubsection{Overall Conclusions of Historical Data}
+
+There isn't much to conclude with my historical attempts. The only important parts to note is that the code wasn't set up in the most optimized way. I found that python had a difficult time emulating a rubik's cube, and dumping all of the data into JSON files was not the best use of system ram.
+
+\newpage
+
+\subsection{The great rewrite of Spring 2023}
+
+In the spring semester of 2023, I decided to try and tackle this project again. I couldn't bear the old code, so I decided to scrap everything and start from scratch. In doing so, I made the choice to include different languages for what they do best.
+
+For emulating the rubik's cube, I used the Rust Programming Language, particulary using py03 to compile Rust code into a Python module. This allows me to emulate the cube using memory-efficient code.
+
+For storing data, I decided to use a Microsoft SQL Server database run from a Docker Container. Using SQL allowed me to not worry about managing JSON files, and also gave me the ability to access the data from anywhere\footnote{This was achieved through the use of Tailscale, which creates a private virtual network between your devices}.
+
+Because I used Microsoft SQL Server, I was able to use R for analyzing, as it has better graphing and reporting features than many other languages like Python. All of the graphs and data tables in this report are made using R and R libraries.
+
+Lastly, I used python for the model itself. I am used to working with the Tensorflow library, and to change things up would not be the best idea. I am using pyodbc to connect to the database, and the Rust library mentioned earlier to emulate the cube.
+
+\subsubsection{The Replay Database}
+
+The rust implementation not only emulates the cube, but also stores the history to be used as a replay database. As opposed to prior implementations in python, using Rust for the replay database made sense, as Rust handles memory efficiency much better than python.
+
+The replay database implementation consists of a list of entries. Each entry contains the initial cube state, the chosen move, the next cube state, and the reward of the next cube state. When the model builds up the replay database, it populates this list until it reaches its capacity, where it will then start randomly replacing values already in the set. When the model needs to train, a random sample of data points will be returned from the set. No items are physically removed from the replay, so it is possible for an entry to be pulled more than once for a training session.
+
+\newpage
+
+\subsection{Model 2043}
+
+\href{https://www.github.com/LittleTealeaf/mlcube/tree/33486dc0e1b074dd91d75fec95c8f1bcea5e8b59}{Git Commit 33486dc0e1b074dd91d75fec95c8f1bcea5e8b59}
+
+
+Model 2043\footnote{Note that the number jump does not mean there were 2000 models. Many of the indexes in the database were used for testing, and actual model tests did not start until index 2032} is the first actual model that I ran after rewriting the entire program. One of the things I forgot to do when building this model was to square-root the average loss values when collecting and storing data. For the graphs below, average loss has been square-rooted in order to keep consistency with the other model graphs.
+
+\subsubsection{First 10,000 Epochs}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics{assets/ model_2043_1000.png}
+	\caption{First 10,000 epoch entries of Model 2043}
+\end{figure}
+
+Notice that many of the spikes are accurately seen as a result of the target updating. These are good signs, meaning that the difference between models for each cycle are different.
+
+One of the major differences between historical data and the data in Model 2043 is the reward system. Calculating reward can be one of many different methods, and it is unclear the results of that choice. For these models, I decided to define the reward of a state as the total sum of correct tiles on the cube. That is, a fully solved 2x2 Rubik's Cube will have a reward of $24$. In further implementations, this is slightly changed so that the minimum possible reward is $0.0$, but it doesn't fundamentally change the meaning behind reward.
+
+When looking deeper into the first 10,000 epochs, I noticed that some of the spikes happened \textit{before} the target update.
+
+\subsubsection{Odd Behaviour}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics{assets/ model_2043_1.png}
+	\caption{Epochs 7750 - 9750 for Model 2043}
+\end{figure}
+
+As seen, the model seemed to spike in loss right before some of the target updates. This type of behaviour is highly irregular, and stumped me for a great deal of time. Even now, I have no mathematical reasoning behind this phenomenon. I tried a few attempts and soon found out that it was an issue with the code. 
+
+\newpage
+
+\subsubsection{Code Errors}
+
+The loss of the model for a training set uses the sum of squares method. The full equation used to calcualte the average loss is as follows:
+
+$$\text{Loss} = \sum_{i}{(\text{Q-Network}_{\text{Choice}_i}(\text{Initial State}_i) - \text{Reward}_i - \gamma \cdot \max{(\text{Target}(\text{Next State}_i))})^2}$$
+
+
+However, the implementation in python read as 
+
+\begin{minted}{python}
+loss_raw = (
+	tf.reshape(
+  	output_2_gathered_scaled, (output_2_gathered_scaled.shape[0], 1)
+ 	)
+ 	- output_1_gathered
+ 	- reward
+)
+
+loss = tf.math.square(loss_raw)
+\end{minted}
+
+The error lied in the fact that I had seemingly swapped the first two variables. This issue meant that the network wasn't at all trying to reduce the loss between the Q-network and the Target network. This has a high possibility of being correlated to why the model had odd behaviours. In the following model, I corrected the code to be as follows:
+
+
+
+\begin{minted}{python}
+loss_raw = (
+	tf.reshape(
+  	output_2_gathered_scaled, (output_2_gathered_scaled.shape[0], 1)
+ 	)
+ 	- output_1_gathered
+ 	+ reward
+)
+
+loss = tf.math.square(loss_raw)
+\end{minted}
+
+
+\newpage
+
+
+\subsection{Models 2044-2046}
+
+Models 2044 and 2046 are similar models that followed Model 2043. After fixing the issues found with Model 2043, multiple models with slightly different configuration were ran in quick succession before making any serious changes.
+
+\newpage
+
+\section{Conclusions}
+
+
+\newpage
+
+\appendix
+
+\section{SQL Code}
+
+\subsection{Tables}
+
+\subsubsection{Model}
+
+This table is used to differentiate between different models, as each model will have different configurations, sizes, and other features that need to be kept separate. This table consists of both historical records parsed from JSON and new models that are used in current analysis.
+
+\inputminted{SQL}{../../sql/tables/model.sql}
+
+\subsubsection{Epoch}
+
+The Epoch table stores all of the epoch data collected during training
+
+\inputminted{SQL}{../../sql/tables/epoch.sql}
+
+\subsubsection{Evaluation}
+
+The Evaluation table stores related data for evaluation runs by the model. The primary function of the Evaluation table is to keep a record of when the model starts making varied moves (instead of repeating the same move over and over).
+
+\inputminted{SQL}{../../sql/tables/evaluation.sql}
+
+\subsubsection{EvaluationMove}
+
+The Evaluation Move table contains each individual move made during evaluations. Each move is tied to an evaluation, a move index, and stores the move and its reward.
+
+\inputminted{SQL}{../../sql/tables/evaluationmove.sql}
+
+\subsubsection{Network}
+
+Acts as an identification item for each unique network stored in the Bias and Weight tables.
+
+\inputminted{SQL}{../../sql/tables/network.sql}
+
+\subsubsection{Bias}
+
+Stores each of the biases within a network.
+
+\inputminted{SQL}{../../sql/tables/bias.sql}
+
+\subsubsection{Weight}
+
+Stores each of the weights within a network.
+
+\inputminted{SQL}{../../sql/tables/weight.sql}
+
+\subsection{Users}
+
+\subsubsection{Model}
+
+The user used when running and training the model itself. The Model user must be able to insert and update data, as well as remove old networks to preserve space.
+
+\inputminted{SQL}{../../sql/users/model.sql}
+
+\subsubsection{Reports}
+
+The user used when building reports and graphs. This user only needs to be able to select and fetch data from various tables.
+
+\inputminted{SQL}{../../sql/users/reports.sql}
+
+\subsection{Views}
+
+\subsubsection{EvaluationData}
+
+A collected table from both the Evaluation and EvaluationMove tables. Used for fetching data for reports and analysis.
+
+\inputminted{SQL}{../../sql/views/EvaluationData.sql}
+
+\subsection{Procedures}
+
+\subsubsection{get\_current\_epoch}
+
+Returns the current epoch for a specified model. Calculates by grabbing the last epoch recorded for that model.
+
+\inputminted{SQL}{../../sql/procedures/get_current_epoch.sql}
+
+\section{GitHub Repository}
+
+All source files, including the ones found in prior appendixes, can be found on the GitHub Repository. \url{https://www.github.com/LittleTealeaf/mlcube}
+
+
+\end{document}
+
