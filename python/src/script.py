@@ -5,7 +5,8 @@ import os
 
 
 replay = PyReplay2x2(100_000)
-
+EXPERIENCE_GATHER_SIZE = 1_000
+TRAIN_SAMPLE_SIZE = 500
 
 UPDATE_TARGET_INTERVAL = 500
 EVALUATION_INTERVAL = 50
@@ -14,14 +15,13 @@ SAVE_INTERVAL = 250
 PURGE_INTERVAL = 1000
 KEEP_COUNT = 2
 
-EXPERIENCE_GATHER_SIZE = 1_000
-TRAIN_SAMPLE_SIZE = 500
 
 def calculate_gamma(epoch):
     return min(0.05 * (epoch // UPDATE_TARGET_INTERVAL), 1.0)
 
 def calculate_epsilon(epoch):
     return (1 - ((epoch % UPDATE_TARGET_INTERVAL) / UPDATE_TARGET_INTERVAL)) * 0.7
+# Keep constant or decrease every target interval
 
 
 def calculate_learning_rate(epoch):
