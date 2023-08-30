@@ -1,6 +1,6 @@
 tensorflow==2.13.0
 pandas==2.0.3
-pymssql==2.2.7
+pymssql==2.2.8
 pyodbc==4.0.39
 python-dotenv==1.0.0
 pytest==7.4.0
