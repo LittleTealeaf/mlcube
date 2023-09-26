@@ -1,4 +1,4 @@
-tensorflow==2.13.0
+tensorflow==2.14.0
 pandas==2.1.0
 pymssql==2.2.8
 pyodbc==4.0.39
