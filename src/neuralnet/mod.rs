@@ -2,6 +2,18 @@ fn sigmoid(x: f64) -> f64 {
     (1.0) / (1.0 + (-x).exp())
 }
 
+fn relu(x: f64) -> f64 {
+    x.max(0f64)
+}
+
+fn relu_derivative(x: f64) -> f64 {
+    if x >= 0f64 {
+        1f64
+    } else {
+        0f64
+    }
+}
+
 pub struct Layer {
     input: usize,
     output: usize,
@@ -26,7 +38,7 @@ impl Layer {
                 for i in 0..self.input {
                     values[j] += input[i] * self.weights[i][j];
                 }
-                values[j] = sigmoid(values[j] + self.bias[j]);
+                values[j] = relu(values[j] + self.bias[j]);
             }
             Ok(values)
         } else {
@@ -87,7 +99,8 @@ impl Network {
         for (activations, output, layer) in layers.into_iter().rev() {
             let mut new_errors = vec![0f64; layer.input];
             for j in 0..layer.output {
-                let error = output[j] * (1f64 - output[j]) * errors[j];
+                // let error = output[j] * (1f64 - output[j]) * errors[j];
+                let error = relu_derivative(output[j]) * errors[j];
                 for i in 0..layer.input {
                     new_errors[i] += error * layer.weights[i][j];
                     layer.weights[i][j] += alpha * activations[i] * error;
