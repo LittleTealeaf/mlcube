@@ -64,6 +64,41 @@ impl Network {
         }
         Ok(values)
     }
+
+    pub fn back_propagate(
+        &mut self,
+        inputs: Vec<f64>,
+        outputs: Vec<f64>,
+        alpha: f64,
+    ) -> Result<(), InvalidDimension> {
+        let mut layers = Vec::with_capacity(self.layers.len());
+        let mut values = inputs;
+        for layer in self.layers.iter_mut() {
+            let output = layer.feed_forward(values.clone())?;
+            layers.push((values, output.clone(), layer));
+            values = output;
+        }
+
+        let mut errors = outputs.clone();
+        for i in 0..errors.len() {
+            errors[i] -= values[i];
+        }
+
+        for (activations, output, layer) in layers.into_iter().rev() {
+            let mut new_errors = vec![0f64; layer.input];
+            for j in 0..layer.output {
+                let error = output[j] * (1f64 - output[j]) * errors[j];
+                for i in 0..layer.input {
+                    new_errors[i] += error * layer.weights[i][j];
+                    layer.weights[i][j] += alpha * activations[i] * error;
+                }
+                layer.bias[j] += alpha * error;
+            }
+            errors = new_errors;
+        }
+
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
