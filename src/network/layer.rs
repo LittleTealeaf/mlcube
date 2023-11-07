@@ -1,36 +1,29 @@
 pub struct Layer {
-    weights: Vec<Vec<f64>>,
+    weights: Vec<f64>,
     bias: Vec<f64>,
+    input_length: usize,
+    output_length: usize,
 }
 
 impl Layer {
-    pub fn new(input: usize, output: usize) -> Self {
+    pub fn new(input_length: usize, output_length: usize) -> Self {
         Self {
-            weights: vec![vec![0f64; output]; input],
-            bias: vec![0f64; output],
-        }
-    }
-
-    pub fn apply(&self, input: &Vec<f64>) -> Result<Vec<f64>, InvalidInputSize> {
-        if input.len() != self.weights.len() {
-            Err(InvalidInputSize {
-                expected: input.len(),
-                found: self.weights.len(),
-            })
-        } else {
-            let mut values = self.bias.clone();
-            for i in 0..self.bias.len() {
-                for j in 0..self.weights.len() {
-                    values[i] += input[j] * self.weights[j][i];
-                }
-            }
-            Ok(values)
+            weights: vec![0f64; input_length * output_length],
+            bias: vec![0f64; output_length],
+            input_length,
+            output_length,
         }
     }
 }
 
-#[derive(Debug)]
-pub struct InvalidInputSize {
-    expected: usize,
-    found: usize,
+impl Layer {
+    #[inline(always)]
+    fn get_weight_index(&self, input: usize, output: usize) -> usize {
+        input * self.input_length + output
+    }
+
+    #[inline(always)]
+    fn get_weight_coordinates(&self, index: usize) -> (usize, usize) {
+        (index / self.input_length, index % self.input_length)
+    }
 }
