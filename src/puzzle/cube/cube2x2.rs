@@ -17,7 +17,7 @@ const PERMUTATIONS: [[[usize; 4]; 3]; 3] = [
 ];
 
 impl Puzzle for Cube2x2 {
-    const ACTIONS_LENGTH: usize = 6;
+    const ACTIONS_LENGTH: usize = 9;
     const FEATURE_LENGTH: usize = 4 * 6 * 6;
 
     fn solved() -> Self {
@@ -26,8 +26,7 @@ impl Puzzle for Cube2x2 {
 
     fn apply(&mut self, action: usize) -> Result<(), crate::puzzle::ActionOutOfBounds> {
         let permutations = PERMUTATIONS[action % 3];
-        let rotation = action / 3;
-        match rotation {
+        match action / 3 {
             0 => {
                 // Normal
                 for row in permutations {
