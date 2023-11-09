@@ -4,7 +4,7 @@ pub trait Puzzle: Clone {
     const ACTIONS_LENGTH: usize;
     const FEATURE_LENGTH: usize;
 
-    fn solved() -> Self;
+    fn new() -> Self;
 
     fn apply(&mut self, action: usize) -> Result<(), ActionOutOfBounds>;
 

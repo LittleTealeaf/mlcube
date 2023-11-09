@@ -1,6 +1,6 @@
 use crate::puzzle::{ActionOutOfBounds, Puzzle};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Cube2x2([usize; 24]);
 
 const SOLVED_STATE: [usize; 24] = [
@@ -20,7 +20,7 @@ impl Puzzle for Cube2x2 {
     const ACTIONS_LENGTH: usize = 9;
     const FEATURE_LENGTH: usize = 4 * 6 * 6;
 
-    fn solved() -> Self {
+    fn new() -> Self {
         Self(SOLVED_STATE)
     }
 
@@ -87,5 +87,47 @@ impl Puzzle for Cube2x2 {
             }
         }
         return true;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_cube_is_solved() {
+        assert!(Cube2x2::new().is_solved());
+    }
+
+    #[test]
+    fn valid_actions_return_ok() {
+        for i in 0..Cube2x2::ACTIONS_LENGTH {
+            assert!(Cube2x2::new().apply(i).is_ok());
+        }
+    }
+
+    #[test]
+    fn invalid_actions_return_err() {
+        assert!(Cube2x2::new().apply(Cube2x2::ACTIONS_LENGTH).is_err());
+    }
+
+    #[test]
+    fn apply_makes_cube_unsolved() {
+        for i in 0..Cube2x2::ACTIONS_LENGTH {
+            let mut cube = Cube2x2::new();
+            cube.apply(i).unwrap();
+            assert!(!cube.is_solved())
+        }
+    }
+
+    #[test]
+    fn apply_repeated_solves_cube() {
+        for action in 0..Cube2x2::ACTIONS_LENGTH {
+            let mut cube = Cube2x2::new();
+            for _ in 0..4 {
+                cube.apply(action).unwrap();
+            }
+            assert!(cube.is_solved())
+        }
     }
 }
