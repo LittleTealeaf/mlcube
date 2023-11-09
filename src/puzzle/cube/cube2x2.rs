@@ -29,6 +29,7 @@ impl Puzzle for Cube2x2 {
         let rotation = action / 3;
         match rotation {
             0 => {
+                // Normal
                 for row in permutations {
                     let tmp = self.0[row[3]];
                     self.0[row[3]] = self.0[row[2]];
@@ -39,6 +40,7 @@ impl Puzzle for Cube2x2 {
                 Ok(())
             }
             1 => {
+                // Reverse
                 for row in permutations {
                     let tmp = self.0[row[0]];
                     self.0[row[0]] = self.0[row[1]];
@@ -50,6 +52,7 @@ impl Puzzle for Cube2x2 {
                 Ok(())
             }
             2 => {
+                // Double
                 for row in permutations {
                     (self.0[row[0]], self.0[row[2]]) = (self.0[row[2]], self.0[row[0]]);
                     (self.0[row[1]], self.0[row[3]]) = (self.0[row[3]], self.0[row[1]]);
