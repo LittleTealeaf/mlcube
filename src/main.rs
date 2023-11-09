@@ -1,6 +1,5 @@
-mod network;
 mod environment;
+mod network;
 mod puzzle;
 
-fn main() {
-}
+fn main() {}
