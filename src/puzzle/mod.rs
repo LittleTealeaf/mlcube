@@ -1,7 +1,19 @@
-
+pub mod cube;
 
 pub trait Puzzle: Clone {
-    /// The number of actions that can be taken on the puzzle
-    const ACTIONS_COUNT: usize;
+    const ACTIONS_LENGTH: usize;
     const FEATURE_LENGTH: usize;
+
+    fn solved() -> Self;
+
+    fn apply(&mut self, action: usize) -> Result<(), ActionOutOfBounds>;
+
+    fn get_features(&self) -> Vec<f64>;
+
+    fn get_reward(&self) -> f64;
+
+    fn is_solved(&self) -> bool;
 }
+
+#[derive(Debug)]
+pub struct ActionOutOfBounds(pub usize);
