@@ -1,17 +1,15 @@
-use puzzle::{cube::Cube2x2, Puzzle};
+use puzzle::Puzzle;
+
+use crate::puzzle::cube::Cube3x3;
 
 mod network;
 mod puzzle;
 
 fn main() {
-    let mut cube = Cube2x2::new();
-    println!("{:?}", cube);
-    cube.apply(5).unwrap();
-    println!("{:?}", cube);
-    cube.apply(5).unwrap();
-    println!("{:?}", cube);
-    cube.apply(5).unwrap();
-    println!("{:?}", cube);
-    cube.apply(5).unwrap();
-    println!("{:?}", cube);
+    let mut cube = Cube3x3::new();
+
+    for i in 0..18 {
+        cube.apply(i).unwrap();
+        println!("{:?}", cube);
+    }
 }
