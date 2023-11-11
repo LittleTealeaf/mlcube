@@ -132,5 +132,42 @@ const PERMUTATIONS: [[[usize; 4]; 5]; 6] = [
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
+    #[test]
+    fn new_cube_is_solved() {
+        assert!(Cube3x3::new().is_solved());
+    }
+
+    #[test]
+    fn valid_actions_return_ok() {
+        for i in 0..Cube3x3::ACTIONS_LENGTH {
+            assert!(Cube3x3::new().apply(i).is_ok());
+        }
+    }
+
+    #[test]
+    fn invalid_actions_return_err() {
+        assert!(Cube3x3::new().apply(Cube3x3::ACTIONS_LENGTH).is_err());
+    }
+
+    #[test]
+    fn apply_makes_cube_unsolved() {
+        for i in 0..Cube3x3::ACTIONS_LENGTH {
+            let mut cube = Cube3x3::new();
+            cube.apply(i).unwrap();
+            assert!(!cube.is_solved())
+        }
+    }
+
+    #[test]
+    fn apply_repeated_solves_cube() {
+        for action in 0..Cube3x3::ACTIONS_LENGTH {
+            let mut cube = Cube3x3::new();
+            for _ in 0..4 {
+                cube.apply(action).unwrap();
+            }
+            assert!(cube.is_solved())
+        }
+    }
 }
