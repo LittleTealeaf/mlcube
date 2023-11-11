@@ -95,6 +95,13 @@ mod tests {
     use super::*;
 
     #[test]
+    fn correct_features_length() {
+        let cube = Cube2x2::new();
+        let features = cube.get_features();
+        assert_eq!(Cube2x2::FEATURE_LENGTH, features.len());
+    }
+
+    #[test]
     fn new_cube_is_solved() {
         assert!(Cube2x2::new().is_solved());
     }
