@@ -48,4 +48,18 @@ where
         }
         features
     }
+
+    pub fn back_propagate(&self, state: P, index: usize, expected: f64) -> Vec<Layer> {
+
+
+
+        todo!()
+    }
+
+    pub fn update_weights(&mut self, nudges: Vec<Layer>) {
+        assert_eq!(self.layers.len(), nudges.len());
+        for (index, layer) in nudges.into_iter().enumerate() {
+            self.layers[index].add(layer);
+        }
+    }
 }

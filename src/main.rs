@@ -22,8 +22,6 @@ fn main() {
     }
 
     for _ in 0..1000 {
-        // println!("{:?}", cube);
-
         let rand = rng.gen_bool(0.5);
 
         if rand {
@@ -31,7 +29,6 @@ fn main() {
             cube.apply(value).unwrap();
         } else {
             let values = network.apply(cube);
-            println!("{:?}", values);
             let i = values.arg_max();
             cube.apply(i).unwrap();
         }
