@@ -1,8 +1,7 @@
+#![allow(dead_code)]
 use puzzle::Puzzle;
 
 use crate::puzzle::cube::Cube3x3;
-
-mod network;
 mod puzzle;
 
 fn main() {
