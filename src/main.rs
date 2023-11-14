@@ -12,75 +12,95 @@ mod puzzle;
 mod utils;
 
 fn main() {
-    let mut network = Network::<Cube2x2>::new(vec![144, 100, 88, 50, 30, 20]);
+    let mut network = Network::<Cube2x2>::new(vec![300,200,100]);
     let mut rng = thread_rng();
-    network.randomize(&mut rng);
+    network.randomize(&mut rng, -0.1..0.1);
 
     const UPDATE_INTERVAL: usize = 20;
-    const CUBE_COUNT: usize = 12;
-    const REPLAY_SIZE: usize = CUBE_COUNT * 1000;
+    const MAX_SCRAMBLE_DEPTH: usize = 10;
+    const REPLAY_SIZE: usize = 2_000;
+    const TRAIN_SAMPLE: usize = REPLAY_SIZE;
 
-    let mut target = network.clone();
-    let mut update_count = UPDATE_INTERVAL;
+    let mut target = Network::<Cube2x2>::new(vec![]);
+    let mut update_count = 0;
 
     let mut iter = 0;
 
     loop {
         iter += 1;
-        println!("Start Iter {}", iter);
+        println!("Iter {}", iter);
 
-        let replay = vec![Cube2x2::new(); CUBE_COUNT]
+        let replay = (0..(REPLAY_SIZE / MAX_SCRAMBLE_DEPTH))
             .into_par_iter()
-            .map(|mut cube| {
+            .map(|_| {
+                let mut cube = Cube2x2::new();
                 let mut rng = thread_rng();
 
-                for _ in 0..10 {
-                    cube.apply(rng.gen_range(0..Cube2x2::ACTIONS_LENGTH))
-                        .unwrap();
-                }
+                (0..MAX_SCRAMBLE_DEPTH)
+                    .into_iter()
+                    .map(|_| {
+                        cube.apply(rng.gen_range(0..Cube2x2::ACTIONS_LENGTH))
+                            .unwrap();
 
-                let mut replay = Vec::new();
-                for _ in 0..(REPLAY_SIZE / 12) {
-                    let state = cube.clone();
-                    let action = {
-                        if rng.gen_bool(0.3) {
-                            rng.gen_range(0..Cube2x2::ACTIONS_LENGTH)
+                        let state = cube.clone();
+                        let action = {
+                            if rng.gen_bool(0.4) {
+                                rng.gen_range(0..Cube2x2::ACTIONS_LENGTH)
+                            } else {
+                                network.apply(cube).arg_max()
+                            }
+                        };
+                        cube.apply(action).unwrap();
+
+                        let expected = if cube.is_solved() {
+                            cube.get_reward() * 2f64
                         } else {
-                            network.apply(cube).arg_max()
-                        }
-                    };
-                    cube.apply(action).unwrap();
-                    let expected = 0.3 * cube.get_reward() + 0.7 * target.apply(cube).max();
-                    replay.push((state, action, expected));
-                }
-                replay
+                            cube.get_reward() + 0.5 * target.apply(cube).max()
+                        };
+                        (state, action, expected)
+                    })
+                    .collect::<Vec<_>>()
             })
             .flatten()
             .collect::<Vec<_>>();
 
-        println!("Created Replay");
-
         let nudges = replay
             .into_iter()
-            .choose_multiple(&mut rng, (REPLAY_SIZE * 10) / 100)
+            .choose_multiple(&mut rng, TRAIN_SAMPLE)
             .into_par_iter()
             .map(|(state, action, expected)| {
                 network.back_propagate(
                     state,
                     action,
                     expected,
-                    (1f64 / (iter as f64 + 0.5f64)) / (REPLAY_SIZE as f64),
+                    (0.1f64 / ((/* iter % UPDATE_INTERVAL + */ iter / UPDATE_INTERVAL + 1) as f64).exp())
+                        / (TRAIN_SAMPLE as f64),
                 )
             })
-            .collect::<Vec<_>>();
+            .reduce(
+                || Vec::new(),
+                |mut a, b| {
+                    if a.len() == 0 {
+                        return b;
+                    } else if b.len() == 0 {
+                        return a;
+                    }
+                    for i in 0..(a.len()) {
+                        a[i].add(b[i].clone());
+                    }
+                    a
+                },
+            );
 
-        println!("Created Nudges");
+        network.update_weights(nudges);
 
-        for nudge in nudges {
-            network.update_weights(nudge);
-        }
+        // // println!("Created Nudges");
 
-        println!("Updated Nudges");
+        // for nudge in nudges {
+        //     network.update_weights(nudge);
+        // }
+
+        // println!("Updated Nudges");
 
         if update_count == UPDATE_INTERVAL {
             target = network.clone();
@@ -89,17 +109,33 @@ fn main() {
         update_count += 1;
 
         let mut cube = Cube2x2::new();
-        for _ in 0..100 {
+        for _ in 0..MAX_SCRAMBLE_DEPTH {
             cube.apply(rng.gen_range(0..Cube2x2::ACTIONS_LENGTH))
                 .unwrap();
         }
 
-        for _ in 0..5 {
+        let mut moves = Vec::new();
+
+        for i in 0..100 {
             let values = network.apply(cube);
-            println!("{:?}", values);
+            moves.push(values.clone());
             let choice = values.arg_max();
             cube.apply(choice).unwrap();
+            if cube.is_solved() {
+                println!("Solved in {} moves", i + 1);
+                break;
+            }
         }
+
+        moves.reverse();
+        while moves.len() > 10 {
+            moves.pop();
+        }
+        moves.reverse();
+        for m in moves {
+            println!("{} {:?}", m.arg_max(), m);
+        }
+
         // let values = network.apply(cube);
         // println!("{:?}", values);
         // println!("State with Reward {}, chose {} with estimated utility {}, ended in state with reward {}", state.get_reward(), choice, value, cube.get_reward());

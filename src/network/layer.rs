@@ -1,4 +1,4 @@
-use rand::{rngs::ThreadRng, Rng};
+use rand::{rngs::ThreadRng, Rng, distributions::uniform::SampleRange};
 
 use crate::utils::Relu;
 
@@ -58,13 +58,13 @@ impl Layer {
         }
     }
 
-    pub fn randomize(&mut self, rng: &mut ThreadRng) {
+    pub fn randomize<R>(&mut self, rng: &mut ThreadRng, range: R) where R: SampleRange<f64> + Clone {
         for i in 0..self.weights.len() {
-            self.weights[i] = rng.gen_range(-0.1f64..0.1f64);
+            self.weights[i] = rng.gen_range(range.clone());
         }
 
         for i in 0..self.bias.len() {
-            self.bias[i] = rng.gen_range(-0.1f64..0.1f64);
+            self.bias[i] = rng.gen_range(range.clone());
         }
     }
 
