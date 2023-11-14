@@ -14,6 +14,21 @@ impl ArgMax for Vec<f64> {
     }
 }
 
+pub trait Max<T> {
+    fn max(&self) -> T;
+}
+
+impl Max<f64> for Vec<f64> {
+    fn max(&self) -> f64 {
+        let mut max = self[0];
+        for i in 1..self.len() {
+            max = self[i].max(max);
+        }
+
+        max
+    }
+}
+
 //
 // impl<T> ArgMax for Vec<T>
 // where

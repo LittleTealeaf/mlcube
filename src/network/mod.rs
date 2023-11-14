@@ -6,6 +6,7 @@ use rand::rngs::ThreadRng;
 
 use crate::puzzle::Puzzle;
 
+#[derive(Clone, Debug)]
 pub struct Network<P>
 where
     P: Puzzle,
@@ -49,11 +50,58 @@ where
         features
     }
 
-    pub fn back_propagate(&self, state: P, index: usize, expected: f64) -> Vec<Layer> {
+    pub fn back_propagate(&self, state: P, action: usize, expected: f64, alpha: f64) -> Vec<Layer> {
+        struct Entry<'a> {
+            features: Vec<f64>,
+            outputs: Vec<f64>,
+            layer: &'a Layer,
+        }
 
+        let mut entries = Vec::with_capacity(self.layers.len());
+        let mut features = state.get_features();
 
+        for layer in self.layers.iter() {
+            let outputs = layer.apply(features.clone());
+            entries.push(Entry {
+                features,
+                outputs: outputs.clone(),
+                layer,
+            });
+            features = outputs;
+        }
 
-        todo!()
+        let mut nudges = Vec::new();
+
+        let mut errors = {
+            let entry = entries.pop().unwrap();
+            let error = expected - entry.outputs[action];
+
+            let LayerBackPropagate { error, nudge } =
+                entry
+                    .layer
+                    .back_propagate_output(entry.features, error, action);
+
+            nudges.push(nudge);
+            error
+        };
+
+        while let Some(Entry {
+            features,
+            outputs,
+            layer,
+        }) = entries.pop()
+        {
+            let LayerBackPropagate { error, nudge } =
+                layer.back_propagate(features, &errors, &outputs);
+            errors = error;
+            nudges.push(nudge);
+        }
+
+        for nudge in &mut nudges {
+            nudge.scale(alpha);
+        }
+
+        nudges.into_iter().rev().collect()
     }
 
     pub fn update_weights(&mut self, nudges: Vec<Layer>) {

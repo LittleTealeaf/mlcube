@@ -1,6 +1,8 @@
 use rand::{rngs::ThreadRng, Rng};
 
-#[derive(Clone)]
+use crate::utils::Relu;
+
+#[derive(Clone, Debug)]
 pub struct Layer {
     weights: Vec<f64>,
     bias: Vec<f64>,
@@ -28,9 +30,7 @@ impl Layer {
             for i in 0..self.inputs {
                 outputs[j] += inputs[j] * self.weights[self.get_weights_index(i, j)];
             }
-            if outputs[j] < 0f64 {
-                outputs[j] = 0f64;
-            }
+            outputs[j] = outputs[j].relu();
         }
         outputs
     }
@@ -67,6 +67,55 @@ impl Layer {
             self.bias[i] = rng.gen_range(-1f64..1f64);
         }
     }
+
+    pub fn back_propagate(
+        &self,
+        features: Vec<f64>,
+        errors: &Vec<f64>,
+        outputs: &Vec<f64>,
+    ) -> LayerBackPropagate {
+        let mut nudge = self.copy_size();
+        let mut new_errors = vec![0f64; self.inputs];
+        for j in 0..self.outputs {
+            let error = outputs[j].relu_derivative() * errors[j];
+            for i in 0..self.inputs {
+                let index = self.get_weights_index(i, j);
+                new_errors[i] += error * self.weights[index];
+                nudge.weights[index] += features[i] * error;
+            }
+            nudge.bias[j] += error;
+        }
+        LayerBackPropagate {
+            error: new_errors,
+            nudge,
+        }
+    }
+
+    pub fn back_propagate_output(
+        &self,
+        features: Vec<f64>,
+        error: f64,
+        index: usize,
+    ) -> LayerBackPropagate {
+        let mut nudge = self.copy_size();
+        let mut new_errors = vec![0f64; self.inputs];
+        for i in 0..self.inputs {
+            let index = self.get_weights_index(i, index);
+            new_errors[i] += error * self.weights[index];
+            nudge.weights[index] += features[i] * error;
+        }
+        nudge.bias[index] += error;
+
+        LayerBackPropagate {
+            error: new_errors,
+            nudge,
+        }
+    }
+}
+
+pub struct LayerBackPropagate {
+    pub error: Vec<f64>,
+    pub nudge: Layer,
 }
 
 impl Layer {
