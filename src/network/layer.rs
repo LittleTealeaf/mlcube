@@ -28,7 +28,7 @@ impl Layer {
         let mut outputs = self.bias.clone();
         for j in 0..self.outputs {
             for i in 0..self.inputs {
-                outputs[j] += inputs[j] * self.weights[self.get_weights_index(i, j)];
+                outputs[j] += inputs[i] * self.weights[self.get_weights_index(i, j)];
             }
             outputs[j] = outputs[j].relu();
         }
@@ -60,11 +60,11 @@ impl Layer {
 
     pub fn randomize(&mut self, rng: &mut ThreadRng) {
         for i in 0..self.weights.len() {
-            self.weights[i] = rng.gen_range(-1f64..1f64);
+            self.weights[i] = rng.gen_range(-0.1f64..0.1f64);
         }
 
         for i in 0..self.bias.len() {
-            self.bias[i] = rng.gen_range(-1f64..1f64);
+            self.bias[i] = rng.gen_range(-0.1f64..0.1f64);
         }
     }
 

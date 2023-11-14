@@ -66,7 +66,11 @@ impl Puzzle for Cube3x3 {
     }
 
     fn get_reward(&self) -> f64 {
-        todo!()
+        if self.is_solved() {
+            1f64
+        } else {
+            0f64
+        }
     }
 
     fn is_solved(&self) -> bool {
