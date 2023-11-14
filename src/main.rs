@@ -16,9 +16,9 @@ fn main() {
     let mut rng = thread_rng();
     network.randomize(&mut rng);
 
-    const THREAD_COUNT: usize = 12;
+    const CUBE_COUNT: usize = 12;
 
-    const REPLAY_SIZE: usize = THREAD_COUNT * 200;
+    const REPLAY_SIZE: usize = CUBE_COUNT * 200;
 
     let mut target = network.clone();
     let mut update_count = 0;
@@ -29,7 +29,7 @@ fn main() {
         iter += 1;
         println!("Start Iter {}", iter);
 
-        let replay = vec![Cube2x2::new(); THREAD_COUNT]
+        let replay = vec![Cube2x2::new(); CUBE_COUNT]
             .into_par_iter()
             .map(|mut cube| {
                 let mut rng = thread_rng();
