@@ -12,37 +12,53 @@ mod puzzle;
 mod utils;
 
 fn main() {
-    let mut network = Network::<Cube2x2>::new(vec![100, 50, 25]);
+    let mut network = Network::<Cube2x2>::new(vec![100, 100, 100, 100]);
     let mut rng = thread_rng();
     network.randomize(&mut rng);
 
-    const REPLAY_SIZE: usize = 100;
+    const THREAD_COUNT: usize = 12;
+
+    const REPLAY_SIZE: usize = THREAD_COUNT * 200;
 
     let mut target = network.clone();
     let mut update_count = 0;
 
+    let mut iter = 0;
+
     loop {
-        let mut cube = Cube2x2::new();
-        // for _ in 0..100 {
-        //     cube.apply(rng.gen_range(0..Cube2x2::ACTIONS_LENGTH))
-        //         .unwrap();
-        // }
+        iter += 1;
+        println!("Start Iter {}", iter);
 
-        let mut replay = Vec::with_capacity(REPLAY_SIZE);
+        let replay = vec![Cube2x2::new(); THREAD_COUNT]
+            .into_par_iter()
+            .map(|mut cube| {
+                let mut rng = thread_rng();
 
-        for _ in 0..REPLAY_SIZE {
-            let state = cube.clone();
-            let action = {
-                if rng.gen_bool(0.8) {
-                    rng.gen_range(0..Cube2x2::ACTIONS_LENGTH)
-                } else {
-                    network.apply(cube).arg_max()
+                for _ in 0..10 {
+                    cube.apply(rng.gen_range(0..Cube2x2::ACTIONS_LENGTH))
+                        .unwrap();
                 }
-            };
-            cube.apply(action).unwrap();
-            let expected = 0.3 * cube.get_reward() + 0.7 * target.apply(cube).max();
-            replay.push((state, action, expected));
-        }
+
+                let mut replay = Vec::new();
+                for _ in 0..(REPLAY_SIZE / 12) {
+                    let state = cube.clone();
+                    let action = {
+                        if rng.gen_bool(0.8) {
+                            rng.gen_range(0..Cube2x2::ACTIONS_LENGTH)
+                        } else {
+                            network.apply(cube).arg_max()
+                        }
+                    };
+                    cube.apply(action).unwrap();
+                    let expected = 0.3 * cube.get_reward() + 0.7 * target.apply(cube).max();
+                    replay.push((state, action, expected));
+                }
+                replay
+            })
+            .flatten()
+            .collect::<Vec<_>>();
+
+        println!("Created Replay");
 
         let nudges = replay
             .into_par_iter()
@@ -51,43 +67,18 @@ fn main() {
             })
             .collect::<Vec<_>>();
 
+        println!("Created Nudges");
+
         for nudge in nudges {
             network.update_weights(nudge);
         }
+
+        println!("Updated Nudges");
 
         update_count += 1;
         if update_count == 10 {
             target = network.clone();
             update_count = 0;
-
-            for _ in 0..10 {
-                println!("{:?}", cube);
-                let values = network.apply(cube);
-                println!("{:?}", values);
-                let action = values.arg_max();
-                println!("Action: {}, Reward {}", action, cube.get_reward());
-                cube.apply(action).unwrap();
-                println!("New Reward: {}", cube.get_reward());
-            }
         }
     }
-
-    // for i in 0..10000 {
-    //     let prev = cube.clone();
-    //
-    //     let action = {
-    //         if rng.gen_bool(0.5) {
-    //             rng.gen_range(0..Cube2x2::ACTIONS_LENGTH)
-    //         } else {
-    //             network.apply(cube).arg_max()
-    //         }
-    //     };
-    //
-    //     cube.apply(action).unwrap();
-    //
-    //     let expected = prev.get_reward() + network.apply(cube).max() * 0.8 + 0.1;
-    //     network.update_weights(network.back_propagate(prev, action, expected, 0.01));
-    //
-    //     println!("{:?} {} {}", network.apply(prev), action, cube.get_reward());
-    // }
 }
