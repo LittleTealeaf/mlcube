@@ -12,7 +12,7 @@ mod puzzle;
 mod utils;
 
 fn main() {
-    let mut network = Network::<Cube2x2>::new(vec![300,200,100]);
+    let mut network = Network::<Cube2x2>::new(vec![300, 300, 200, 200, 100, 100]);
     let mut rng = thread_rng();
     network.randomize(&mut rng, -0.1..0.1);
 
@@ -55,7 +55,7 @@ fn main() {
                         let expected = if cube.is_solved() {
                             cube.get_reward() * 2f64
                         } else {
-                            cube.get_reward() + 0.5 * target.apply(cube).max()
+                            cube.get_reward() + 0.8 * target.apply(cube).max()
                         };
                         (state, action, expected)
                     })
