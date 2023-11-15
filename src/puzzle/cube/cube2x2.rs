@@ -74,9 +74,9 @@ impl Puzzle for Cube2x2 {
 
     fn get_reward(&self) -> f64 {
         if self.is_solved() {
-            10f64
+            1f64
         } else {
-            -1f64
+            -0.1f64
         }
         // let mut reward = 0f64;
         // for i in 0..24 {
