@@ -73,7 +73,7 @@ fn main() {
                     state,
                     action,
                     expected,
-                    0.9f64.powi((iter % UPDATE_INTERVAL + iter / UPDATE_INTERVAL * 2) as i32)
+                    0.9f64.powi((iter % UPDATE_INTERVAL /* + iter / UPDATE_INTERVAL * 2 */) as i32)
                         / (TRAIN_SAMPLE as f64),
                 )
             })
