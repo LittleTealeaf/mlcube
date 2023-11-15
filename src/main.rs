@@ -22,7 +22,6 @@ fn main() {
     const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
 
     let mut target = network.clone();
-    let mut update_count = 0;
 
     let mut iter = 0;
 
@@ -73,7 +72,7 @@ fn main() {
                     state,
                     action,
                     expected,
-                    0.9f64.powi((iter % UPDATE_INTERVAL /* + iter / UPDATE_INTERVAL * 2 */) as i32)
+                    0.9f64.powi((iter % UPDATE_INTERVAL/* + iter / UPDATE_INTERVAL * 2 */) as i32)
                         / (TRAIN_SAMPLE as f64),
                 )
             })
@@ -94,11 +93,9 @@ fn main() {
 
         network.update_weights(nudges);
 
-        if update_count == UPDATE_INTERVAL {
+        if iter % UPDATE_INTERVAL == 0 {
             target = network.clone();
-            update_count = 0;
         }
-        update_count += 1;
 
         let mut cube = Cube2x2::new();
         for _ in 0..MAX_SCRAMBLE_DEPTH {
