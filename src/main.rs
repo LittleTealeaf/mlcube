@@ -16,12 +16,12 @@ fn main() {
     let mut rng = thread_rng();
     network.randomize(&mut rng, -0.1..0.1);
 
-    const UPDATE_INTERVAL: usize = 20;
+    const UPDATE_INTERVAL: usize = 50;
     const MAX_SCRAMBLE_DEPTH: usize = 10;
     const REPLAY_SIZE: usize = 2_000;
     const TRAIN_SAMPLE: usize = REPLAY_SIZE;
 
-    let mut target = Network::<Cube2x2>::new(vec![]);
+    let mut target = network.clone();
     let mut update_count = 0;
 
     let mut iter = 0;
@@ -73,7 +73,8 @@ fn main() {
                     state,
                     action,
                     expected,
-                    (0.1f64 / (0.5 * (iter as f64 + 0.5) as f64).exp()) / (TRAIN_SAMPLE as f64),
+                    0.9f64.powi((iter % UPDATE_INTERVAL + iter / UPDATE_INTERVAL * 2) as i32)
+                        / (TRAIN_SAMPLE as f64),
                 )
             })
             .reduce(
