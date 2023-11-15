@@ -94,14 +94,6 @@ fn main() {
 
         network.update_weights(nudges);
 
-        // // println!("Created Nudges");
-
-        // for nudge in nudges {
-        //     network.update_weights(nudge);
-        // }
-
-        // println!("Updated Nudges");
-
         if update_count == UPDATE_INTERVAL {
             target = network.clone();
             update_count = 0;
@@ -135,9 +127,5 @@ fn main() {
         for m in moves {
             println!("{} {:?}", m.arg_max(), m);
         }
-
-        // let values = network.apply(cube);
-        // println!("{:?}", values);
-        // println!("State with Reward {}, chose {} with estimated utility {}, ended in state with reward {}", state.get_reward(), choice, value, cube.get_reward());
     }
 }
