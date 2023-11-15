@@ -17,7 +17,7 @@ fn main() {
     network.randomize(&mut rng, -0.1..0.1);
 
     const UPDATE_INTERVAL: usize = 50;
-    const MAX_SCRAMBLE_DEPTH: usize = 10;
+    const MAX_SCRAMBLE_DEPTH: usize = 20;
     const REPLAY_SIZE: usize = 2_000;
     const TRAIN_SAMPLE: usize = REPLAY_SIZE;
 
