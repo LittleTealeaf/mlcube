@@ -2,7 +2,7 @@ mod layer;
 use std::marker::PhantomData;
 
 pub use layer::*;
-use rand::{rngs::ThreadRng, distributions::uniform::SampleRange};
+use rand::{distributions::uniform::SampleRange, rngs::ThreadRng};
 
 use crate::puzzle::Puzzle;
 
@@ -36,7 +36,17 @@ where
         }
     }
 
-    pub fn randomize<R>(&mut self, rng: &mut ThreadRng, range: R) where R: SampleRange<f64> + Clone {
+    pub fn copy_size(&self) -> Self {
+        let mut iter = self.layers.iter();
+        iter.next();
+        let hidden_layers = iter.map(|layer| layer.get_inputs()).collect();
+        Self::new(hidden_layers)
+    }
+
+    pub fn randomize<R>(&mut self, rng: &mut ThreadRng, range: R)
+    where
+        R: SampleRange<f64> + Clone,
+    {
         for layer in &mut self.layers {
             layer.randomize(rng, range.clone());
         }

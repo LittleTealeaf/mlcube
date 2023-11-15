@@ -111,6 +111,15 @@ impl Layer {
             nudge,
         }
     }
+
+
+    pub fn get_inputs(&self) -> usize {
+        self.inputs
+    }
+
+    pub fn get_outputs(&self) -> usize {
+        self.outputs
+    }
 }
 
 pub struct LayerBackPropagate {
