@@ -17,7 +17,7 @@ const PERMUTATIONS: [[[usize; 4]; 3]; 3] = [
 ];
 
 impl Puzzle for Cube2x2 {
-    const ACTIONS_LENGTH: usize = 6;
+    const ACTIONS_LENGTH: usize = 9;
     const FEATURE_LENGTH: usize = 4 * 6 * 6;
 
     fn new() -> Self {
