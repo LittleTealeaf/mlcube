@@ -1,4 +1,4 @@
-use rand::{rngs::ThreadRng, Rng, distributions::uniform::SampleRange};
+use rand::{distributions::uniform::SampleRange, rngs::ThreadRng, Rng};
 
 use crate::utils::Relu;
 
@@ -58,7 +58,10 @@ impl Layer {
         }
     }
 
-    pub fn randomize<R>(&mut self, rng: &mut ThreadRng, range: R) where R: SampleRange<f64> + Clone {
+    pub fn randomize<R>(&mut self, rng: &mut ThreadRng, range: R)
+    where
+        R: SampleRange<f64> + Clone,
+    {
         for i in 0..self.weights.len() {
             self.weights[i] = rng.gen_range(range.clone());
         }
@@ -111,7 +114,6 @@ impl Layer {
             nudge,
         }
     }
-
 
     pub fn get_inputs(&self) -> usize {
         self.inputs

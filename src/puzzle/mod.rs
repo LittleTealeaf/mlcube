@@ -1,6 +1,6 @@
 pub mod cube;
 
-pub trait Puzzle: Clone {
+pub trait Puzzle: Clone + Eq {
     const ACTIONS_LENGTH: usize;
     const FEATURE_LENGTH: usize;
 

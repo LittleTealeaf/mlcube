@@ -4,7 +4,7 @@ use std::marker::PhantomData;
 pub use layer::*;
 use rand::{distributions::uniform::SampleRange, rngs::ThreadRng};
 
-use crate::puzzle::Puzzle;
+use crate::{puzzle::Puzzle, utils::ArgMax};
 
 #[derive(Clone, Debug)]
 pub struct Network<P>
@@ -120,4 +120,44 @@ where
             self.layers[index].add(layer);
         }
     }
+}
+
+/// Once training is done
+impl<P> Network<P>
+where
+    P: Puzzle,
+{
+    /// Attempts to solve the puzzle. Returns the moves taken to solve. If it loops and does not
+    /// solve, returns [`None`]
+    ///
+    /// Also returns [`None`] if it takes more than 10000 moves.
+    pub fn solve(&self, mut puzzle: P) -> SolveStatus {
+        let mut actions = Vec::new();
+        let mut states = vec![puzzle.clone()];
+
+        for _ in 0..10000 {
+            if puzzle.is_solved() {
+                return SolveStatus::Solved(actions);
+            }
+            let values = self.apply(puzzle.clone());
+            let action = values.arg_max();
+            actions.push(action);
+            puzzle.apply(action).unwrap();
+
+            if states.contains(&puzzle) {
+                return SolveStatus::Loop(actions);
+            }
+
+            states.push(puzzle.clone());
+        }
+
+        SolveStatus::TimedOut
+    }
+}
+
+#[derive(Debug)]
+pub enum SolveStatus {
+    Solved(Vec<usize>),
+    TimedOut,
+    Loop(Vec<usize>),
 }

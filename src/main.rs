@@ -12,7 +12,7 @@ mod puzzle;
 mod utils;
 
 fn main() {
-    let mut network = Network::<Cube2x2>::new(vec![300,200,100]);
+    let mut network = Network::<Cube2x2>::new(vec![300, 200, 100]);
     let mut rng = thread_rng();
     network.randomize(&mut rng, -0.1..0.1);
 
@@ -73,8 +73,7 @@ fn main() {
                     state,
                     action,
                     expected,
-                    (0.1f64 / ((/* iter % UPDATE_INTERVAL + */ iter / UPDATE_INTERVAL + 1) as f64).exp())
-                        / (TRAIN_SAMPLE as f64),
+                    (0.1f64 / (0.5 * (iter as f64 + 0.5) as f64).exp()) / (TRAIN_SAMPLE as f64),
                 )
             })
             .reduce(
@@ -106,26 +105,11 @@ fn main() {
                 .unwrap();
         }
 
-        let mut moves = Vec::new();
+        let values = network.apply(cube);
+        println!("{:?}", values);
 
-        for i in 0..100 {
-            let values = network.apply(cube);
-            moves.push(values.clone());
-            let choice = values.arg_max();
-            cube.apply(choice).unwrap();
-            if cube.is_solved() {
-                println!("Solved in {} moves", i + 1);
-                break;
-            }
-        }
+        let result = network.solve(cube);
 
-        moves.reverse();
-        while moves.len() > 10 {
-            moves.pop();
-        }
-        moves.reverse();
-        for m in moves {
-            println!("{} {:?}", m.arg_max(), m);
-        }
+        println!("{:?}", result);
     }
 }
