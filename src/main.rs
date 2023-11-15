@@ -12,7 +12,7 @@ mod puzzle;
 mod utils;
 
 fn main() {
-    let mut network = Network::<Cube2x2>::new(vec![300, 300, 200, 200, 100, 100]);
+    let mut network = Network::<Cube2x2>::new(vec![300, 200, 200, 100, 100]);
     let mut rng = thread_rng();
     network.randomize(&mut rng, -0.1..0.1);
 
