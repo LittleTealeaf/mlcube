@@ -19,7 +19,7 @@ fn main() {
     const UPDATE_INTERVAL: usize = 50;
     const MAX_SCRAMBLE_DEPTH: usize = 20;
     const REPLAY_SIZE: usize = 2_000;
-    const TRAIN_SAMPLE: usize = REPLAY_SIZE;
+    const TRAIN_SAMPLE: usize = REPLAY_SIZE * 3 / 4;
 
     let mut target = network.clone();
     let mut update_count = 0;
