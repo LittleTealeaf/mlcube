@@ -76,7 +76,7 @@ impl Puzzle for Cube2x2 {
         if self.is_solved() {
             1f64
         } else {
-            -0.1f64
+            0f64
         }
         // let mut reward = 0f64;
         // for i in 0..24 {
