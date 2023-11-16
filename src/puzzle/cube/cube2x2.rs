@@ -78,13 +78,6 @@ impl Puzzle for Cube2x2 {
         } else {
             0f64
         }
-        // let mut reward = 0f64;
-        // for i in 0..24 {
-        //     if self.0[i] == i / 4 {
-        //         reward += 1f64;
-        //     }
-        // }
-        // reward * reward
     }
 
     fn is_solved(&self) -> bool {
