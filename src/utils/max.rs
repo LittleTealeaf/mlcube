@@ -28,19 +28,3 @@ impl Max<f64> for Vec<f64> {
         max
     }
 }
-
-//
-// impl<T> ArgMax for Vec<T>
-// where
-//     T: Ord,
-// {
-//     fn arg_max(&self) -> usize {
-//         let (index, _) = self
-//             .iter()
-//             .enumerate()
-//             .max_by_key(|(_, value)| *value)
-//             .unwrap();
-//         return index;
-//     }
-// }
-//
