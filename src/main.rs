@@ -19,10 +19,10 @@ const SCRAMBLE_DEPTH: usize = 100;
 const REPLAY_SIZE: usize = 10_000;
 const TRAIN_SIZE: usize = REPLAY_SIZE / 4;
 
-const UPDATE_INTERVAL: usize = 100;
+const UPDATE_INTERVAL: usize = 50;
 const GAMMA: f64 = 0.6;
 
-fn epsilon(iter: usize) -> f64 {
+fn epsilon(_iter: usize) -> f64 {
     0.5
 }
 
