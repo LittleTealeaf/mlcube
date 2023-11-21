@@ -1,4 +1,5 @@
 mod layer;
+mod activation;
 use std::marker::PhantomData;
 
 pub use layer::*;

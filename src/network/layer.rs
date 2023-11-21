@@ -1,6 +1,6 @@
 use rand::{distributions::uniform::SampleRange, rngs::ThreadRng, Rng};
 
-use crate::utils::Relu;
+use super::activation::Activation;
 
 #[derive(Clone, Debug)]
 pub struct Layer {
@@ -30,7 +30,7 @@ impl Layer {
             for i in 0..self.inputs {
                 outputs[j] += inputs[i] * self.weights[self.get_weights_index(i, j)];
             }
-            outputs[j] = outputs[j].relu();
+            outputs[j] = outputs[j].activation();
         }
         outputs
     }
@@ -80,7 +80,7 @@ impl Layer {
         let mut nudge = self.copy_size();
         let mut new_errors = vec![0f64; self.inputs];
         for j in 0..self.outputs {
-            let error = outputs[j].relu_derivative() * errors[j];
+            let error = outputs[j].activation_derivative() * errors[j];
             for i in 0..self.inputs {
                 let index = self.get_weights_index(i, j);
                 new_errors[i] += error * self.weights[index];
