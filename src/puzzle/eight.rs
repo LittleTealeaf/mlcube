@@ -66,15 +66,15 @@ impl Puzzle for EightPuzzle {
             }
         }
 
-        sum
+        sum / 9.0
     }
 
     fn is_solved(&self) -> bool {
         for i in 0..9 {
             if self.0[i] != i {
-                return false
+                return false;
             }
         }
-        return true
+        return true;
     }
 }
