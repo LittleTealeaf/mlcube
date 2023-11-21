@@ -16,6 +16,7 @@ type _Puzzle = EightPuzzle;
 const UPDATE_INTERVAL: usize = 100;
 const MAX_SCRAMBLE_DEPTH: usize = 20;
 const REPLAY_SIZE: usize = 10_000;
+const PARALLEL_PUZZLES: usize = 100;
 const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
 
 const GAMMA: f64 = 0.5;
@@ -37,27 +38,28 @@ fn main() {
     loop {
         println!("Iter {}", iter);
 
-        let replay = (0..(REPLAY_SIZE / MAX_SCRAMBLE_DEPTH))
+        let replay = (0..PARALLEL_PUZZLES)
             .into_par_iter()
             .map(|_| {
                 let mut puzzle = _Puzzle::new();
                 let mut rng = thread_rng();
 
-                (0..MAX_SCRAMBLE_DEPTH)
+                for _ in 0..MAX_SCRAMBLE_DEPTH {
+                    puzzle.apply(rng.gen_range(0.._Puzzle::ACTIONS_LENGTH)).unwrap();
+                }
+
+                (0..(REPLAY_SIZE / PARALLEL_PUZZLES))
                     .into_iter()
                     .map(|_| {
-                        puzzle
-                            .apply(rng.gen_range(0.._Puzzle::ACTIONS_LENGTH))
-                            .unwrap();
-
                         let state = puzzle.clone();
                         let action = {
                             if rng.gen_bool(EPSILON) {
                                 rng.gen_range(0.._Puzzle::ACTIONS_LENGTH)
                             } else {
-                                network.apply(puzzle).arg_max()
+                                network.apply(state).arg_max()
                             }
                         };
+
                         puzzle.apply(action).unwrap();
 
                         let expected = puzzle.get_reward() + GAMMA * target.apply(puzzle).max();
@@ -68,6 +70,35 @@ fn main() {
             })
             .flatten()
             .collect::<Vec<_>>();
+
+        // let replay = (0..(REPLAY_SIZE / MAX_SCRAMBLE_DEPTH))
+        //     .into_par_iter()
+        //     .map(|_| {
+        //         let mut puzzle = _Puzzle::new();
+        //         let mut rng = thread_rng();
+        //
+        //         (0..MAX_SCRAMBLE_DEPTH)
+        //             .into_iter()
+        //             .map(|_| {
+        //                 puzzle
+        //                     .apply(rng.gen_range(0.._Puzzle::ACTIONS_LENGTH))
+        //                     .unwrap();
+        //
+        //                 let state = puzzle.clone();
+        //                 let action = {
+        //                     if rng.gen_bool(EPSILON) {
+        //                         rng.gen_range(0.._Puzzle::ACTIONS_LENGTH)
+        //                     } else {
+        //                         network.apply(puzzle).arg_max()
+        //                     }
+        //                 };
+        //                 puzzle.apply(action).unwrap();
+        //
+        //             })
+        //             .collect::<Vec<_>>()
+        //     })
+        //     .flatten()
+        //     .collect::<Vec<_>>();
 
         let nudges = replay
             .into_iter()
