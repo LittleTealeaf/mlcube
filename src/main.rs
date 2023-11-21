@@ -14,7 +14,7 @@ mod utils;
 type _Puzzle = EightPuzzle;
 
 const UPDATE_INTERVAL: usize = 100;
-const MAX_SCRAMBLE_DEPTH: usize = 200;
+const SCRAMBLE_DEPTH: usize = 200;
 const REPLAY_SIZE: usize = 10_000;
 const PARALLEL_PUZZLES: usize = 100;
 const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
@@ -44,7 +44,7 @@ fn main() {
                 let mut puzzle = _Puzzle::new();
                 let mut rng = thread_rng();
 
-                for _ in 0..MAX_SCRAMBLE_DEPTH {
+                for _ in 0..SCRAMBLE_DEPTH {
                     puzzle
                         .apply(rng.gen_range(0.._Puzzle::ACTIONS_LENGTH))
                         .unwrap();
@@ -131,7 +131,7 @@ fn main() {
         }
 
         let mut puzzle = _Puzzle::new();
-        for _ in 0..MAX_SCRAMBLE_DEPTH {
+        for _ in 0..SCRAMBLE_DEPTH {
             puzzle
                 .apply(rng.gen_range(0.._Puzzle::ACTIONS_LENGTH))
                 .unwrap();
