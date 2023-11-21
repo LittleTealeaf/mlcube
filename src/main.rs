@@ -14,13 +14,13 @@ mod utils;
 type _Puzzle = EightPuzzle;
 
 fn main() {
-    let mut network = Network::<_Puzzle>::new(vec![100,100,100]);
+    let mut network = Network::<_Puzzle>::new(vec![9 * 8 * 3, 9 * 8 * 2, 9 * 8, 9 * 8 / 2]);
     let mut rng = thread_rng();
     network.randomize(&mut rng, -0.1..0.1);
 
     const UPDATE_INTERVAL: usize = 50;
     const MAX_SCRAMBLE_DEPTH: usize = 100;
-    const REPLAY_SIZE: usize = 5_000;
+    const REPLAY_SIZE: usize = 10_000;
     const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
 
     let mut target = network.clone();
