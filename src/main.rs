@@ -1,23 +1,25 @@
 #![allow(dead_code)]
 use network::Network;
-use puzzle::Puzzle;
+use puzzle::{eight::EightPuzzle, Puzzle};
 use rand::{seq::IteratorRandom, thread_rng, Rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use utils::ArgMax;
 
-use crate::{puzzle::cube::Cube2x2, utils::Max};
+use crate::utils::Max;
 
 mod network;
 mod puzzle;
 mod utils;
 
+type _Puzzle = EightPuzzle;
+
 fn main() {
-    let mut network = Network::<Cube2x2>::new(vec![300, 200, 200, 100, 100]);
+    let mut network = Network::<_Puzzle>::new(vec![100,100,100]);
     let mut rng = thread_rng();
     network.randomize(&mut rng, -0.1..0.1);
 
     const UPDATE_INTERVAL: usize = 50;
-    const MAX_SCRAMBLE_DEPTH: usize = 20;
+    const MAX_SCRAMBLE_DEPTH: usize = 100;
     const REPLAY_SIZE: usize = 5_000;
     const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
 
@@ -32,29 +34,30 @@ fn main() {
         let replay = (0..(REPLAY_SIZE / MAX_SCRAMBLE_DEPTH))
             .into_par_iter()
             .map(|_| {
-                let mut cube = Cube2x2::new();
+                let mut puzzle = _Puzzle::new();
                 let mut rng = thread_rng();
 
                 (0..MAX_SCRAMBLE_DEPTH)
                     .into_iter()
                     .map(|_| {
-                        cube.apply(rng.gen_range(0..Cube2x2::ACTIONS_LENGTH))
+                        puzzle
+                            .apply(rng.gen_range(0.._Puzzle::ACTIONS_LENGTH))
                             .unwrap();
 
-                        let state = cube.clone();
+                        let state = puzzle.clone();
                         let action = {
                             if rng.gen_bool(0.4) {
-                                rng.gen_range(0..Cube2x2::ACTIONS_LENGTH)
+                                rng.gen_range(0.._Puzzle::ACTIONS_LENGTH)
                             } else {
-                                network.apply(cube).arg_max()
+                                network.apply(puzzle).arg_max()
                             }
                         };
-                        cube.apply(action).unwrap();
+                        puzzle.apply(action).unwrap();
 
-                        let expected = if cube.is_solved() {
-                            cube.get_reward() * 2f64
+                        let expected = if puzzle.is_solved() {
+                            puzzle.get_reward() * 2f64
                         } else {
-                            cube.get_reward() + 0.8 * target.apply(cube).max()
+                            puzzle.get_reward() + 0.8 * target.apply(puzzle).max()
                         };
                         (state, action, expected)
                     })
@@ -97,16 +100,17 @@ fn main() {
             target = network.clone();
         }
 
-        let mut cube = Cube2x2::new();
+        let mut puzzle = _Puzzle::new();
         for _ in 0..MAX_SCRAMBLE_DEPTH {
-            cube.apply(rng.gen_range(0..Cube2x2::ACTIONS_LENGTH))
+            puzzle
+                .apply(rng.gen_range(0.._Puzzle::ACTIONS_LENGTH))
                 .unwrap();
         }
 
-        let values = network.apply(cube);
+        let values = network.apply(puzzle);
         println!("{:?}", values);
 
-        let result = network.solve(cube);
+        let result = network.solve(puzzle);
 
         println!("{:?}", result);
     }

@@ -1,4 +1,5 @@
 pub mod cube;
+pub mod eight;
 
 pub trait Puzzle: Clone + Eq {
     const ACTIONS_LENGTH: usize;
