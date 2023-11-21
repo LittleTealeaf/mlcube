@@ -1,5 +1,4 @@
-use crate::utils::Sigmoid;
-
+use crate::utils::Relu;
 
 pub trait Activation {
     fn activation(self) -> Self;
@@ -8,10 +7,10 @@ pub trait Activation {
 
 impl Activation for f64 {
     fn activation(self) -> Self {
-        self.sigmoid()
+        self.relu()
     }
 
     fn activation_derivative(self) -> Self {
-        self.sigmoid_derivative()
+        self.relu_derivative()
     }
 }
