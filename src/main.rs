@@ -28,7 +28,7 @@ fn epsilon(_iter: usize) -> f64 {
 }
 
 fn alpha(iter: usize) -> f64 {
-    0.95f64.powi((iter % UPDATE_INTERVAL + 1) as i32)
+    0.9f64.powi((iter % UPDATE_INTERVAL + 1) as i32)
 }
 
 fn main() {
