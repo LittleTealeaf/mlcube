@@ -59,11 +59,14 @@ impl Puzzle for EightPuzzle {
     }
 
     fn get_reward(&self) -> f64 {
-        if self.is_solved() {
-            1f64
-        } else {
-            0f64
+        let mut sum = 0f64;
+        for i in 0..9 {
+            if self.0[i] == i {
+                sum += 1f64;
+            }
         }
+
+        sum * sum
     }
 
     fn is_solved(&self) -> bool {
