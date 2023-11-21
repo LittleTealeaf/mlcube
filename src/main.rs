@@ -10,6 +10,7 @@ use crate::utils::Max;
 mod network;
 mod puzzle;
 mod utils;
+mod agent;
 
 type _Puzzle = EightPuzzle;
 

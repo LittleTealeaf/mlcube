@@ -1,13 +1,14 @@
-mod layer;
 mod activation;
+mod layer;
 use std::marker::PhantomData;
 
 pub use layer::*;
 use rand::{distributions::uniform::SampleRange, rngs::ThreadRng};
+use serde::{Deserialize, Serialize};
 
 use crate::{puzzle::Puzzle, utils::ArgMax};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Network<P>
 where
     P: Puzzle,

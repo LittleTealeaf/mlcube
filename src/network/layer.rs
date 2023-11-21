@@ -1,8 +1,9 @@
 use rand::{distributions::uniform::SampleRange, rngs::ThreadRng, Rng};
+use serde::{Deserialize, Serialize};
 
 use super::activation::Activation;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Layer {
     weights: Vec<f64>,
     bias: Vec<f64>,
