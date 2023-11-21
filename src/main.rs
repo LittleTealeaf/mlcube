@@ -14,9 +14,15 @@ mod utils;
 type _Puzzle = EightPuzzle;
 
 const UPDATE_INTERVAL: usize = 100;
-const MAX_SCRAMBLE_DEPTH: usize = 100;
+const MAX_SCRAMBLE_DEPTH: usize = 20;
 const REPLAY_SIZE: usize = 10_000;
 const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
+
+const GAMMA: f64 = 0.5;
+
+fn alpha(iter: usize) -> f64 {
+    0.9f64.powi((iter % UPDATE_INTERVAL + 1) as i32)
+}
 
 fn main() {
     let mut network = Network::<_Puzzle>::new(vec![9 * 8 * 3, 9 * 8 * 2, 9 * 8, 9 * 8 / 2]);
@@ -28,7 +34,6 @@ fn main() {
     let mut iter = 0;
 
     loop {
-        iter += 1;
         println!("Iter {}", iter);
 
         let replay = (0..(REPLAY_SIZE / MAX_SCRAMBLE_DEPTH))
@@ -54,11 +59,8 @@ fn main() {
                         };
                         puzzle.apply(action).unwrap();
 
-                        let expected = if puzzle.is_solved() {
-                            puzzle.get_reward() * 2f64
-                        } else {
-                            puzzle.get_reward() + 0.8 * target.apply(puzzle).max()
-                        };
+                        let expected = puzzle.get_reward() + GAMMA * target.apply(puzzle).max();
+
                         (state, action, expected)
                     })
                     .collect::<Vec<_>>()
@@ -71,13 +73,7 @@ fn main() {
             .choose_multiple(&mut rng, TRAIN_SAMPLE)
             .into_par_iter()
             .map(|(state, action, expected)| {
-                network.back_propagate(
-                    state,
-                    action,
-                    expected,
-                    0.9f64.powi((iter % UPDATE_INTERVAL/* + iter / UPDATE_INTERVAL * 2 */) as i32)
-                        / (TRAIN_SAMPLE as f64),
-                )
+                network.back_propagate(state, action, expected, alpha(iter) / (TRAIN_SAMPLE as f64))
             })
             .reduce(
                 || Vec::new(),
@@ -113,5 +109,7 @@ fn main() {
         let result = network.solve(puzzle);
 
         println!("{:?}", result);
+
+        iter += 1;
     }
 }
