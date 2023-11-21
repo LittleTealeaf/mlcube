@@ -32,7 +32,7 @@ fn alpha(iter: usize) -> f64 {
 }
 
 fn main() {
-    let mut network = Network::<_Puzzle>::new(vec![100, 100, 100]);
+    let mut network = Network::<_Puzzle>::new(vec![100; 6]);
     let mut rng = thread_rng();
     network.randomize(&mut rng, -0.1..0.1);
 
