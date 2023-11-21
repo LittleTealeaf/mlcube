@@ -22,8 +22,8 @@ const TRAIN_SIZE: usize = REPLAY_SIZE / 4;
 const UPDATE_INTERVAL: usize = 50;
 const GAMMA: f64 = 0.6;
 
-fn epsilon(_iter: usize) -> f64 {
-    0.5
+fn epsilon(iter: usize) -> f64 {
+    0.7 * 0.9f64.powi((iter / UPDATE_INTERVAL) as i32)
 }
 
 fn alpha(iter: usize) -> f64 {
