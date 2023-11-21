@@ -14,7 +14,7 @@ mod agent;
 
 type _Puzzle = EightPuzzle;
 
-const SCRAMBLE_DEPTH: usize = 31;
+const SCRAMBLE_DEPTH: usize = 500;
 const REPLAY_SIZE: usize = 5_000;
 const TRAIN_SIZE: usize = (REPLAY_SIZE * 2) / 3;
 
