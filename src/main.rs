@@ -22,7 +22,7 @@ const UPDATE_INTERVAL: usize = 50;
 const GAMMA: f64 = 0.9;
 
 fn epsilon(_iter: usize) -> f64 {
-    0.3
+    0.5
     // 0.7 * 0.9f64.powi((iter / UPDATE_INTERVAL) as i32)
 }
 
