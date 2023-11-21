@@ -1,4 +1,4 @@
-use rand::{thread_rng, Rng};
+use rand::{seq::SliceRandom, thread_rng, Rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use serde::{Deserialize, Serialize};
 
@@ -30,7 +30,9 @@ impl ReplayStrategy {
                     (0..*scramble_depth)
                         .into_iter()
                         .map(|_| {
-                            puzzle.scramble(&mut rng).unwrap();
+                            puzzle
+                                .apply(*puzzle.get_valid_actions().choose(&mut rng).unwrap())
+                                .unwrap();
 
                             let mut state = puzzle.clone();
 

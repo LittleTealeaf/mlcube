@@ -24,7 +24,7 @@ impl Puzzle for Cube2x2 {
         Self(SOLVED_STATE)
     }
 
-    fn apply(&mut self, action: usize) -> Result<(), crate::puzzle::ActionOutOfBounds> {
+    fn apply(&mut self, action: usize) -> Result<(), ActionOutOfBounds> {
         let permutations = PERMUTATIONS[action % 3];
         match action / 3 {
             0 => {
@@ -87,6 +87,10 @@ impl Puzzle for Cube2x2 {
             }
         }
         return true;
+    }
+
+    fn get_valid_actions(&self) -> Vec<usize> {
+        vec![0, 1, 2, 3, 4, 5, 6, 7, 8]
     }
 }
 

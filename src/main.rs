@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use network::Network;
 use puzzle::{eight::EightPuzzle, Puzzle};
-use rand::{seq::IteratorRandom, thread_rng, Rng};
+use rand::{seq::{IteratorRandom, SliceRandom}, thread_rng, Rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use utils::ArgMax;
 
@@ -53,7 +53,7 @@ fn main() {
                     .map(|_| {
                         if puzzle.is_solved() {
                             for _ in 0..i {
-                                puzzle.scramble(&mut rng).unwrap();
+                                puzzle.apply(*puzzle.get_valid_actions().choose(&mut rng).unwrap()).unwrap();
                             }
                         }
 

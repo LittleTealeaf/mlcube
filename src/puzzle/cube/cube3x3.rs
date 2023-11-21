@@ -76,6 +76,10 @@ impl Puzzle for Cube3x3 {
     fn is_solved(&self) -> bool {
         SOLVED_STATE.eq(&self.0)
     }
+
+    fn get_valid_actions(&self) -> Vec<usize> {
+        vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    }
 }
 
 const SOLVED_STATE: [usize; 54] = [
