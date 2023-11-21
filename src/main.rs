@@ -15,7 +15,7 @@ type _Puzzle = EightPuzzle;
 
 const PARALLEL_PROCESSES: usize = 24;
 
-const SCRAMBLE_DEPTH: usize = 31 * 2;
+const SCRAMBLE_DEPTH: usize = 31;
 const REPLAY_SIZE: usize = 1_000;
 const TRAIN_SIZE: usize = REPLAY_SIZE / 2;
 
