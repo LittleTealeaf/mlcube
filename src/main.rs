@@ -17,8 +17,8 @@ const SCRAMBLE_DEPTH: usize = 31;
 const REPLAY_SIZE: usize = 5_000;
 const TRAIN_SIZE: usize = (REPLAY_SIZE * 2) / 3;
 
-const UPDATE_INTERVAL: usize = 25;
-const GAMMA: f64 = 0.6;
+const UPDATE_INTERVAL: usize = 50;
+const GAMMA: f64 = 0.9;
 
 fn epsilon(_iter: usize) -> f64 {
     0.3
