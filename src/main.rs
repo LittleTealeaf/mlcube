@@ -19,7 +19,7 @@ const REPLAY_SIZE: usize = 10_000;
 const PARALLEL_PUZZLES: usize = 100;
 const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
 
-const GAMMA: f64 = 0.9;
+const GAMMA: f64 = 0.6;
 const EPSILON: f64 = 0.3;
 
 fn alpha(iter: usize) -> f64 {
