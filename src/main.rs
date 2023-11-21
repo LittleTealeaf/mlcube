@@ -14,7 +14,7 @@ mod utils;
 type _Puzzle = EightPuzzle;
 
 const UPDATE_INTERVAL: usize = 100;
-const SCRAMBLE_DEPTH: usize = 200;
+const SCRAMBLE_DEPTH: usize = 5;
 const REPLAY_SIZE: usize = 10_000;
 const PARALLEL_PUZZLES: usize = 100;
 const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
