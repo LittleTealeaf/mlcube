@@ -62,7 +62,7 @@ impl Puzzle for EightPuzzle {
         if self.is_solved() {
             1f64
         } else {
-            0f64
+            -1f64 / 30f64
         }
     }
 

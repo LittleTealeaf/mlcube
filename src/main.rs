@@ -68,8 +68,7 @@ fn main() {
 
                         puzzle.apply(action).unwrap();
 
-                        let expected = puzzle.get_reward() + GAMMA * target.apply(puzzle).max()
-                            - 1f64 / (SCRAMBLE_DEPTH as f64);
+                        let expected = puzzle.get_reward() + GAMMA * target.apply(puzzle).max();
 
                         (state, action, expected)
                     })
