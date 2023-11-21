@@ -19,6 +19,7 @@ const REPLAY_SIZE: usize = 10_000;
 const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
 
 const GAMMA: f64 = 0.5;
+const EPSILON: f64 = 0.8;
 
 fn alpha(iter: usize) -> f64 {
     0.9f64.powi((iter % UPDATE_INTERVAL + 1) as i32)
@@ -51,7 +52,7 @@ fn main() {
 
                         let state = puzzle.clone();
                         let action = {
-                            if rng.gen_bool(0.4) {
+                            if rng.gen_bool(EPSILON) {
                                 rng.gen_range(0.._Puzzle::ACTIONS_LENGTH)
                             } else {
                                 network.apply(puzzle).arg_max()
