@@ -66,7 +66,7 @@ impl Puzzle for EightPuzzle {
             }
         }
 
-        sum * sum
+        sum
     }
 
     fn is_solved(&self) -> bool {
