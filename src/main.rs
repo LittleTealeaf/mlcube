@@ -16,7 +16,7 @@ type _Puzzle = EightPuzzle;
 const PARALLEL_PROCESSES: usize = 24;
 
 const SCRAMBLE_DEPTH: usize = 31 * 2;
-const REPLAY_SIZE: usize = 1_000;
+const REPLAY_SIZE: usize = 5_000;
 const TRAIN_SIZE: usize = REPLAY_SIZE / 2;
 
 const UPDATE_INTERVAL: usize = 100;
@@ -32,7 +32,7 @@ fn alpha(iter: usize) -> f64 {
 }
 
 fn main() {
-    let mut network = Network::<_Puzzle>::new(vec![100; 6]);
+    let mut network = Network::<_Puzzle>::new(vec![200; 6]);
     let mut rng = thread_rng();
     network.randomize(&mut rng, -0.1..0.1);
 
