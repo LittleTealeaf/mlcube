@@ -19,8 +19,8 @@ const REPLAY_SIZE: usize = 10_000;
 const PARALLEL_PUZZLES: usize = 100;
 const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
 
-const GAMMA: f64 = 0.5;
-const EPSILON: f64 = 0.8;
+const GAMMA: f64 = 0.9;
+const EPSILON: f64 = 0.3;
 
 fn alpha(iter: usize) -> f64 {
     0.9f64.powi((iter % UPDATE_INTERVAL + 1) as i32)
@@ -45,7 +45,9 @@ fn main() {
                 let mut rng = thread_rng();
 
                 for _ in 0..MAX_SCRAMBLE_DEPTH {
-                    puzzle.apply(rng.gen_range(0.._Puzzle::ACTIONS_LENGTH)).unwrap();
+                    puzzle
+                        .apply(rng.gen_range(0.._Puzzle::ACTIONS_LENGTH))
+                        .unwrap();
                 }
 
                 (0..(REPLAY_SIZE / PARALLEL_PUZZLES))
