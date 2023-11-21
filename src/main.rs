@@ -13,14 +13,18 @@ mod utils;
 
 type _Puzzle = EightPuzzle;
 
-const UPDATE_INTERVAL: usize = 100;
+const PARALLEL_PROCESSES: usize = 24;
+
 const SCRAMBLE_DEPTH: usize = 100;
 const REPLAY_SIZE: usize = 10_000;
-const PARALLEL_PUZZLES: usize = 100;
-const TRAIN_SAMPLE: usize = REPLAY_SIZE / 4;
+const TRAIN_SIZE: usize = REPLAY_SIZE / 4;
 
+const UPDATE_INTERVAL: usize = 100;
 const GAMMA: f64 = 0.6;
-const EPSILON: f64 = 0.3;
+
+fn epsilon(iter: usize) -> f64 {
+    0.5
+}
 
 fn alpha(iter: usize) -> f64 {
     0.9f64.powi((iter % UPDATE_INTERVAL + 1) as i32)
@@ -38,27 +42,30 @@ fn main() {
     loop {
         println!("Iter {}", iter);
 
-        let replay = (0..(REPLAY_SIZE / SCRAMBLE_DEPTH))
+        let replay = (1..SCRAMBLE_DEPTH)
             .into_par_iter()
-            .map(|_| {
+            .map(|i| {
                 let mut puzzle = _Puzzle::new();
                 let mut rng = thread_rng();
 
-                (0..SCRAMBLE_DEPTH)
+                (0..REPLAY_SIZE / SCRAMBLE_DEPTH)
                     .into_iter()
                     .map(|_| {
-                        puzzle
-                            .apply(rng.gen_range(0.._Puzzle::ACTIONS_LENGTH))
-                            .unwrap();
+                        if puzzle.is_solved() {
+                            for _ in 0..i {
+                                puzzle.scramble(&mut rng).unwrap();
+                            }
+                        }
 
                         let state = puzzle.clone();
                         let action = {
-                            if rng.gen_bool(EPSILON) {
+                            if rng.gen_bool(epsilon(iter)) {
                                 rng.gen_range(0.._Puzzle::ACTIONS_LENGTH)
                             } else {
-                                network.apply(puzzle).arg_max()
+                                network.apply(state).arg_max()
                             }
                         };
+
                         puzzle.apply(action).unwrap();
 
                         let expected = puzzle.get_reward() + GAMMA * target.apply(puzzle).max();
@@ -72,10 +79,10 @@ fn main() {
 
         let nudges = replay
             .into_iter()
-            .choose_multiple(&mut rng, TRAIN_SAMPLE)
+            .choose_multiple(&mut rng, TRAIN_SIZE)
             .into_par_iter()
             .map(|(state, action, expected)| {
-                network.back_propagate(state, action, expected, alpha(iter) / (TRAIN_SAMPLE as f64))
+                network.back_propagate(state, action, expected, alpha(iter) / (TRAIN_SIZE as f64))
             })
             .reduce(
                 || Vec::new(),

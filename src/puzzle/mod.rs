@@ -1,3 +1,5 @@
+use rand::{rngs::ThreadRng, Rng};
+
 pub mod cube;
 pub mod eight;
 
@@ -14,6 +16,11 @@ pub trait Puzzle: Clone + Eq {
     fn get_reward(&self) -> f64;
 
     fn is_solved(&self) -> bool;
+
+    fn scramble(&mut self, rng: &mut ThreadRng) -> Result<(), ActionOutOfBounds> {
+        self.apply(rng.gen_range(0..Self::ACTIONS_LENGTH))
+    }
+
 }
 
 #[derive(Debug)]
