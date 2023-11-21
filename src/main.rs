@@ -15,23 +15,24 @@ type _Puzzle = EightPuzzle;
 
 const PARALLEL_PROCESSES: usize = 24;
 
-const SCRAMBLE_DEPTH: usize = 200;
-const REPLAY_SIZE: usize = 10_000;
-const TRAIN_SIZE: usize = REPLAY_SIZE / 4;
+const SCRAMBLE_DEPTH: usize = 100;
+const REPLAY_SIZE: usize = 1_000;
+const TRAIN_SIZE: usize = REPLAY_SIZE / 2;
 
-const UPDATE_INTERVAL: usize = 50;
+const UPDATE_INTERVAL: usize = 1000;
 const GAMMA: f64 = 0.6;
 
-fn epsilon(iter: usize) -> f64 {
-    0.7 * 0.9f64.powi((iter / UPDATE_INTERVAL) as i32)
+fn epsilon(_iter: usize) -> f64 {
+    0.3
+    // 0.7 * 0.9f64.powi((iter / UPDATE_INTERVAL) as i32)
 }
 
 fn alpha(iter: usize) -> f64 {
-    0.9f64.powi((iter % UPDATE_INTERVAL + 1) as i32)
+    0.95f64.powi((iter % UPDATE_INTERVAL + 1) as i32)
 }
 
 fn main() {
-    let mut network = Network::<_Puzzle>::new(vec![9 * 8 * 3, 9 * 8 * 2, 9 * 8, 9 * 8 / 2]);
+    let mut network = Network::<_Puzzle>::new(vec![100, 100, 100]);
     let mut rng = thread_rng();
     network.randomize(&mut rng, -0.1..0.1);
 
