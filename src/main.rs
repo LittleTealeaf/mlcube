@@ -38,5 +38,8 @@ fn main() {
         train_size: 1_000,
         update_interval: 50,
     }
-    .build::<_Puzzle>();
+    .build::<_Puzzle>()
+    .unwrap();
+
+    println!("{}", ron::to_string(&_agent).unwrap())
 }

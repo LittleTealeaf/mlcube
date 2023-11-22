@@ -103,6 +103,10 @@ where
 
             self.epoch += 1;
     }
+
+    pub fn get_epoch(&self) -> usize {
+        self.epoch
+    }
 }
 
 #[derive(Debug)]

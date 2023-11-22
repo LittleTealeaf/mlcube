@@ -1,7 +1,10 @@
+use serde::{Serialize, Deserialize};
+
+
 pub mod cube;
 pub mod eight;
 
-pub trait Puzzle: Clone + Eq {
+pub trait Puzzle: Clone + Eq + Serialize {
     /// Total number of unique actions that can be taken on this puzzle.
     ///
     /// It is possible that a puzzle may not have all actions availiable at all states. To get

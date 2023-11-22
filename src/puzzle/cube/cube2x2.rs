@@ -1,6 +1,8 @@
+use serde::{Serialize, Deserialize};
+
 use crate::puzzle::{ActionOutOfBounds, Puzzle};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Cube2x2([usize; 24]);
 
 const SOLVED_STATE: [usize; 24] = [

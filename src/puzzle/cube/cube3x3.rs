@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 use crate::puzzle::{ActionOutOfBounds, Puzzle};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Cube3x3([usize; 54]);
 
 impl Puzzle for Cube3x3 {
