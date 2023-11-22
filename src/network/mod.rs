@@ -137,13 +137,13 @@ where
     /// solve, returns [`None`]
     ///
     /// Also returns [`None`] if it takes more than 10000 moves.
-    pub fn solve(&self, mut puzzle: P) -> SolveStatus {
+    pub fn solve(&self, mut puzzle: P) -> SolveResult {
         let mut actions = Vec::new();
         let mut states = vec![puzzle.clone()];
 
         for _ in 0..10000 {
             if puzzle.is_solved() {
-                return SolveStatus::Solved(actions);
+                return SolveResult::Solved(actions);
             }
             let values = self.apply(puzzle.clone());
             let action = values.arg_max();
@@ -151,18 +151,18 @@ where
             puzzle.apply(action).unwrap();
 
             if states.contains(&puzzle) {
-                return SolveStatus::Loop(actions);
+                return SolveResult::Loop(actions);
             }
 
             states.push(puzzle.clone());
         }
 
-        SolveStatus::TimedOut
+        SolveResult::TimedOut
     }
 }
 
 #[derive(Debug)]
-pub enum SolveStatus {
+pub enum SolveResult {
     Solved(Vec<usize>),
     TimedOut,
     Loop(Vec<usize>),

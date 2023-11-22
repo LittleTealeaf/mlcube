@@ -10,7 +10,11 @@ pub use replay::*;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{network::Network, puzzle::Puzzle, utils::Max};
+use crate::{
+    network::{Network, SolveResult},
+    puzzle::Puzzle,
+    utils::Max,
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct Agent<P>
@@ -110,6 +114,10 @@ where
 
     pub fn has_inf_or_nan(&self) -> bool {
         self.network.has_inf_or_nan()
+    }
+
+    pub fn solve(&self, puzzle: P) -> SolveResult {
+        self.network.solve(puzzle)
     }
 }
 

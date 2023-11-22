@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 
 use crate::puzzle::{ActionOutOfBounds, Puzzle};
@@ -92,5 +94,23 @@ impl Puzzle for EightPuzzle {
         .into_iter()
         .flatten()
         .collect()
+    }
+}
+
+impl Display for EightPuzzle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}{}{} {}{}{} {}{}{}",
+            self.0[0],
+            self.0[1],
+            self.0[2],
+            self.0[3],
+            self.0[4],
+            self.0[5],
+            self.0[6],
+            self.0[7],
+            self.0[8]
+        )
     }
 }

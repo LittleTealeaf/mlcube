@@ -3,6 +3,9 @@ use std::fs;
 
 use agent::{AgentFactory, EpochFunction, ReplayStrategy};
 use puzzle::environments::EightPuzzle;
+use rand::{seq::SliceRandom, thread_rng};
+
+use crate::{network::SolveResult, puzzle::Puzzle};
 
 mod agent;
 mod network;
@@ -11,7 +14,7 @@ mod utils;
 
 fn main() {
     let mut agent = AgentFactory {
-        hidden_layers: vec![50],
+        hidden_layers: vec![150; 10],
         gamma: 0.9,
         alpha: EpochFunction::WithinTargetPow {
             scale: 0.9,
@@ -34,7 +37,6 @@ fn main() {
     .unwrap();
 
     loop {
-        println!("Epoch: {}", agent.get_epoch());
         if agent.get_epoch() % 20 == 0 {
             fs::write("./test.ron", ron::to_string(&agent).unwrap()).unwrap();
         }
@@ -43,6 +45,37 @@ fn main() {
 
         if agent.has_inf_or_nan() {
             panic!("Ran into inf / NaN");
+        }
+
+        if agent.get_epoch() % 100 == 0 {
+            println!("Epoch {}", agent.get_epoch());
+            let mut puzzle = EightPuzzle::new();
+            let mut rng = thread_rng();
+            for _ in 0..500 {
+                puzzle
+                    .apply(*puzzle.get_valid_actions().choose(&mut rng).unwrap())
+                    .unwrap();
+            }
+
+            match agent.solve(puzzle.clone()) {
+                SolveResult::Solved(actions) => {
+                    println!("Solved:");
+                    println!("\t{}", puzzle);
+                    for action in actions {
+                        puzzle.apply(action).unwrap();
+                        println!("\t{}", puzzle);
+                    }
+                }
+                SolveResult::TimedOut => println!("Timed Out"),
+                SolveResult::Loop(actions) => {
+                    println!("Solved:");
+                    println!("\t{}", puzzle);
+                    for action in actions {
+                        puzzle.apply(action).unwrap();
+                        println!("\t{}", puzzle);
+                    }
+                }
+            }
         }
     }
 
