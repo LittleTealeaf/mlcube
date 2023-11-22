@@ -30,6 +30,7 @@ fn main() {
         },
         train_size: 500,
         update_interval: 100,
+        initialize_range: -0.00001..0.00001
     }
     .build::<EightPuzzle>()
     .unwrap();

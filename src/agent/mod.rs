@@ -4,7 +4,7 @@ mod replay;
 
 pub use epoch_function::*;
 pub use factory::*;
-use rand::{seq::IteratorRandom, thread_rng};
+use rand::{distributions::uniform::SampleRange, seq::IteratorRandom, thread_rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 pub use replay::*;
 
@@ -36,7 +36,7 @@ impl<P> Agent<P>
 where
     P: Puzzle + Sync + Send,
 {
-    pub fn new(
+    pub fn new<R>(
         hidden_layers: Vec<usize>,
         gamma: f64,
         update_interval: usize,
@@ -44,7 +44,11 @@ where
         train_size: usize,
         epsilon: EpochFunction,
         alpha: EpochFunction,
-    ) -> Result<Self, AgentConfigError> {
+        initialize_range: R,
+    ) -> Result<Self, AgentConfigError>
+    where
+        R: SampleRange<f64> + Clone,
+    {
         if replay_strategy.get_min_observations() < train_size {
             return Err(AgentConfigError::NotEnoughReplay {
                 train_size,
@@ -53,7 +57,7 @@ where
         }
 
         let mut network = Network::new(hidden_layers);
-        network.randomize(&mut thread_rng(), -0.01..0.01);
+        network.randomize(&mut thread_rng(), initialize_range);
 
         Ok(Self {
             target: network.clone(),

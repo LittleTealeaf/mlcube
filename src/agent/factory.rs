@@ -1,8 +1,10 @@
+use rand::distributions::uniform::SampleRange;
+
 use crate::puzzle::Puzzle;
 
 use super::{Agent, AgentConfigError, EpochFunction, ReplayStrategy};
 
-pub struct AgentFactory {
+pub struct AgentFactory<R> where R: SampleRange<f64> + Clone {
     pub hidden_layers: Vec<usize>,
     pub gamma: f64,
     pub update_interval: usize,
@@ -12,9 +14,11 @@ pub struct AgentFactory {
     pub epsilon: EpochFunction,
     /// How fast the algorithm learns
     pub alpha: EpochFunction,
+    /// Range of values to randomize network with
+    pub initialize_range: R
 }
 
-impl AgentFactory {
+impl<R> AgentFactory<R> where R: SampleRange<f64> + Clone {
     pub fn build<P>(self) -> Result<Agent<P>, AgentConfigError>
     where
         P: Puzzle + Sync + Send,
@@ -27,6 +31,7 @@ impl AgentFactory {
             train_size,
             epsilon,
             alpha,
+            initialize_range: initialization_range
         } = self;
 
         Agent::new(
@@ -37,6 +42,7 @@ impl AgentFactory {
             train_size,
             epsilon,
             alpha,
+            initialization_range
         )
     }
 }
