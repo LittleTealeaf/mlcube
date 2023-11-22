@@ -28,7 +28,7 @@ fn main() {
             scramble_depth: 100,
             instances: 100,
         },
-        train_size: 5000,
+        train_size: 500,
         update_interval: 500,
     }
     .build::<EightPuzzle>()
