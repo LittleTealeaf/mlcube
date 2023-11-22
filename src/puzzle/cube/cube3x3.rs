@@ -43,9 +43,7 @@ impl Puzzle for Cube3x3 {
                 // Two
                 for row in permutations {
                     for i in [0, 1] {
-                        let tmp = self.0[row[i]];
-                        self.0[row[i]] = self.0[row[i + 2]];
-                        self.0[row[i + 2]] = tmp;
+                        self.0.swap(row[i], row[i + 2]);
                     }
                 }
                 Ok(())

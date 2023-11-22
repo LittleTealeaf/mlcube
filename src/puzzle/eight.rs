@@ -1,4 +1,3 @@
-
 use super::{ActionOutOfBounds, Puzzle};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -20,25 +19,25 @@ impl Puzzle for EightPuzzle {
                     // Down
                     0 => {
                         if i < 6 {
-                            (self.0[i + 3], self.0[i]) = (self.0[i], self.0[i + 3]);
+                            self.0.swap(i + 3, i);
                         }
                     }
                     // Up
                     1 => {
                         if i > 2 {
-                            (self.0[i - 3], self.0[i]) = (self.0[i], self.0[i - 3]);
+                            self.0.swap(i - 3, i);
                         }
                     }
                     // Right
                     2 => {
                         if i % 3 < 2 {
-                            (self.0[i + 1], self.0[i]) = (self.0[i], self.0[i + 1]);
+                            self.0.swap(i + 1, i);
                         }
                     }
                     // Left
                     3 => {
                         if i % 3 > 0 {
-                            (self.0[i - 1], self.0[i]) = (self.0[i], self.0[i - 1]);
+                            self.0.swap(i - 1, i);
                         }
                     }
                     i => Err(ActionOutOfBounds(i))?,
