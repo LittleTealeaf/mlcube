@@ -14,7 +14,7 @@ mod utils;
 
 fn main() {
     let mut agent = AgentFactory {
-        hidden_layers: vec![100; 5],
+        hidden_layers: vec![200; 10],
         gamma: 0.8,
         alpha: EpochFunction::WithinTargetPow {
             scale: 0.9,
