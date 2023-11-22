@@ -49,7 +49,6 @@ fn main() {
                 let mut rng = thread_rng();
 
                 (0..REPLAY_SIZE / SCRAMBLE_DEPTH)
-                    .into_iter()
                     .map(|_| {
                         if puzzle.is_solved() {
                             for _ in 0..i {
