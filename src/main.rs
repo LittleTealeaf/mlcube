@@ -7,24 +7,26 @@ mod network;
 mod puzzle;
 mod utils;
 
-type _Puzzle = EightPuzzle;
-
 fn main() {
-    let _agent = AgentFactory {
-        hidden_layers: vec![150; 10],
+    let mut _agent = AgentFactory {
+        hidden_layers: vec![100; 5],
         gamma: 0.9,
-        alpha: EpochFunction::WithinTargetPow { scale: 0.95 },
+        alpha: EpochFunction::WithinTargetPow { scale: 0.9 },
         epsilon: EpochFunction::Const(0.5),
         replay_strategy: ReplayStrategy::ScrambledState {
             scramble_depth: 100,
             instances: 50,
             instance_replay_length: 100,
         },
-        train_size: 1_000,
+        train_size: 100,
         update_interval: 50,
     }
-    .build::<_Puzzle>()
+    .build::<EightPuzzle>()
     .unwrap();
 
-    println!("{}", ron::to_string(&_agent).unwrap())
+    for i in 0..100 {
+        println!("Epoch {i}");
+        _agent.train_epoch();
+    }
+
 }

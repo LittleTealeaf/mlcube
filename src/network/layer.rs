@@ -123,6 +123,13 @@ impl Layer {
     pub fn get_outputs(&self) -> usize {
         self.outputs
     }
+
+    pub fn has_inf_or_nan(&self) -> bool {
+        self.weights
+            .iter()
+            .chain(self.bias.iter())
+            .any(|i| i.is_infinite() || i.is_nan())
+    }
 }
 
 pub struct LayerBackPropagate {
