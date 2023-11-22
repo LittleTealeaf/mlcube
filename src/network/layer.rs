@@ -28,7 +28,7 @@ impl Layer {
     pub fn apply(&self, inputs: Vec<f64>) -> Vec<f64> {
         let mut outputs = self.bias.clone();
         for j in 0..self.outputs {
-            for i in 0..self.inputs {
+            for i in 0..inputs.len() {
                 outputs[j] += inputs[i] * self.weights[self.get_weights_index(i, j)];
             }
             outputs[j] = outputs[j].activation();
@@ -75,8 +75,8 @@ impl Layer {
     pub fn back_propagate(
         &self,
         features: Vec<f64>,
-        errors: &Vec<f64>,
-        outputs: &Vec<f64>,
+        errors: &[f64],
+        outputs: &[f64],
     ) -> LayerBackPropagate {
         let mut nudge = self.copy_size();
         let mut new_errors = vec![0f64; self.inputs];
