@@ -26,11 +26,11 @@ fn main() {
         },
         replay_strategy: ReplayStrategy::ScrambledState {
             scramble_depth: 31,
-            instances: 24,
-            instance_replay_length: 100,
+            instances: 10,
+            instance_replay_length: 10,
         },
-        train_size: 1000,
-        update_interval: 100,
+        train_size: 10,
+        update_interval: 1000,
         initialize_range: -0.00001..0.00001,
     }
     .build::<EightPuzzle>()
