@@ -18,18 +18,18 @@ fn main() {
         gamma: 0.9,
         alpha: EpochFunction::WithinTargetPow {
             base: 0.9,
-            scale: 0.95,
+            scale: 0.9,
         },
         epsilon: EpochFunction::WithinTargetPow {
-            base: 1f64,
-            scale: 0.85,
+            base: 0.7,
+            scale: 0.8,
         },
         replay_strategy: ReplayStrategy::EvenSample {
             scramble_depth: 31,
-            instances: 10,
+            instances: 100,
         },
-        train_size: 100,
-        update_interval: 1000,
+        train_size: 1000,
+        update_interval: 20,
         initialize_range: -0.00001..0.00001,
     }
     .build::<EightPuzzle>()
