@@ -1,12 +1,12 @@
 mod epoch_function;
-mod replay;
 mod factory;
+mod replay;
 
-pub use replay::*;
 pub use epoch_function::*;
 pub use factory::*;
 use rand::{seq::IteratorRandom, thread_rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
+pub use replay::*;
 
 use serde::{Deserialize, Serialize};
 
@@ -49,7 +49,7 @@ where
         }
 
         let mut network = Network::new(hidden_layers);
-        network.randomize(&mut thread_rng(), -0.1..0.1);
+        network.randomize(&mut thread_rng(), -0.01..0.01);
 
         Ok(Self {
             target: network.clone(),
@@ -95,13 +95,13 @@ where
                 }
             });
 
-            self.network.update_weights(nudges);
+        self.network.update_weights(nudges);
 
-            if self.epoch % self.update_interval == 0 {
-                self.target = self.network.clone();
-            }
+        if self.epoch % self.update_interval == 0 {
+            self.target = self.network.clone();
+        }
 
-            self.epoch += 1;
+        self.epoch += 1;
     }
 
     pub fn get_epoch(&self) -> usize {
