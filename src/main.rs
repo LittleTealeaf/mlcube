@@ -22,7 +22,7 @@ fn main() {
         },
         epsilon: EpochFunction::WithinTargetPow {
             scale: 0.9,
-            base: 0.6,
+            base: 0.8,
         },
         replay_strategy: ReplayStrategy::EvenSample {
             scramble_depth: 100,
