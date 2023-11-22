@@ -8,7 +8,9 @@ pub struct AgentFactory {
     pub update_interval: usize,
     pub replay_strategy: ReplayStrategy,
     pub train_size: usize,
+    /// The chance that the algorithm will make a random move
     pub epsilon: EpochFunction,
+    /// How fast the algorithm learns
     pub alpha: EpochFunction,
 }
 

@@ -21,7 +21,7 @@ fn main() {
             base: 0.8,
         },
         epsilon: EpochFunction::WithinTargetPow {
-            scale: 0.9,
+            scale: 0.5,
             base: 0.8,
         },
         replay_strategy: ReplayStrategy::EvenSample {
