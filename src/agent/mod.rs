@@ -5,7 +5,7 @@ pub use epoch_function::*;
 use rand::thread_rng;
 pub use replay::*;
 
-use serde::{de::Error, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{network::Network, puzzle::Puzzle};
 
@@ -41,7 +41,7 @@ where
         if replay_strategy.get_min_observations() < train_size {
             return Err(AgentConfigError::NotEnoughReplay {
                 train_size,
-                min_replay_size: replay_strategy.get_min_observations()
+                min_replay_size: replay_strategy.get_min_observations(),
             });
         }
 
@@ -67,6 +67,6 @@ pub enum AgentConfigError {
     /// There isn't enough replay to provide the required train size
     NotEnoughReplay {
         min_replay_size: usize,
-        train_size: usize
+        train_size: usize,
     },
 }
