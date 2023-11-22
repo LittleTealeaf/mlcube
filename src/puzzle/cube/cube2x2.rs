@@ -86,7 +86,7 @@ impl Puzzle for Cube2x2 {
                 return false;
             }
         }
-        return true;
+        true
     }
 
     fn get_valid_actions(&self) -> Vec<usize> {

@@ -70,7 +70,7 @@ impl Puzzle for EightPuzzle {
                 return false;
             }
         }
-        return true;
+        true
     }
 
     fn get_valid_actions(&self) -> Vec<usize> {

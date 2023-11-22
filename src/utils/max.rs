@@ -10,7 +10,7 @@ impl ArgMax for Vec<f64> {
                 max_index = index;
             }
         }
-        return max_index;
+        max_index
     }
 }
 
