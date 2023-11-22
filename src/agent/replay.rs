@@ -71,8 +71,8 @@ pub struct ReplayObservation<P>
 where
     P: Puzzle,
 {
-    state: P,
-    action: usize,
-    reward: f64,
-    next_state: P,
+    pub state: P,
+    pub action: usize,
+    pub reward: f64,
+    pub next_state: P,
 }
