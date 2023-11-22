@@ -14,7 +14,7 @@ jobs:
     name: Test Rust Module
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout Repository
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -25,7 +25,7 @@ jobs:
     needs: [rust_test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout Repository
       - uses: actions/setup-python@v4
         with:
