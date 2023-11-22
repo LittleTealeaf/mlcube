@@ -57,6 +57,14 @@ impl ReplayStrategy {
                 .collect::<Vec<_>>(),
         }
     }
+
+
+    /// Returns the minimum guarunteed observations
+    pub fn get_min_observations(&self) -> usize {
+        match self {
+            ReplayStrategy::EvenSample { scramble_depth, instances } => scramble_depth * instances,
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
