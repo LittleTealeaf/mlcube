@@ -85,11 +85,11 @@ fn main() {
                 network.back_propagate(state, action, expected, alpha(iter) / (TRAIN_SIZE as f64))
             })
             .reduce(
-                || Vec::new(),
+                Vec::new,
                 |mut a, b| {
-                    if a.len() == 0 {
+                    if a.is_empty() {
                         return b;
-                    } else if b.len() == 0 {
+                    } else if b.is_empty() {
                         return a;
                     }
                     for i in 0..(a.len()) {
