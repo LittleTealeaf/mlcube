@@ -29,13 +29,13 @@ fn main() {
             instances: 100,
         },
         train_size: 5000,
-        update_interval: 50,
+        update_interval: 500,
     }
     .build::<EightPuzzle>()
     .unwrap();
 
     loop {
-        if agent.get_epoch() % 20 == 0 {
+        if agent.get_epoch() % 100 == 0 {
             fs::write("./test.ron", ron::to_string(&agent).unwrap()).unwrap();
         }
 
