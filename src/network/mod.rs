@@ -122,6 +122,10 @@ where
             self.layers[index].add(layer);
         }
     }
+
+    pub fn has_inf_or_nan(&self) -> bool {
+        self.layers.iter().any(Layer::has_inf_or_nan)
+    }
 }
 
 /// Once training is done

@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+use std::fs;
+
 use agent::{AgentFactory, EpochFunction, ReplayStrategy};
 use puzzle::environments::EightPuzzle;
 
@@ -8,7 +10,7 @@ mod puzzle;
 mod utils;
 
 fn main() {
-    let mut _agent = AgentFactory {
+    let mut agent = AgentFactory {
         hidden_layers: vec![100; 5],
         gamma: 0.9,
         alpha: EpochFunction::WithinTargetPow { scale: 0.9 },
@@ -24,9 +26,16 @@ fn main() {
     .build::<EightPuzzle>()
     .unwrap();
 
-    for i in 0..100 {
-        println!("Epoch {i}");
-        _agent.train_epoch();
+    loop {
+        if agent.get_epoch() % 20 == 0 {
+            fs::write("./test.ron", ron::to_string(&agent).unwrap()).unwrap();
+        }
+
+        agent.train_epoch();
     }
 
+    // for i in 0..100 {
+    //     println!("Epoch {i}");
+    //     _agent.train_epoch();
+    // }
 }

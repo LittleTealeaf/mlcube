@@ -107,6 +107,10 @@ where
     pub fn get_epoch(&self) -> usize {
         self.epoch
     }
+
+    pub fn has_inf_or_nan(&self) -> bool {
+        self.network.has_inf_or_nan()
+    }
 }
 
 #[derive(Debug)]
