@@ -77,9 +77,4 @@ fn main() {
             }
         }
     }
-
-    // for i in 0..100 {
-    //     println!("Epoch {i}");
-    //     _agent.train_epoch();
-    // }
 }
