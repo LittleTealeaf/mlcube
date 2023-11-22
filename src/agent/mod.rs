@@ -52,8 +52,8 @@ where
             });
         }
 
-        let mut network = Network::new(hidden_layers);
-        network.randomize(&mut thread_rng(), -0.01..0.01);
+        let network = Network::new(hidden_layers);
+        // network.randomize(&mut thread_rng(), -0.01..0.01);
 
         Ok(Self {
             target: network.clone(),
