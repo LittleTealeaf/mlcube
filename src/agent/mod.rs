@@ -76,9 +76,7 @@ where
         let alpha = self.alpha.calculate(self.epoch, self.update_interval);
         let epsilon = self.epsilon.calculate(self.epoch, self.update_interval);
         let mut rng = thread_rng();
-        let replay = self
-            .replay_strategy
-            .build_replay(&self.network, epsilon / (self.train_size as f64));
+        let replay = self.replay_strategy.build_replay(&self.network, epsilon);
 
         let nudges = replay
             .into_iter()
@@ -87,8 +85,12 @@ where
             .map(|observation| {
                 let expected = observation.reward
                     + self.gamma * self.target.apply(observation.next_state).max();
-                self.network
-                    .back_propagate(observation.state, observation.action, expected, alpha)
+                self.network.back_propagate(
+                    observation.state,
+                    observation.action,
+                    expected,
+                    alpha / (self.train_size as f64),
+                )
             })
             .reduce(Vec::new, |mut a, b| {
                 if a.is_empty() {
