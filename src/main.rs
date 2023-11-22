@@ -21,11 +21,12 @@ fn main() {
             base: 0.9,
         },
         epsilon: EpochFunction::Const(0.4f64),
-        replay_strategy: ReplayStrategy::EvenSample {
-            scramble_depth: 100,
-            instances: 10,
+        replay_strategy: ReplayStrategy::ScrambledState {
+            scramble_depth: 31,
+            instances: 24,
+            instance_replay_length: 100,
         },
-        train_size: 750,
+        train_size: 1000,
         update_interval: 100,
         initialize_range: -0.00001..0.00001,
     }
