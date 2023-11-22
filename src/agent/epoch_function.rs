@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize)]
 pub enum EpochFunction {
     Const(f64),
-    WithinTargetPow { scale: f64, base: f64 },
+    WithinTargetPow { base: f64, scale: f64 },
 }
 
 impl EpochFunction {
