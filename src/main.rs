@@ -14,23 +14,26 @@ mod utils;
 
 fn main() {
     let mut agent = AgentFactory {
-        hidden_layers: vec![100; 3],
+        hidden_layers: vec![100; 5],
         gamma: 0.9,
         alpha: EpochFunction::WithinTargetPow {
             scale: 0.9,
             base: 0.5,
         },
-        epsilon: EpochFunction::Const(0.5),
+        epsilon: EpochFunction::WithinTargetPow {
+            scale: 0.9,
+            base: 0.6,
+        },
         replay_strategy: ReplayStrategy::EvenSample {
-            scramble_depth: 500,
-            instances: 10,
+            scramble_depth: 100,
+            instances: 50,
         },
         // replay_strategy: ReplayStrategy::ScrambledState {
         //     scramble_depth: 100,
         //     instances: 50,
         //     instance_replay_length: 100,
         // },
-        train_size: 100,
+        train_size: 1000,
         update_interval: 50,
     }
     .build::<EightPuzzle>()
@@ -47,7 +50,7 @@ fn main() {
             panic!("Ran into inf / NaN");
         }
 
-        if agent.get_epoch() % 100 == 0 {
+        if agent.get_epoch() % 20 == 0 {
             println!("Epoch {}", agent.get_epoch());
             let mut puzzle = EightPuzzle::new();
             let mut rng = thread_rng();
