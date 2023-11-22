@@ -27,6 +27,7 @@ fn main() {
     .unwrap();
 
     loop {
+        println!("Epoch: {}", agent.get_epoch());
         if agent.get_epoch() % 20 == 0 {
             fs::write("./test.ron", ron::to_string(&agent).unwrap()).unwrap();
         }
