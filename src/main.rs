@@ -28,7 +28,7 @@ fn main() {
             scramble_depth: 50,
             instances: 100,
         },
-        train_size: 500,
+        train_size: 2500,
         update_interval: 100,
         initialize_range: -0.00001..0.00001
     }
