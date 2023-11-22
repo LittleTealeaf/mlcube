@@ -21,8 +21,8 @@ pub trait Max<T> {
 impl Max<f64> for Vec<f64> {
     fn max(&self) -> f64 {
         let mut max = self[0];
-        for i in 1..self.len() {
-            max = self[i].max(max);
+        for value in &self[1..] {
+            max = max.max(*value);
         }
 
         max
