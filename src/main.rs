@@ -13,7 +13,7 @@ fn main() {
     let mut agent = AgentFactory {
         hidden_layers: vec![100; 5],
         gamma: 0.9,
-        alpha: EpochFunction::WithinTargetPow { scale: 0.9 },
+        alpha: EpochFunction::WithinTargetPow { scale: 0.8 },
         epsilon: EpochFunction::Const(0.5),
         replay_strategy: ReplayStrategy::EvenSample {
             scramble_depth: 500,
