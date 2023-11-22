@@ -14,20 +14,20 @@ mod utils;
 
 fn main() {
     let mut agent = AgentFactory {
-        hidden_layers: vec![200; 10],
-        gamma: 0.8,
+        hidden_layers: vec![9 * 9; 10],
+        gamma: 0.9,
         alpha: EpochFunction::WithinTargetPow {
             scale: 0.9,
             base: 0.9,
         },
         epsilon: EpochFunction::Const(0.4f64),
         replay_strategy: ReplayStrategy::EvenSample {
-            scramble_depth: 50,
-            instances: 100,
+            scramble_depth: 100,
+            instances: 10,
         },
-        train_size: 2500,
+        train_size: 750,
         update_interval: 100,
-        initialize_range: -0.00001..0.00001
+        initialize_range: -0.00001..0.00001,
     }
     .build::<EightPuzzle>()
     .unwrap();
