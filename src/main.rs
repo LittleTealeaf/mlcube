@@ -19,10 +19,12 @@ fn main() {
         alpha: EpochFunction::WithinTargetPow {
             base: 0.95,
             scale: 0.9,
+            intercept: 0.0,
         },
         epsilon: EpochFunction::WithinTargetPow {
-            base: 0.7,
+            base: 0.5,
             scale: 0.8,
+            intercept: 0.3,
         },
         replay_strategy: ReplayStrategy::EvenSample {
             scramble_depth: 100,
