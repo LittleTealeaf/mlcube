@@ -28,8 +28,8 @@ impl Layer {
     pub fn apply(&self, inputs: Vec<f64>) -> Vec<f64> {
         let mut outputs = self.bias.clone();
         for j in 0..self.outputs {
-            for i in 0..inputs.len() {
-                outputs[j] += inputs[i] * self.weights[self.get_weights_index(i, j)];
+            for (i, value) in inputs.iter().enumerate() {
+                outputs[j] += *value * self.weights[self.get_weights_index(i, j)];
             }
             outputs[j] = outputs[j].activation();
         }
