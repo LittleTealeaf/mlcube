@@ -11,7 +11,7 @@ impl EpochFunction {
         match self {
             Self::Const(val) => *val,
             Self::WithinTargetPow { scale, base } => {
-                base * scale.powi((epoch % update_interval + 1) as i32)
+                base * scale.powi((epoch % update_interval) as i32)
             }
         }
     }

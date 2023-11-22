@@ -18,7 +18,7 @@ fn main() {
         gamma: 0.8,
         alpha: EpochFunction::WithinTargetPow {
             scale: 0.9,
-            base: 0.8,
+            base: 0.9,
         },
         epsilon: EpochFunction::WithinTargetPow {
             scale: 0.5,
