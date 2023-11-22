@@ -15,7 +15,7 @@ mod utils;
 fn main() {
     let mut agent = AgentFactory {
         hidden_layers: vec![100; 5],
-        gamma: 0.9,
+        gamma: 0.8,
         alpha: EpochFunction::WithinTargetPow {
             scale: 0.9,
             base: 0.8,
@@ -28,11 +28,6 @@ fn main() {
             scramble_depth: 100,
             instances: 100,
         },
-        // replay_strategy: ReplayStrategy::ScrambledState {
-        //     scramble_depth: 100,
-        //     instances: 50,
-        //     instance_replay_length: 100,
-        // },
         train_size: 5000,
         update_interval: 50,
     }
