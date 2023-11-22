@@ -18,7 +18,7 @@ fn main() {
         gamma: 0.9,
         alpha: EpochFunction::WithinTargetPow {
             scale: 0.9,
-            base: 0.5,
+            base: 0.8,
         },
         epsilon: EpochFunction::WithinTargetPow {
             scale: 0.9,
@@ -26,14 +26,14 @@ fn main() {
         },
         replay_strategy: ReplayStrategy::EvenSample {
             scramble_depth: 100,
-            instances: 50,
+            instances: 100,
         },
         // replay_strategy: ReplayStrategy::ScrambledState {
         //     scramble_depth: 100,
         //     instances: 50,
         //     instance_replay_length: 100,
         // },
-        train_size: 1000,
+        train_size: 5000,
         update_interval: 50,
     }
     .build::<EightPuzzle>()
