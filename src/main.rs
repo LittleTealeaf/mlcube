@@ -29,7 +29,7 @@ fn main() {
             instances: 100,
         },
         train_size: 500,
-        update_interval: 500,
+        update_interval: 100,
     }
     .build::<EightPuzzle>()
     .unwrap();
