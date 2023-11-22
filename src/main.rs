@@ -33,6 +33,10 @@ fn main() {
         }
 
         agent.train_epoch();
+
+        if agent.has_inf_or_nan() {
+            panic!("Ran into inf / NaN");
+        }
     }
 
     // for i in 0..100 {
