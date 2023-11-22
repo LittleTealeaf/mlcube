@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::{ActionOutOfBounds, Puzzle};
+use crate::puzzle::{ActionOutOfBounds, Puzzle};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EightPuzzle([usize; 9]);

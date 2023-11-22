@@ -1,7 +1,6 @@
 use serde::Serialize;
 
-pub mod cube;
-pub mod eight;
+pub mod environments;
 
 pub trait Puzzle: Clone + Eq + Serialize {
     /// Total number of unique actions that can be taken on this puzzle.
