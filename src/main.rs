@@ -15,11 +15,15 @@ fn main() {
         gamma: 0.9,
         alpha: EpochFunction::WithinTargetPow { scale: 0.9 },
         epsilon: EpochFunction::Const(0.5),
-        replay_strategy: ReplayStrategy::ScrambledState {
+        replay_strategy: ReplayStrategy::EvenSample {
             scramble_depth: 100,
             instances: 50,
-            instance_replay_length: 100,
         },
+        // replay_strategy: ReplayStrategy::ScrambledState {
+        //     scramble_depth: 100,
+        //     instances: 50,
+        //     instance_replay_length: 100,
+        // },
         train_size: 100,
         update_interval: 50,
     }
