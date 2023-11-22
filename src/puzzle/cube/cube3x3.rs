@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::puzzle::{ActionOutOfBounds, Puzzle};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Cube3x3([usize; 54]);
+pub struct Cube3x3([[usize; 9]; 6]);
 
 impl Puzzle for Cube3x3 {
     const ACTIONS_LENGTH: usize = 18;
@@ -21,11 +21,12 @@ impl Puzzle for Cube3x3 {
             0 => {
                 // Normal
                 for row in permutations {
-                    let tmp = self.0[row[3]];
+                    let tmp = self.0[row[3] / 9][row[3] % 9];
                     for i in 0..3 {
-                        self.0[row[3 - i]] = self.0[row[2 - i]];
+                        self.0[row[3 - i] / 9][row[3 - i] % 9] =
+                            self.0[row[2 - i] / 9][row[2 - i] % 9];
                     }
-                    self.0[row[0]] = tmp;
+                    self.0[row[0] / 9][row[0] % 9] = tmp;
                 }
 
                 Ok(())
@@ -33,11 +34,11 @@ impl Puzzle for Cube3x3 {
             1 => {
                 // Prime
                 for row in permutations {
-                    let tmp = self.0[row[0]];
+                    let tmp = self.0[row[0] / 9][row[0] % 9];
                     for i in 0..3 {
-                        self.0[row[i]] = self.0[row[i + 1]];
+                        self.0[row[i] / 9][row[i] % 9] = self.0[row[i + 1] / 9][row[i + 1] % 9];
                     }
-                    self.0[row[3]] = tmp;
+                    self.0[row[3] / 9][row[3] % 9] = tmp;
                 }
                 Ok(())
             }
@@ -45,7 +46,13 @@ impl Puzzle for Cube3x3 {
                 // Two
                 for row in permutations {
                     for i in [0, 1] {
-                        self.0.swap(row[i], row[i + 2]);
+                        (
+                            self.0[row[i] / 9][row[i] % 9],
+                            self.0[row[i + 2] / 9][row[i + 2] % 9],
+                        ) = (
+                            self.0[row[i + 2] / 9][row[i + 2] % 9],
+                            self.0[row[i] / 9][row[i] % 9],
+                        );
                     }
                 }
                 Ok(())
@@ -58,7 +65,7 @@ impl Puzzle for Cube3x3 {
         let mut observations = [0f64; Self::FEATURE_LENGTH];
 
         for i in 0..54 {
-            let value = self.0[i];
+            let value = self.0[i / 9][i % 9];
             observations[i * 6 + value] = 1f64;
         }
 
@@ -82,10 +89,7 @@ impl Puzzle for Cube3x3 {
     }
 }
 
-const SOLVED_STATE: [usize; 54] = [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3,
-    3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-];
+const SOLVED_STATE: [[usize; 9]; 6] = [[0; 9], [1; 9], [2; 9], [3; 9], [4; 9], [5; 9]];
 
 const PERMUTATIONS: [[[usize; 4]; 5]; 6] = [
     //U
