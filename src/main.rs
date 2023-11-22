@@ -63,16 +63,16 @@ fn main() {
                     println!("\t{}", puzzle);
                     for action in actions {
                         puzzle.apply(action).unwrap();
-                        println!("\t{}", puzzle);
+                        println!("\t{} | {}", puzzle, action);
                     }
                 }
                 SolveResult::TimedOut => println!("Timed Out"),
                 SolveResult::Loop(actions) => {
-                    println!("Solved:");
+                    println!("Loop:");
                     println!("\t{}", puzzle);
                     for action in actions {
                         puzzle.apply(action).unwrap();
-                        println!("\t{}", puzzle);
+                        println!("\t{} | {}", puzzle, action);
                     }
                 }
             }
