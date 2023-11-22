@@ -17,19 +17,18 @@ fn main() {
         hidden_layers: vec![9 * 9; 20],
         gamma: 0.9,
         alpha: EpochFunction::WithinTargetPow {
-            scale: 0.9,
             base: 0.9,
+            scale: 0.95,
         },
         epsilon: EpochFunction::WithinTargetPow {
-            base: 0.7,
-            scale: 0.6,
+            base: 1f64,
+            scale: 0.85,
         },
-        replay_strategy: ReplayStrategy::ScrambledState {
+        replay_strategy: ReplayStrategy::EvenSample {
             scramble_depth: 31,
             instances: 10,
-            instance_replay_length: 10,
         },
-        train_size: 10,
+        train_size: 100,
         update_interval: 1000,
         initialize_range: -0.00001..0.00001,
     }
