@@ -16,8 +16,8 @@ fn main() {
         alpha: EpochFunction::WithinTargetPow { scale: 0.9 },
         epsilon: EpochFunction::Const(0.5),
         replay_strategy: ReplayStrategy::EvenSample {
-            scramble_depth: 100,
-            instances: 50,
+            scramble_depth: 500,
+            instances: 10,
         },
         // replay_strategy: ReplayStrategy::ScrambledState {
         //     scramble_depth: 100,
