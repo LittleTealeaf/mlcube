@@ -25,7 +25,7 @@ fn main() {
             scale: 0.7,
         },
         replay_strategy: ReplayStrategy::EvenSample {
-            scramble_depth: 100,
+            scramble_depth: 50,
             instances: 100,
         },
         train_size: 500,
