@@ -28,7 +28,6 @@ impl ReplayStrategy {
                     let mut rng = thread_rng();
 
                     (0..*scramble_depth)
-                        .into_iter()
                         .map(|_| {
                             puzzle
                                 .apply(*puzzle.get_valid_actions().choose(&mut rng).unwrap())
