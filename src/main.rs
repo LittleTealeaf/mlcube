@@ -20,10 +20,7 @@ fn main() {
             scale: 0.9,
             base: 0.9,
         },
-        epsilon: EpochFunction::WithinTargetPow {
-            base: 0.8,
-            scale: 0.7,
-        },
+        epsilon: EpochFunction::Const(0.4f64),
         replay_strategy: ReplayStrategy::EvenSample {
             scramble_depth: 50,
             instances: 100,
