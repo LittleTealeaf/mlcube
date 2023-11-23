@@ -39,7 +39,7 @@ fn main() {
 
     loop {
         if agent.get_epoch() % 100 == 0 {
-            fs::write("./test.ron", ron::to_string(&agent).unwrap()).unwrap();
+            fs::write("./agent.ron", ron::to_string(&agent).unwrap()).unwrap();
         }
 
         agent.train_epoch();
