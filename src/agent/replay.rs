@@ -11,15 +11,20 @@ pub enum ReplayStrategy {
     /// Each instance takes a solved puzzle, feeds it into the network to create a replay
     /// observation, and then applies a random move to that cube (regardless of what the replay is)
     EvenSample {
+        /// Maximum depth to scramble to
         scramble_depth: usize,
+        /// Number of parallel instances to run
         instances: usize,
     },
     /// Takes a number of instances of randomly scrambled cubes, and gathers some number of replay
     /// observations from each instance. If it is solved, then it will scramble the cube again and
     /// continue building replay
     ScrambledState {
+        /// Number of moves used to scramble the cube
         scramble_depth: usize,
+        /// How many parallel instances
         instances: usize,
+        /// How many observations should each instance gather
         instance_replay_length: usize,
     },
 }
