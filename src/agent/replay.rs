@@ -6,10 +6,17 @@ use crate::{network::Network, puzzle::Puzzle, utils::ArgMax};
 
 #[derive(Serialize, Deserialize)]
 pub enum ReplayStrategy {
+    /// Attempts to give an even distribution of states close to being solved, and states further
+    /// away from being solved. This is achieved by having `n` instances, each running parallel.
+    /// Each instance takes a solved puzzle, feeds it into the network to create a replay
+    /// observation, and then applies a random move to that cube (regardless of what the replay is)
     EvenSample {
         scramble_depth: usize,
         instances: usize,
     },
+    /// Takes a number of instances of randomly scrambled cubes, and gathers some number of replay
+    /// observations from each instance. If it is solved, then it will scramble the cube again and
+    /// continue building replay
     ScrambledState {
         scramble_depth: usize,
         instances: usize,
