@@ -72,7 +72,7 @@ where
         let mut entries = Vec::with_capacity(self.layers.len());
         let mut features = state.get_features();
 
-        for layer in self.layers.iter() {
+        for layer in &self.layers {
             let outputs = layer.apply(features.clone());
             entries.push(Entry {
                 features,
@@ -88,13 +88,12 @@ where
             let entry = entries.pop().unwrap();
             let error = expected - entry.outputs[action];
 
-            let LayerBackPropagate { error, nudge } =
-                entry
-                    .layer
-                    .back_propagate_output(entry.features, error, action);
+            let layer_bp = entry
+                .layer
+                .back_propagate_output(entry.features, error, action);
 
-            nudges.push(nudge);
-            error
+            nudges.push(layer_bp.nudge);
+            layer_bp.error
         };
 
         while let Some(Entry {
@@ -103,10 +102,9 @@ where
             layer,
         }) = entries.pop()
         {
-            let LayerBackPropagate { error, nudge } =
-                layer.back_propagate(features, &errors, &outputs);
-            errors = error;
-            nudges.push(nudge);
+            let layer_bp = layer.back_propagate(features, &errors, &outputs);
+            errors = layer_bp.error;
+            nudges.push(layer_bp.nudge);
         }
 
         for nudge in &mut nudges {
