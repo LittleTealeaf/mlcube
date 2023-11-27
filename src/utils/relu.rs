@@ -1,4 +1,3 @@
-
 pub trait Relu {
     fn relu(self) -> Self;
     fn relu_derivative(self) -> Self;
