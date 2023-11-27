@@ -58,7 +58,7 @@ fn main() {
                     .unwrap();
             }
 
-            match agent.solve(puzzle.clone()) {
+            match agent.solve(puzzle.clone(), 10_000) {
                 SolveResult::Solved(actions) => {
                     println!("Solved:");
                     println!("\t{}", puzzle);

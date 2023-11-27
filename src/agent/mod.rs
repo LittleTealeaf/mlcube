@@ -122,8 +122,8 @@ where
         self.network.has_inf_or_nan()
     }
 
-    pub fn solve(&self, puzzle: P) -> SolveResult {
-        self.network.solve(puzzle)
+    pub fn solve(&self, puzzle: P, max_moves: usize) -> SolveResult {
+        self.network.solve(puzzle, max_moves)
     }
 }
 

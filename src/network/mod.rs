@@ -135,11 +135,11 @@ where
     /// solve, returns [`None`]
     ///
     /// Also returns [`None`] if it takes more than 10000 moves.
-    pub fn solve(&self, mut puzzle: P) -> SolveResult {
+    pub fn solve(&self, mut puzzle: P, max_moves: usize) -> SolveResult {
         let mut actions = Vec::new();
         let mut states = vec![puzzle.clone()];
 
-        for _ in 0..10000 {
+        for _ in 0..max_moves {
             if puzzle.is_solved() {
                 return SolveResult::Solved(actions);
             }
