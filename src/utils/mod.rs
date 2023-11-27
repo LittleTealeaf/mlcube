@@ -4,4 +4,3 @@ mod relu;
 pub use relu::*;
 mod sigmoid;
 pub use sigmoid::*;
-
