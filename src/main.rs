@@ -1,16 +1,12 @@
 #![allow(dead_code)]
 use std::fs;
 
-use agent::{AgentFactory, ParamFunction, ReplayStrategy};
-use puzzle::environments::EightPuzzle;
+use mlcube::{
+    agent::{AgentFactory, ParamFunction, ReplayStrategy},
+    network::SolveResult,
+    puzzle::{environments::EightPuzzle, Puzzle},
+};
 use rand::{seq::SliceRandom, thread_rng};
-
-use crate::{network::SolveResult, puzzle::Puzzle};
-
-mod agent;
-mod network;
-mod puzzle;
-mod utils;
 
 fn main() {
     let mut agent = AgentFactory {
@@ -24,9 +20,12 @@ fn main() {
             ParamFunction::Const(0.3),
             ParamFunction::powf(
                 ParamFunction::Const(0.5),
-                ParamFunction::Product(vec![
-                    ParamFunction::Epoch,
-                    ParamFunction::inverse(ParamFunction::UpdateInterval),
+                ParamFunction::Sum(vec![
+                    ParamFunction::Const(1f64),
+                    ParamFunction::Product(vec![
+                        ParamFunction::Epoch,
+                        ParamFunction::inverse(ParamFunction::UpdateInterval),
+                    ]),
                 ]),
             ),
         ]),
