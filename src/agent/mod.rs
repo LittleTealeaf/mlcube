@@ -1,8 +1,8 @@
-mod epoch_function;
 mod factory;
 mod replay;
+mod function_parameter;
 
-pub use epoch_function::*;
+pub use function_parameter::*;
 pub use factory::*;
 use rand::{distributions::uniform::SampleRange, seq::IteratorRandom, thread_rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -28,8 +28,8 @@ where
     update_interval: usize,
     replay_strategy: ReplayStrategy,
     train_size: usize,
-    epsilon: EpochFunction,
-    alpha: EpochFunction,
+    epsilon: ParamFunction,
+    alpha: ParamFunction,
 }
 
 impl<P> Agent<P>
@@ -42,8 +42,8 @@ where
         update_interval: usize,
         replay_strategy: ReplayStrategy,
         train_size: usize,
-        epsilon: EpochFunction,
-        alpha: EpochFunction,
+        epsilon: ParamFunction,
+        alpha: ParamFunction,
         initialize_range: R,
     ) -> Result<Self, AgentConfigError>
     where
@@ -73,8 +73,12 @@ where
     }
 
     pub fn train_epoch(&mut self) {
-        let alpha = self.alpha.calculate(self.epoch, self.update_interval);
-        let epsilon = self.epsilon.calculate(self.epoch, self.update_interval);
+        let variables = FunctionVariables {
+            epoch: self.epoch,
+            update_interval: self.update_interval
+        };
+        let alpha = self.alpha.calculate(&variables);
+        let epsilon = self.epsilon.calculate(&variables);
         let mut rng = thread_rng();
         let replay = self.replay_strategy.build_replay(&self.network, epsilon);
 

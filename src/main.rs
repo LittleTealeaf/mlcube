@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use std::fs;
 
-use agent::{AgentFactory, EpochFunction, ReplayStrategy};
+use agent::{AgentFactory, ParamFunction, ReplayStrategy};
 use puzzle::environments::EightPuzzle;
 use rand::{seq::SliceRandom, thread_rng};
 
@@ -16,16 +16,20 @@ fn main() {
     let mut agent = AgentFactory {
         hidden_layers: vec![100; 20],
         gamma: 0.9,
-        alpha: EpochFunction::WithinTargetPow {
-            base: 0.95,
-            scale: 0.9,
-            intercept: 0.0,
-        },
-        epsilon: EpochFunction::PerTargetPow {
-            base: 0.5,
-            scale: 0.8,
-            intercept: 0.3,
-        },
+        alpha: ParamFunction::powf(
+            ParamFunction::Const(0.95),
+            ParamFunction::powf(ParamFunction::Epoch, ParamFunction::UpdateInterval),
+        ),
+        epsilon: ParamFunction::Sum(vec![
+            ParamFunction::Const(0.3),
+            ParamFunction::powf(
+                ParamFunction::Const(0.5),
+                ParamFunction::Product(vec![
+                    ParamFunction::Epoch,
+                    ParamFunction::inverse(ParamFunction::UpdateInterval),
+                ]),
+            ),
+        ]),
         replay_strategy: ReplayStrategy::ScrambledState {
             scramble_depth: 100,
             instances: 50,
