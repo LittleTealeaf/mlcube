@@ -19,34 +19,34 @@ use serde::{Deserialize, Serialize};
 // },
 
 #[derive(Serialize, Deserialize)]
-pub enum Value {
+pub enum FnValue {
     Const(f64),
     Epoch,
     UpdateInterval,
-    Add(Box<Value>, Box<Value>),
-    Sub(Box<Value>, Box<Value>),
-    Mul(Box<Value>, Box<Value>),
-    Div(Box<Value>, Box<Value>),
-    Exponent { base: Box<Value>, exp: Box<Value> },
-    Rem(Box<Value>, Box<Value>),
-    Neg(Box<Value>),
+    Add(Box<FnValue>, Box<FnValue>),
+    Sub(Box<FnValue>, Box<FnValue>),
+    Mul(Box<FnValue>, Box<FnValue>),
+    Div(Box<FnValue>, Box<FnValue>),
+    Exponent { base: Box<FnValue>, exp: Box<FnValue> },
+    Rem(Box<FnValue>, Box<FnValue>),
+    Neg(Box<FnValue>),
 }
 
-impl Value {
+impl FnValue {
     pub fn calculate(&self, variables: &FunctionVariables) -> f64 {
         match self {
-            Value::Const(val) => *val,
-            Value::Epoch => variables.epoch as f64,
-            Value::UpdateInterval => variables.update_interval as f64,
-            Value::Add(a, b) => a.calculate(variables) + b.calculate(variables),
-            Value::Sub(a, b) => a.calculate(variables) - b.calculate(variables),
-            Value::Mul(a, b) => a.calculate(variables) * b.calculate(variables),
-            Value::Div(a, b) => a.calculate(variables) / b.calculate(variables),
-            Value::Exponent { base, exp } => {
+            FnValue::Const(val) => *val,
+            FnValue::Epoch => variables.epoch as f64,
+            FnValue::UpdateInterval => variables.update_interval as f64,
+            FnValue::Add(a, b) => a.calculate(variables) + b.calculate(variables),
+            FnValue::Sub(a, b) => a.calculate(variables) - b.calculate(variables),
+            FnValue::Mul(a, b) => a.calculate(variables) * b.calculate(variables),
+            FnValue::Div(a, b) => a.calculate(variables) / b.calculate(variables),
+            FnValue::Exponent { base, exp } => {
                 base.calculate(variables).powf(exp.calculate(variables))
             }
-            Value::Rem(a, b) => a.calculate(variables) % b.calculate(variables),
-            Value::Neg(a) => a.calculate(variables) * -1f64,
+            FnValue::Rem(a, b) => a.calculate(variables) % b.calculate(variables),
+            FnValue::Neg(a) => a.calculate(variables) * -1f64,
         }
     }
 }
@@ -56,7 +56,7 @@ pub struct FunctionVariables {
     pub update_interval: usize,
 }
 
-impl Value {
+impl FnValue {
     pub fn exp(self, exp: Self) -> Self {
         Self::Exponent {
             base: self.into(),
@@ -65,20 +65,20 @@ impl Value {
     }
 }
 
-impl From<f64> for Value {
+impl From<f64> for FnValue {
     fn from(value: f64) -> Self {
         Self::Const(value)
     }
 }
 
-impl Add for Value {
-    type Output = Value;
+impl Add for FnValue {
+    type Output = FnValue;
     fn add(self, rhs: Self) -> Self::Output {
         Self::Add(self.into(), rhs.into())
     }
 }
 
-impl Sub for Value {
+impl Sub for FnValue {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -86,28 +86,28 @@ impl Sub for Value {
     }
 }
 
-impl Mul for Value {
+impl Mul for FnValue {
     type Output = Self;
     fn mul(self, rhs: Self) -> Self::Output {
         Self::Mul(self.into(), rhs.into())
     }
 }
 
-impl Div for Value {
+impl Div for FnValue {
     type Output = Self;
     fn div(self, rhs: Self) -> Self::Output {
         Self::Div(self.into(), rhs.into())
     }
 }
 
-impl Rem for Value {
+impl Rem for FnValue {
     type Output = Self;
     fn rem(self, rhs: Self) -> Self::Output {
         Self::Rem(self.into(), rhs.into())
     }
 }
 
-impl Neg for Value {
+impl Neg for FnValue {
     type Output = Self;
     fn neg(self) -> Self::Output {
         Self::Neg(self.into())
