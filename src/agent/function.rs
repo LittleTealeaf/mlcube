@@ -7,7 +7,7 @@ pub enum ParamFunction {
     UpdateInterval,
     Modular {
         base: Box<ParamFunction>,
-        modular: Box<ParamFunction>
+        modular: Box<ParamFunction>,
     },
     Sum(Vec<ParamFunction>),
     Product(Vec<ParamFunction>),
@@ -19,17 +19,15 @@ pub enum ParamFunction {
     },
 }
 
-
-
-
 impl ParamFunction {
-
     pub fn calculate(&self, variables: &FunctionVariables) -> f64 {
         match self {
             Self::Const(val) => *val,
             Self::Epoch => variables.epoch as f64,
             Self::UpdateInterval => variables.update_interval as f64,
-            Self::Modular {base, modular} => base.calculate(variables) % modular.calculate(variables),
+            Self::Modular { base, modular } => {
+                base.calculate(variables) % modular.calculate(variables)
+            }
             Self::Sum(vals) => vals.into_iter().map(|val| val.calculate(variables)).sum(),
             Self::Negative(fun) => -1f64 * fun.calculate(variables),
             Self::Product(vals) => vals
@@ -50,7 +48,10 @@ pub struct FunctionVariables {
 /// Fucntions to simplify the Box values
 impl ParamFunction {
     pub fn powf(base: ParamFunction, exp: ParamFunction) -> Self {
-        Self::Powf { base: base.into(), exp: exp.into() }
+        Self::Powf {
+            base: base.into(),
+            exp: exp.into(),
+        }
     }
 
     pub fn inverse(val: ParamFunction) -> Self {
@@ -62,6 +63,9 @@ impl ParamFunction {
     }
 
     pub fn modular(base: ParamFunction, modular: ParamFunction) -> Self {
-        Self::Modular { base: base.into(), modular: modular.into() }
+        Self::Modular {
+            base: base.into(),
+            modular: modular.into(),
+        }
     }
 }

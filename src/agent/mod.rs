@@ -1,8 +1,8 @@
 mod factory;
 mod replay;
-mod function_parameter;
+mod function;
 
-pub use function_parameter::*;
+pub use function::*;
 pub use factory::*;
 use rand::{distributions::uniform::SampleRange, seq::IteratorRandom, thread_rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
