@@ -11,7 +11,7 @@ pub enum FnValue {
     Sub(Box<FnValue>, Box<FnValue>),
     Mul(Box<FnValue>, Box<FnValue>),
     Div(Box<FnValue>, Box<FnValue>),
-    Exponent { base: Box<FnValue>, exp: Box<FnValue> },
+    Exponent(Box<FnValue>, Box<FnValue>),
     Rem(Box<FnValue>, Box<FnValue>),
     Neg(Box<FnValue>),
 }
@@ -26,9 +26,7 @@ impl FnValue {
             FnValue::Sub(a, b) => a.calculate(variables) - b.calculate(variables),
             FnValue::Mul(a, b) => a.calculate(variables) * b.calculate(variables),
             FnValue::Div(a, b) => a.calculate(variables) / b.calculate(variables),
-            FnValue::Exponent { base, exp } => {
-                base.calculate(variables).powf(exp.calculate(variables))
-            }
+            FnValue::Exponent(a, b) => a.calculate(variables).powf(b.calculate(variables)),
             FnValue::Rem(a, b) => a.calculate(variables) % b.calculate(variables),
             FnValue::Neg(a) => a.calculate(variables) * -1f64,
         }
@@ -42,10 +40,7 @@ pub struct FunctionVariables {
 
 impl FnValue {
     pub fn exp(self, exp: Self) -> Self {
-        Self::Exponent {
-            base: self.into(),
-            exp: exp.into(),
-        }
+        Self::Exponent(self.into(), exp.into())
     }
 }
 
