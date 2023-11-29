@@ -2,7 +2,7 @@ use rand::distributions::uniform::SampleRange;
 
 use crate::puzzle::Puzzle;
 
-use super::{Agent, AgentConfigError, ReplayStrategy, ParamFunction};
+use super::{Agent, AgentConfigError, ReplayStrategy, Value};
 
 pub struct AgentFactory<R>
 where
@@ -14,9 +14,9 @@ where
     pub replay_strategy: ReplayStrategy,
     pub train_size: usize,
     /// The chance that the algorithm will make a random move
-    pub epsilon: ParamFunction,
+    pub epsilon: Value,
     /// How fast the algorithm learns
-    pub alpha: ParamFunction,
+    pub alpha: Value,
     /// Range of values to randomize network with
     pub initialize_range: R,
 }

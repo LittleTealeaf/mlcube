@@ -28,8 +28,8 @@ where
     update_interval: usize,
     replay_strategy: ReplayStrategy,
     train_size: usize,
-    epsilon: ParamFunction,
-    alpha: ParamFunction,
+    epsilon: Value,
+    alpha: Value,
 }
 
 impl<P> Agent<P>
@@ -42,8 +42,8 @@ where
         update_interval: usize,
         replay_strategy: ReplayStrategy,
         train_size: usize,
-        epsilon: ParamFunction,
-        alpha: ParamFunction,
+        epsilon: Value,
+        alpha: Value,
         initialize_range: R,
     ) -> Result<Self, AgentConfigError>
     where

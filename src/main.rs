@@ -2,7 +2,7 @@
 use std::fs;
 
 use mlcube::{
-    agent::{AgentFactory, ParamFunction, ReplayStrategy},
+    agent::{AgentFactory, ReplayStrategy, Value},
     network::SolveResult,
     puzzle::{environments::EightPuzzle, Puzzle},
 };
@@ -12,23 +12,9 @@ fn main() {
     let mut agent = AgentFactory {
         hidden_layers: vec![100; 20],
         gamma: 0.9,
-        alpha: ParamFunction::powf(
-            ParamFunction::Const(0.95),
-            ParamFunction::powf(ParamFunction::Epoch, ParamFunction::UpdateInterval),
-        ),
-        epsilon: ParamFunction::Sum(vec![
-            ParamFunction::Const(0.3),
-            ParamFunction::powf(
-                ParamFunction::Const(0.5),
-                ParamFunction::Sum(vec![
-                    ParamFunction::Const(1f64),
-                    ParamFunction::Product(vec![
-                        ParamFunction::Epoch,
-                        ParamFunction::inverse(ParamFunction::UpdateInterval),
-                    ]),
-                ]),
-            ),
-        ]),
+        alpha: Value::Const(0.95).exp((Value::Epoch % Value::UpdateInterval) + Value::Const(1f64)),
+        epsilon: Value::Const(0.5)
+            .exp((Value::Epoch % Value::UpdateInterval) + Value::Const(1f64)),
         replay_strategy: ReplayStrategy::ScrambledState {
             scramble_depth: 100,
             instances: 50,
