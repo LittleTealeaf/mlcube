@@ -21,7 +21,7 @@ fn main() {
             scale: 0.9,
             intercept: 0.0,
         },
-        epsilon: EpochFunction::WithinTargetPow {
+        epsilon: EpochFunction::PerTargetPow {
             base: 0.5,
             scale: 0.8,
             intercept: 0.3,

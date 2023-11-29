@@ -8,6 +8,11 @@ pub enum EpochFunction {
         scale: f64,
         intercept: f64,
     },
+    PerTargetPow {
+        base: f64,
+        scale: f64,
+        intercept: f64,
+    },
 }
 
 impl EpochFunction {
@@ -19,6 +24,11 @@ impl EpochFunction {
                 scale,
                 base,
             } => intercept + base * scale.powi((epoch % update_interval) as i32),
+            Self::PerTargetPow {
+                base,
+                scale,
+                intercept,
+            } => intercept + base * scale.powi((epoch / update_interval) as i32),
         }
     }
 }
