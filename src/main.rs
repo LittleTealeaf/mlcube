@@ -26,9 +26,10 @@ fn main() {
             scale: 0.8,
             intercept: 0.3,
         },
-        replay_strategy: ReplayStrategy::EvenSample {
+        replay_strategy: ReplayStrategy::ScrambledState {
             scramble_depth: 100,
-            instances: 30,
+            instances: 50,
+            instance_replay_length: 100,
         },
         train_size: 1000,
         update_interval: 50,
