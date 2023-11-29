@@ -2,22 +2,6 @@ use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 
 use serde::{Deserialize, Serialize};
 
-// Const(f64),
-// Epoch,
-// UpdateInterval,
-// Modular {
-//     base: Box<ParamFunction>,
-//     modular: Box<ParamFunction>,
-// },
-// Sum(Vec<ParamFunction>),
-// Product(Vec<ParamFunction>),
-// Negative(Box<ParamFunction>),
-// Inverse(Box<ParamFunction>),
-// Exponent {
-//     base: Box<ParamFunction>,
-//     exp: Box<ParamFunction>,
-// },
-
 #[derive(Serialize, Deserialize)]
 pub enum FnValue {
     Const(f64),
