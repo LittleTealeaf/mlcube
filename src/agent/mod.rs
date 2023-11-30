@@ -34,8 +34,6 @@ impl<P> Agent<P>
 where
     P: Puzzle + Sync + Send,
 {
-    // TODO: Refactor this into NewParams, create a new file called "agent_args", and pass that
-    // object into here
     pub fn new<R>(config: NewAgentConfig<R>) -> Result<Self, AgentConfigError>
     where
         R: SampleRange<f64> + Clone,
