@@ -1,9 +1,7 @@
-mod factory;
-mod replay;
 mod function;
+mod replay;
 
 pub use function::*;
-pub use factory::*;
 use rand::{distributions::uniform::SampleRange, seq::IteratorRandom, thread_rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 pub use replay::*;
@@ -38,46 +36,37 @@ where
 {
     // TODO: Refactor this into NewParams, create a new file called "agent_args", and pass that
     // object into here
-    pub fn new<R>(
-        hidden_layers: Vec<usize>,
-        gamma: f64,
-        update_interval: usize,
-        replay_strategy: ReplayStrategy,
-        train_size: usize,
-        epsilon: FnValue,
-        alpha: FnValue,
-        initialize_range: R,
-    ) -> Result<Self, AgentConfigError>
+    pub fn new<R>(config: NewAgentConfig<R>) -> Result<Self, AgentConfigError>
     where
         R: SampleRange<f64> + Clone,
     {
-        if replay_strategy.get_min_observations() < train_size {
+        if config.replay_strategy.get_min_observations() < config.train_size {
             return Err(AgentConfigError::NotEnoughReplay {
-                train_size,
-                min_replay_size: replay_strategy.get_min_observations(),
+                train_size: config.train_size,
+                min_replay_size: config.replay_strategy.get_min_observations(),
             });
         }
 
-        let mut network = Network::new(hidden_layers);
-        network.randomize(&mut thread_rng(), initialize_range);
+        let mut network = Network::new(config.hidden_layers);
+        network.randomize(&mut thread_rng(), config.initialize_range);
 
         Ok(Self {
             target: network.clone(),
             network,
             epoch: 0,
-            gamma,
-            train_size,
-            update_interval,
-            replay_strategy,
-            epsilon,
-            alpha,
+            gamma: config.gamma,
+            train_size: config.train_size,
+            update_interval: config.update_interval,
+            replay_strategy: config.replay_strategy,
+            epsilon: config.epsilon,
+            alpha: config.alpha,
         })
     }
 
     pub fn train_epoch(&mut self) {
         let variables = FunctionVariables {
             epoch: self.epoch,
-            update_interval: self.update_interval
+            update_interval: self.update_interval,
         };
         let alpha = self.alpha.calculate(&variables);
         let epsilon = self.epsilon.calculate(&variables);
@@ -131,6 +120,20 @@ where
     pub fn solve(&self, puzzle: P, max_moves: usize) -> SolveResult {
         self.network.solve(puzzle, max_moves)
     }
+}
+
+pub struct NewAgentConfig<R>
+where
+    R: SampleRange<f64> + Clone,
+{
+    pub hidden_layers: Vec<usize>,
+    pub gamma: f64,
+    pub update_interval: usize,
+    pub replay_strategy: ReplayStrategy,
+    pub train_size: usize,
+    pub epsilon: FnValue,
+    pub alpha: FnValue,
+    pub initialize_range: R,
 }
 
 #[derive(Debug)]
