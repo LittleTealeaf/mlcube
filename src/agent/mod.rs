@@ -36,6 +36,8 @@ impl<P> Agent<P>
 where
     P: Puzzle + Sync + Send,
 {
+    // TODO: Refactor this into NewParams, create a new file called "agent_args", and pass that
+    // object into here
     pub fn new<R>(
         hidden_layers: Vec<usize>,
         gamma: f64,
