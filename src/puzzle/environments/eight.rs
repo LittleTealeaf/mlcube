@@ -150,7 +150,7 @@ impl Puzzle for GenerousEight {
             .filter(|i| self.0.state[*i] == *i)
             .count() as f64)
             / 9.0)
-            .powi(10)
+            .powi(2)
     }
 
     fn get_valid_actions(&self) -> Vec<usize> {
