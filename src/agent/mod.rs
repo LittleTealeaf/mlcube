@@ -118,6 +118,10 @@ where
     pub fn solve(&self, puzzle: P, max_moves: usize) -> SolveResult {
         self.network.solve(puzzle, max_moves)
     }
+
+    pub fn get_network(&self) -> &Network<P> {
+        &self.network
+    }
 }
 
 pub struct NewAgentConfig<R>
