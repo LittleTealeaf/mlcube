@@ -5,7 +5,10 @@ use serde::{Deserialize, Serialize};
 use crate::puzzle::{ActionOutOfBounds, Puzzle};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct EightPuzzle([usize; 9]);
+pub struct EightPuzzle {
+    state: [usize; 9],
+    prev_state: [usize; 9],
+}
 
 impl Puzzle for EightPuzzle {
     const ACTIONS_LENGTH: usize = 4;
@@ -13,39 +16,44 @@ impl Puzzle for EightPuzzle {
     const FEATURE_LENGTH: usize = 9 * 9;
 
     fn new() -> Self {
-        Self([0, 1, 2, 3, 4, 5, 6, 7, 8])
+        Self {
+            state: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+            prev_state: [0; 9],
+        }
     }
 
     fn apply(&mut self, action: usize) -> Result<(), ActionOutOfBounds> {
+        let old = self.state;
         for i in 0..9 {
-            if self.0[i] == 0 {
+            if self.state[i] == 0 {
                 match action {
                     // Down
                     0 => {
                         if i < 6 {
-                            self.0.swap(i + 3, i);
+                            self.state.swap(i + 3, i);
                         }
                     }
                     // Up
                     1 => {
                         if i > 2 {
-                            self.0.swap(i - 3, i);
+                            self.state.swap(i - 3, i);
                         }
                     }
                     // Right
                     2 => {
                         if i % 3 < 2 {
-                            self.0.swap(i + 1, i);
+                            self.state.swap(i + 1, i);
                         }
                     }
                     // Left
                     3 => {
                         if i % 3 > 0 {
-                            self.0.swap(i - 1, i);
+                            self.state.swap(i - 1, i);
                         }
                     }
                     i => Err(ActionOutOfBounds(i))?,
                 }
+                self.prev_state = old;
                 return Ok(());
             }
         }
@@ -55,7 +63,7 @@ impl Puzzle for EightPuzzle {
     fn get_features(&self) -> Vec<f64> {
         let mut features = vec![0f64; Self::FEATURE_LENGTH];
         for i in 0..9 {
-            features[i + self.0[i]] = 1f64;
+            features[i + self.state[i]] = 1f64;
         }
         features
     }
@@ -64,13 +72,17 @@ impl Puzzle for EightPuzzle {
         if self.is_solved() {
             1f64
         } else {
-            0f64
+            if self.prev_state == self.state {
+                -1f64
+            } else {
+                0f64
+            }
         }
     }
 
     fn is_solved(&self) -> bool {
         for i in 0..9 {
-            if self.0[i] != i {
+            if self.state[i] != i {
                 return false;
             }
         }
@@ -79,7 +91,7 @@ impl Puzzle for EightPuzzle {
 
     fn get_valid_actions(&self) -> Vec<usize> {
         let index = self
-            .0
+            .state
             .iter()
             .enumerate()
             .find_map(|(index, value)| (value == &0).then_some(index))
@@ -102,15 +114,15 @@ impl Display for EightPuzzle {
         write!(
             f,
             "{}{}{} {}{}{} {}{}{}",
-            self.0[0],
-            self.0[1],
-            self.0[2],
-            self.0[3],
-            self.0[4],
-            self.0[5],
-            self.0[6],
-            self.0[7],
-            self.0[8]
+            self.state[0],
+            self.state[1],
+            self.state[2],
+            self.state[3],
+            self.state[4],
+            self.state[5],
+            self.state[6],
+            self.state[7],
+            self.state[8]
         )
     }
 }
@@ -141,7 +153,12 @@ impl Puzzle for GenerousEight {
 
     fn get_reward(&self) -> f64 {
         // Count number of correct spots
-        (((0..9).into_iter().filter(|i| self.0 .0[*i] == *i).count() as f64) / 9.0).powi(10)
+        (((0..9)
+            .into_iter()
+            .filter(|i| self.0.state[*i] == *i)
+            .count() as f64)
+            / 9.0)
+            .powi(10)
     }
 
     fn get_valid_actions(&self) -> Vec<usize> {
