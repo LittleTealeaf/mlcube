@@ -12,6 +12,7 @@ pub enum FnValue {
     Mul(Box<FnValue>, Box<FnValue>),
     Div(Box<FnValue>, Box<FnValue>),
     Exponent(Box<FnValue>, Box<FnValue>),
+    Floor(Box<FnValue>),
     Rem(Box<FnValue>, Box<FnValue>),
     Neg(Box<FnValue>),
 }
@@ -29,6 +30,7 @@ impl FnValue {
             FnValue::Exponent(a, b) => a.calculate(variables).powf(b.calculate(variables)),
             FnValue::Rem(a, b) => a.calculate(variables) % b.calculate(variables),
             FnValue::Neg(a) => a.calculate(variables) * -1f64,
+            FnValue::Floor(a) => a.calculate(variables).floor(),
         }
     }
 }
@@ -41,6 +43,10 @@ pub struct FunctionVariables {
 impl FnValue {
     pub fn exp(self, exp: Self) -> Self {
         Self::Exponent(self.into(), exp.into())
+    }
+
+    pub fn floor(self) -> Self {
+        Self::Floor(self.into())
     }
 }
 

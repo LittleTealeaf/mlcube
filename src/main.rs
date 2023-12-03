@@ -16,7 +16,8 @@ fn main() {
         gamma: 0.9,
         alpha: FnValue::from(0.7).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
         epsilon: FnValue::from(0.3)
-            + FnValue::Const(0.5).exp((FnValue::Epoch + 1.0.into()) / FnValue::UpdateInterval),
+            + FnValue::Const(0.5)
+                .exp((FnValue::Epoch / FnValue::UpdateInterval).floor() + 1.0.into()),
         replay_strategy: ReplayStrategy::RandomScrambleState {
             scramble_min: 1,
             scramble_max: 50,
