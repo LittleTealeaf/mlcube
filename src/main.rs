@@ -10,7 +10,7 @@ use rand::{seq::SliceRandom, thread_rng};
 
 fn main() {
     let mut agent: Agent<EightPuzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![100; 20],
+        hidden_layers: vec![81; 10],
         gamma: 0.9,
         alpha: FnValue::Const(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1f64.into()),
         epsilon: FnValue::Const(0.5).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1f64.into()),
