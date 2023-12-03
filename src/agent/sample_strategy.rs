@@ -4,8 +4,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{network::Network, puzzle::Puzzle, utils::ArgMax};
 
+use super::ReplayObservation;
+
 #[derive(Serialize, Deserialize)]
-pub enum ReplayStrategy {
+pub enum SampleStrategy {
     /// Attempts to give an even distribution of states close to being solved, and states further
     /// away from being solved. This is achieved by having `n` instances, each running parallel.
     /// Each instance takes a solved puzzle, feeds it into the network to create a replay
@@ -35,13 +37,13 @@ pub enum ReplayStrategy {
     },
 }
 
-impl ReplayStrategy {
+impl SampleStrategy {
     pub fn build_replay<P>(&self, network: &Network<P>, epsilon: f64) -> Vec<ReplayObservation<P>>
     where
         P: Puzzle + Send + Sync,
     {
         match self {
-            ReplayStrategy::EvenSample {
+            SampleStrategy::EvenSample {
                 scramble_depth,
                 instances,
             } => (0..*instances)
@@ -187,15 +189,4 @@ impl ReplayStrategy {
             } => instances * instance_replay_length,
         }
     }
-}
-
-#[derive(Clone, Copy)]
-pub struct ReplayObservation<P>
-where
-    P: Puzzle,
-{
-    pub state: P,
-    pub action: usize,
-    pub reward: f64,
-    pub next_state: P,
 }

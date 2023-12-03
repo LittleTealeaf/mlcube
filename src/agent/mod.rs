@@ -1,10 +1,12 @@
 mod function;
-mod replay;
+mod replay_buffer;
+mod sample_strategy;
 
 pub use function::*;
 use rand::{distributions::uniform::SampleRange, seq::IteratorRandom, thread_rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-pub use replay::*;
+pub use replay_buffer::*;
+pub use sample_strategy::*;
 
 use serde::{Deserialize, Serialize};
 
@@ -24,10 +26,11 @@ where
     epoch: usize,
     gamma: f64,
     update_interval: usize,
-    replay_strategy: ReplayStrategy,
+    sample_strategy: SampleStrategy,
     train_size: usize,
     epsilon: FnValue,
     alpha: FnValue,
+    replay: ReplayBuffer<P>,
 }
 
 impl<P> Agent<P>
@@ -38,10 +41,10 @@ where
     where
         R: SampleRange<f64> + Clone,
     {
-        if config.replay_strategy.get_min_observations() < config.train_size {
+        if config.sample_strategy.get_min_observations() < config.train_size {
             return Err(AgentConfigError::NotEnoughReplay {
                 train_size: config.train_size,
-                min_replay_size: config.replay_strategy.get_min_observations(),
+                min_replay_size: config.sample_strategy.get_min_observations(),
             });
         }
 
@@ -55,9 +58,10 @@ where
             gamma: config.gamma,
             train_size: config.train_size,
             update_interval: config.update_interval,
-            replay_strategy: config.replay_strategy,
+            sample_strategy: config.sample_strategy,
             epsilon: config.epsilon,
             alpha: config.alpha,
+            replay: ReplayBuffer::new(config.max_replay_size),
         })
     }
 
@@ -69,11 +73,12 @@ where
         let alpha = self.alpha.calculate(&variables);
         let epsilon = self.epsilon.calculate(&variables);
         let mut rng = thread_rng();
-        let replay = self.replay_strategy.build_replay(&self.network, epsilon);
+        let replay = self.sample_strategy.build_replay(&self.network, epsilon);
+        for observation in replay {
+            self.replay.insert_observation(observation, &mut rng);
+        }
 
-        let nudges = replay
-            .into_iter()
-            .choose_multiple(&mut rng, self.train_size)
+        let nudges = self.replay.sample(self.train_size, &mut rng)
             .into_par_iter()
             .map(|observation| {
                 let expected = observation.reward
@@ -135,11 +140,12 @@ where
     pub hidden_layers: Vec<usize>,
     pub gamma: f64,
     pub update_interval: usize,
-    pub replay_strategy: ReplayStrategy,
+    pub sample_strategy: SampleStrategy,
     pub train_size: usize,
     pub epsilon: FnValue,
     pub alpha: FnValue,
     pub initialize_range: R,
+    pub max_replay_size: usize,
 }
 
 #[derive(Debug)]

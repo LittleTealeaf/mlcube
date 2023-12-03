@@ -2,7 +2,7 @@
 use std::fs;
 
 use mlcube::{
-    agent::{Agent, FnValue, NewAgentConfig, ReplayStrategy},
+    agent::{Agent, FnValue, NewAgentConfig, SampleStrategy},
     network::SolveResult,
     puzzle::{environments::EightPuzzle, Puzzle},
 };
@@ -14,22 +14,23 @@ type _Puzzle = EightPuzzle;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![81; 10],
+        hidden_layers: vec![200, 200, 200],
         gamma: 0.9,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
         epsilon: FnValue::from(0.3)
             + FnValue::Const(0.5)
                 .exp((FnValue::Epoch / FnValue::UpdateInterval).floor() + 1.0.into()),
-        replay_strategy: ReplayStrategy::RandomScrambleState {
+        sample_strategy: SampleStrategy::RandomScrambleState {
             scramble_min: 1,
             scramble_max: 30,
             instances: 10,
             instance_replay_length: 100,
         },
         train_size: 128,
-        update_interval: 100,
+        update_interval: 1000,
         initialize_range: -0.1..0.1,
+        max_replay_size: 100_000
     })
     .unwrap();
 
