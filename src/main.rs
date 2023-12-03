@@ -32,7 +32,7 @@ fn main() {
         train_size: 128,
         update_interval: 1000,
         initialize_range: -0.1..0.1,
-        max_replay_size: 100_000,
+        max_replay_size: 1_000_000,
         penalize_repeats: false,
     })
     .unwrap();
