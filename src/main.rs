@@ -15,7 +15,7 @@ fn main() {
         hidden_layers: vec![81; 10],
         gamma: 0.9,
         alpha: FnValue::from(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
-        epsilon: FnValue::Const(0.99).exp(FnValue::Epoch / FnValue::UpdateInterval),
+        epsilon: FnValue::Const(0.9).exp(FnValue::Epoch / FnValue::UpdateInterval),
         replay_strategy: ReplayStrategy::RandomScrambleState {
             scramble_min: 1,
             scramble_max: 100,
