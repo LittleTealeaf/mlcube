@@ -3,7 +3,7 @@ mod replay_buffer;
 mod sample_strategy;
 
 pub use function::*;
-use rand::{distributions::uniform::SampleRange, seq::IteratorRandom, thread_rng};
+use rand::{distributions::uniform::SampleRange, thread_rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 pub use replay_buffer::*;
 pub use sample_strategy::*;
@@ -31,7 +31,7 @@ where
     epsilon: FnValue,
     alpha: FnValue,
     replay: ReplayBuffer<P>,
-    penalize_repeats: bool
+    penalize_repeats: bool,
 }
 
 impl<P> Agent<P>
@@ -63,7 +63,7 @@ where
             epsilon: config.epsilon,
             alpha: config.alpha,
             replay: ReplayBuffer::new(config.max_replay_size),
-            penalize_repeats: config.penalize_repeats
+            penalize_repeats: config.penalize_repeats,
         })
     }
 
@@ -80,7 +80,9 @@ where
             self.replay.insert_observation(observation, &mut rng);
         }
 
-        let nudges = self.replay.sample(self.train_size, &mut rng)
+        let nudges = self
+            .replay
+            .sample(self.train_size, &mut rng)
             .into_par_iter()
             .map(|observation| {
                 let expected = observation.reward
@@ -148,7 +150,7 @@ where
     pub alpha: FnValue,
     pub initialize_range: R,
     pub max_replay_size: usize,
-    pub penalize_repeats: bool
+    pub penalize_repeats: bool,
 }
 
 #[derive(Debug)]
