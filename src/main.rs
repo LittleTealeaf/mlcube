@@ -21,7 +21,7 @@ fn main() {
             instance_replay_length: 100,
         },
         train_size: 1000,
-        update_interval: 50,
+        update_interval: 20,
         initialize_range: -0.00001..0.00001,
     })
     .unwrap();
