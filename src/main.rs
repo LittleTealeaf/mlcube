@@ -23,8 +23,8 @@ fn main() {
                 .exp((FnValue::Epoch / FnValue::UpdateInterval).floor() + 1.0.into()),
         replay_strategy: ReplayStrategy::RandomScrambleState {
             scramble_min: 1,
-            scramble_max: 50,
-            instances: 20,
+            scramble_max: 30,
+            instances: 10,
             instance_replay_length: 100,
         },
         train_size: 24,
