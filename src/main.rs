@@ -13,7 +13,7 @@ use rand::{seq::SliceRandom, thread_rng};
 
 const EVALUATE_INTERVAL: usize = 100;
 
-type _Puzzle = GenerousEight;
+type _Puzzle = EightPuzzle;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
@@ -33,6 +33,7 @@ fn main() {
         update_interval: 1000,
         initialize_range: -0.1..0.1,
         max_replay_size: 100_000,
+        penalize_repeats: false,
     })
     .unwrap();
 

@@ -31,6 +31,7 @@ where
     epsilon: FnValue,
     alpha: FnValue,
     replay: ReplayBuffer<P>,
+    penalize_repeats: bool
 }
 
 impl<P> Agent<P>
@@ -62,6 +63,7 @@ where
             epsilon: config.epsilon,
             alpha: config.alpha,
             replay: ReplayBuffer::new(config.max_replay_size),
+            penalize_repeats: config.penalize_repeats
         })
     }
 
@@ -82,7 +84,7 @@ where
             .into_par_iter()
             .map(|observation| {
                 let expected = observation.reward
-                    + if observation.state == observation.next_state {
+                    + if self.penalize_repeats && observation.state == observation.next_state {
                         0f64
                     } else {
                         self.gamma * self.target.apply(observation.next_state).max()
@@ -146,6 +148,7 @@ where
     pub alpha: FnValue,
     pub initialize_range: R,
     pub max_replay_size: usize,
+    pub penalize_repeats: bool
 }
 
 #[derive(Debug)]
