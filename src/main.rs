@@ -19,10 +19,10 @@ fn main() {
         replay_strategy: ReplayStrategy::RandomScrambleState {
             scramble_min: 1,
             scramble_max: 100,
-            instances: 100,
+            instances: 20,
             instance_replay_length: 100,
         },
-        train_size: 100,
+        train_size: 500,
         update_interval: 100,
         initialize_range: -0.00001..0.00001,
     })
