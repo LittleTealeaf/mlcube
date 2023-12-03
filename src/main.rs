@@ -5,7 +5,7 @@ use mlcube::{
     agent::{Agent, FnValue, NewAgentConfig, SampleStrategy},
     network::SolveResult,
     puzzle::{
-        environments::{EightPuzzle, GenerousEight},
+        environments::{EightPuzzle, GenerousEight, Cube2x2},
         Puzzle,
     },
 };
@@ -13,7 +13,7 @@ use rand::{seq::SliceRandom, thread_rng};
 
 const EVALUATE_INTERVAL: usize = 100;
 
-type _Puzzle = EightPuzzle;
+type _Puzzle = Cube2x2;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {

@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 
 use crate::puzzle::{ActionOutOfBounds, Puzzle};
@@ -93,6 +95,39 @@ impl Puzzle for Cube2x2 {
 
     fn get_valid_actions(&self) -> Vec<usize> {
         vec![0, 1, 2, 3, 4, 5, 6, 7, 8]
+    }
+}
+
+impl Display for Cube2x2 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}{}{}{} {}{}{}{} {}{}{}{} {}{}{}{} {}{}{}{} {}{}{}{}",
+            self.0[0],
+            self.0[1],
+            self.0[2],
+            self.0[3],
+            self.0[4],
+            self.0[5],
+            self.0[6],
+            self.0[7],
+            self.0[8],
+            self.0[9],
+            self.0[10],
+            self.0[11],
+            self.0[12],
+            self.0[13],
+            self.0[14],
+            self.0[15],
+            self.0[16],
+            self.0[17],
+            self.0[18],
+            self.0[19],
+            self.0[20],
+            self.0[21],
+            self.0[22],
+            self.0[23],
+        )
     }
 }
 
