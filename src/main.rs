@@ -5,7 +5,7 @@ use mlcube::{
     agent::{Agent, FnValue, NewAgentConfig, SampleStrategy},
     network::SolveResult,
     puzzle::{
-        environments::{EightPuzzle, GenerousEight, Cube2x2},
+        environments::{Cube2x2, EightPuzzle, GenerousEight},
         Puzzle,
     },
 };
@@ -17,7 +17,7 @@ type _Puzzle = Cube2x2;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![200, 200, 200],
+        hidden_layers: vec![500, 500, 500],
         gamma: 0.9,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
