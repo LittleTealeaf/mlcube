@@ -4,7 +4,10 @@ use std::fs;
 use mlcube::{
     agent::{Agent, FnValue, NewAgentConfig, SampleStrategy},
     network::SolveResult,
-    puzzle::{environments::{EightPuzzle, GenerousEight}, Puzzle},
+    puzzle::{
+        environments::{EightPuzzle, GenerousEight},
+        Puzzle,
+    },
 };
 use rand::{seq::SliceRandom, thread_rng};
 
@@ -18,9 +21,10 @@ fn main() {
         gamma: 0.9,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
-        epsilon: FnValue::from(0.3)
-            + FnValue::Const(0.5)
-                .exp((FnValue::Epoch / FnValue::UpdateInterval).floor() + 1.0.into()),
+        epsilon: FnValue::from(0.05)
+            + (FnValue::Const(0.85)
+                * FnValue::Const(0.9)
+                    .exp((FnValue::Epoch / FnValue::UpdateInterval).floor() + 1.0.into())),
         sample_strategy: SampleStrategy::RandomScrambleState {
             scramble_min: 1,
             scramble_max: 30,
@@ -30,7 +34,7 @@ fn main() {
         train_size: 128,
         update_interval: 1000,
         initialize_range: -0.1..0.1,
-        max_replay_size: 100_000
+        max_replay_size: 100_000,
     })
     .unwrap();
 
