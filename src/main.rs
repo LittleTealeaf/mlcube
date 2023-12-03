@@ -13,10 +13,11 @@ fn main() {
         hidden_layers: vec![81; 10],
         gamma: 0.9,
         alpha: FnValue::Const(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1f64.into()),
-        epsilon: FnValue::Const(0.5).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1f64.into()),
-        replay_strategy: ReplayStrategy::ScrambledState {
-            scramble_depth: 100,
-            instances: 50,
+        epsilon: FnValue::Const(0.5).exp((FnValue::Epoch / FnValue::UpdateInterval) + 1f64.into()),
+        replay_strategy: ReplayStrategy::RandomScrambleState {
+            scramble_min: 1,
+            scramble_max: 100,
+            instances: 100,
             instance_replay_length: 100,
         },
         train_size: 1000,

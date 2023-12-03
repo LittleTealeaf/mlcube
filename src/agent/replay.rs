@@ -27,6 +27,12 @@ pub enum ReplayStrategy {
         /// How many observations should each instance gather
         instance_replay_length: usize,
     },
+    RandomScrambleState {
+        scramble_min: usize,
+        scramble_max: usize,
+        instances: usize,
+        instance_replay_length: usize,
+    },
 }
 
 impl ReplayStrategy {
@@ -114,18 +120,68 @@ impl ReplayStrategy {
                 })
                 .flatten()
                 .collect::<Vec<_>>(),
+            Self::RandomScrambleState {
+                scramble_min,
+                scramble_max,
+                instances,
+                instance_replay_length,
+            } => (0..*instances)
+                .into_par_iter()
+                .map(|_| {
+                    let mut puzzle = P::new();
+                    let mut rng = thread_rng();
+
+                    (0..*instance_replay_length)
+                        .map(|_| {
+                            if puzzle.is_solved() {
+                                for _ in 0..rng.gen_range(*scramble_min..=*scramble_max) {
+                                    puzzle
+                                        .apply(
+                                            *puzzle.get_valid_actions().choose(&mut rng).unwrap(),
+                                        )
+                                        .unwrap();
+                                }
+                            }
+
+                            let state = puzzle.clone();
+
+                            let action = if rng.gen_bool(epsilon) {
+                                rng.gen_range(0..P::ACTIONS_LENGTH)
+                            } else {
+                                network.apply(puzzle.clone()).arg_max()
+                            };
+
+                            puzzle.apply(action).unwrap();
+
+                            ReplayObservation {
+                                state,
+                                action,
+                                reward: puzzle.get_reward(),
+                                next_state: puzzle.clone(),
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                })
+                .flatten()
+                .collect(),
         }
     }
 
     /// Returns the minimum guarunteed observations
     pub fn get_min_observations(&self) -> usize {
         match self {
-            ReplayStrategy::EvenSample {
+            Self::EvenSample {
                 scramble_depth,
                 instances,
             } => scramble_depth * instances,
-            ReplayStrategy::ScrambledState {
+            Self::ScrambledState {
                 scramble_depth: _,
+                instances,
+                instance_replay_length,
+            } => instances * instance_replay_length,
+            Self::RandomScrambleState {
+                scramble_min: _,
+                scramble_max: _,
                 instances,
                 instance_replay_length,
             } => instances * instance_replay_length,
