@@ -24,8 +24,8 @@ fn main() {
         sample_strategy: SampleStrategy::RandomScrambleState {
             scramble_min: 1,
             scramble_max: 30,
-            instances: 10,
-            instance_replay_length: 100,
+            instances: 24,
+            instance_replay_length: 40,
         },
         train_size: 128,
         update_interval: 1000,
