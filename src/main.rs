@@ -30,7 +30,7 @@ fn main() {
             instances: 24,
         },
         train_size: 256,
-        update_interval: 500,
+        update_interval: 100,
         initialize_range: -0.1..0.1,
         max_replay_size: 1_000_000,
         penalize_repeats: true,
