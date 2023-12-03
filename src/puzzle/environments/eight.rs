@@ -7,7 +7,6 @@ use crate::puzzle::{ActionOutOfBounds, Puzzle};
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EightPuzzle {
     state: [usize; 9],
-    prev_state: [usize; 9],
 }
 
 impl Puzzle for EightPuzzle {
@@ -18,12 +17,10 @@ impl Puzzle for EightPuzzle {
     fn new() -> Self {
         Self {
             state: [0, 1, 2, 3, 4, 5, 6, 7, 8],
-            prev_state: [0; 9],
         }
     }
 
     fn apply(&mut self, action: usize) -> Result<(), ActionOutOfBounds> {
-        let old = self.state;
         for i in 0..9 {
             if self.state[i] == 0 {
                 match action {
@@ -53,7 +50,6 @@ impl Puzzle for EightPuzzle {
                     }
                     i => Err(ActionOutOfBounds(i))?,
                 }
-                self.prev_state = old;
                 return Ok(());
             }
         }
@@ -72,11 +68,7 @@ impl Puzzle for EightPuzzle {
         if self.is_solved() {
             1f64
         } else {
-            if self.prev_state == self.state {
-                -1f64
-            } else {
-                0f64
-            }
+            0f64
         }
     }
 

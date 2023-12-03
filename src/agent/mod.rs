@@ -77,7 +77,11 @@ where
             .into_par_iter()
             .map(|observation| {
                 let expected = observation.reward
-                    + self.gamma * self.target.apply(observation.next_state).max();
+                    + if observation.state == observation.next_state {
+                        0f64
+                    } else {
+                        self.gamma * self.target.apply(observation.next_state).max()
+                    };
                 self.network.back_propagate(
                     observation.state,
                     observation.action,
