@@ -38,7 +38,7 @@ fn main() {
     .unwrap();
 
     loop {
-        if agent.get_epoch() % 100 == 0 {
+        if agent.get_epoch() % 1000 == 0 {
             fs::write("./agent.ron", ron::to_string(&agent).unwrap()).unwrap();
         }
 
