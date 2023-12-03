@@ -4,13 +4,13 @@ use std::fs;
 use mlcube::{
     agent::{Agent, FnValue, NewAgentConfig, ReplayStrategy},
     network::SolveResult,
-    puzzle::{environments::{GenerousEight, GoHome}, Puzzle},
+    puzzle::{environments::GenerousEight, Puzzle},
 };
 use rand::{seq::SliceRandom, thread_rng};
 
 const EVALUATE_INTERVAL: usize = 100;
 
-type _Puzzle = GoHome;
+type _Puzzle = GenerousEight;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
