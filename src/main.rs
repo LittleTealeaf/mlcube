@@ -18,7 +18,7 @@ fn main() {
         epsilon: FnValue::Const(0.9).exp(FnValue::Epoch / FnValue::UpdateInterval),
         replay_strategy: ReplayStrategy::RandomScrambleState {
             scramble_min: 1,
-            scramble_max: 100,
+            scramble_max: 50,
             instances: 20,
             instance_replay_length: 100,
         },
@@ -43,7 +43,7 @@ fn main() {
             println!("Epoch {}", agent.get_epoch());
             let mut puzzle = EightPuzzle::new();
             let mut rng = thread_rng();
-            for _ in 0..10 {
+            for _ in 0..50 {
                 puzzle
                     .apply(*puzzle.get_valid_actions().choose(&mut rng).unwrap())
                     .unwrap();
