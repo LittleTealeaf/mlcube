@@ -27,7 +27,7 @@ fn main() {
             instances: 20,
             instance_replay_length: 100,
         },
-        train_size: 500,
+        train_size: 24,
         update_interval: 100,
         initialize_range: -0.1..0.1,
     })
