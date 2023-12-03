@@ -26,11 +26,11 @@ fn main() {
                 * FnValue::Const(0.9)
                     .exp((FnValue::Epoch / FnValue::UpdateInterval).floor() + 1.0.into())),
         sample_strategy: SampleStrategy::EvenSample {
-            scramble_depth: 50,
+            scramble_depth: 21,
             instances: 24,
         },
-        train_size: 128,
-        update_interval: 100,
+        train_size: 256,
+        update_interval: 500,
         initialize_range: -0.1..0.1,
         max_replay_size: 1_000_000,
         penalize_repeats: true,
