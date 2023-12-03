@@ -41,7 +41,7 @@ fn main() {
             println!("Epoch {}", agent.get_epoch());
             let mut puzzle = EightPuzzle::new();
             let mut rng = thread_rng();
-            for _ in 0..500 {
+            for _ in 0..100 {
                 puzzle
                     .apply(*puzzle.get_valid_actions().choose(&mut rng).unwrap())
                     .unwrap();
