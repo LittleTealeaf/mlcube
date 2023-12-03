@@ -12,16 +12,16 @@ fn main() {
     let mut agent: Agent<EightPuzzle> = Agent::new(NewAgentConfig {
         hidden_layers: vec![81; 10],
         gamma: 0.9,
-        alpha: FnValue::Const(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1f64.into()),
-        epsilon: FnValue::Const(0.5).exp((FnValue::Epoch / FnValue::UpdateInterval) + 1f64.into()),
+        alpha: FnValue::from(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
+        epsilon: FnValue::Const(0.99).exp(FnValue::Epoch / FnValue::UpdateInterval),
         replay_strategy: ReplayStrategy::RandomScrambleState {
             scramble_min: 1,
             scramble_max: 100,
             instances: 100,
             instance_replay_length: 100,
         },
-        train_size: 1000,
-        update_interval: 20,
+        train_size: 100,
+        update_interval: 1000,
         initialize_range: -0.00001..0.00001,
     })
     .unwrap();
