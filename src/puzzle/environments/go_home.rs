@@ -28,8 +28,8 @@ impl Puzzle for GoHome {
 
     fn get_features(&self) -> Vec<f64> {
         vec![
-            (1.0 - 1.0 / ((self.x.abs() + 1) as f64)) * (self.x / self.x.abs()) as f64,
-            (1.0 - 1.0 / ((self.y.abs() + 1) as f64)) * (self.y / self.y.abs()) as f64,
+            if self.x == 0 {1.0} else {(1.0 - 1.0 / ((self.x.abs()) as f64)) * (self.x / self.x.abs()) as f64},
+            if self.y == 0 {1.0} else {(1.0 - 1.0 / ((self.y.abs() + 1) as f64)) * (self.y / self.y.abs()) as f64},
         ]
     }
 
