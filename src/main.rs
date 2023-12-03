@@ -8,6 +8,8 @@ use mlcube::{
 };
 use rand::{seq::SliceRandom, thread_rng};
 
+const EVALUATE_INTERVAL: usize = 100;
+
 fn main() {
     let mut agent: Agent<EightPuzzle> = Agent::new(NewAgentConfig {
         hidden_layers: vec![81; 10],
@@ -37,7 +39,7 @@ fn main() {
             panic!("Ran into inf / NaN");
         }
 
-        if agent.get_epoch() % 20 == 0 {
+        if agent.get_epoch() % EVALUATE_INTERVAL == 0 {
             println!("Epoch {}", agent.get_epoch());
             let mut puzzle = EightPuzzle::new();
             let mut rng = thread_rng();
