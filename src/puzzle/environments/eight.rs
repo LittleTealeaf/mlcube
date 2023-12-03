@@ -141,7 +141,7 @@ impl Puzzle for GenerousEight {
 
     fn get_reward(&self) -> f64 {
         // Count number of correct spots
-        (1.0 / ((0..9).into_iter().filter(|i| self.0 .0[*i] == *i).count() as f64)).powi(2)
+        (((0..9).into_iter().filter(|i| self.0 .0[*i] == *i).count() as f64) / 9.0).powi(2)
     }
 
     fn get_valid_actions(&self) -> Vec<usize> {
