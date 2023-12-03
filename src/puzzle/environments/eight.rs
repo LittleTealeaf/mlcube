@@ -114,3 +114,43 @@ impl Display for EightPuzzle {
         )
     }
 }
+
+#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GenerousEight(EightPuzzle);
+
+impl Puzzle for GenerousEight {
+    const ACTIONS_LENGTH: usize = EightPuzzle::ACTIONS_LENGTH;
+
+    const FEATURE_LENGTH: usize = EightPuzzle::FEATURE_LENGTH;
+
+    fn apply(&mut self, action: usize) -> Result<(), ActionOutOfBounds> {
+        self.0.apply(action)
+    }
+
+    fn is_solved(&self) -> bool {
+        self.0.is_solved()
+    }
+
+    fn get_features(&self) -> Vec<f64> {
+        self.0.get_features()
+    }
+
+    fn new() -> Self {
+        Self(EightPuzzle::new())
+    }
+
+    fn get_reward(&self) -> f64 {
+        // Count number of correct spots
+        (1.0 / ((0..9).into_iter().filter(|i| self.0 .0[*i] == *i).count() as f64)).powi(2)
+    }
+
+    fn get_valid_actions(&self) -> Vec<usize> {
+        self.0.get_valid_actions()
+    }
+}
+
+impl Display for GenerousEight {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}

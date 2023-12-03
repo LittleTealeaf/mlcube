@@ -4,14 +4,16 @@ use std::fs;
 use mlcube::{
     agent::{Agent, FnValue, NewAgentConfig, ReplayStrategy},
     network::SolveResult,
-    puzzle::{environments::EightPuzzle, Puzzle},
+    puzzle::{environments::GenerousEight, Puzzle},
 };
 use rand::{seq::SliceRandom, thread_rng};
 
 const EVALUATE_INTERVAL: usize = 100;
 
+type _Puzzle = GenerousEight;
+
 fn main() {
-    let mut agent: Agent<EightPuzzle> = Agent::new(NewAgentConfig {
+    let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
         hidden_layers: vec![81; 10],
         gamma: 0.9,
         alpha: FnValue::from(0.7).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
@@ -43,7 +45,7 @@ fn main() {
 
         if agent.get_epoch() % EVALUATE_INTERVAL == 0 {
             println!("Epoch {}", agent.get_epoch());
-            let mut puzzle = EightPuzzle::new();
+            let mut puzzle = _Puzzle::new();
             let mut rng = thread_rng();
             for _ in 0..50 {
                 puzzle
