@@ -29,13 +29,13 @@ fn main() {
             scramble_min: 1,
             scramble_max: 100,
             instances: 24,
-            instance_replay_length: 20,
+            instance_replay_length: 50,
         },
         // TODO: rename into batch size
         train_size: 128,
         update_interval: 1000,
         initialize_range: -0.001..0.001,
-        max_replay_size: 400_000,
+        max_replay_size: 24 * 50 * 1000,
         penalize_repeats: false,
     })
     .unwrap();
