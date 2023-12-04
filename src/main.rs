@@ -14,10 +14,10 @@ type _Puzzle = Cube2x2;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![200; 7],
+        hidden_layers: vec![200; 5],
         gamma: 0.95,
         alpha: FnValue::from(0.1)
-            * FnValue::from(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
+            * FnValue::from(0.975).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
         epsilon: FnValue::from(0.1)
             + (FnValue::Const(0.5)
                 * FnValue::Const(0.75)
@@ -29,7 +29,7 @@ fn main() {
             instance_replay_length: 100,
         },
         train_size: 128,
-        update_interval: 100,
+        update_interval: 500,
         initialize_range: -0.01..0.01,
         max_replay_size: 100_000,
         penalize_repeats: false,
