@@ -11,13 +11,13 @@ use mlcube::{
 };
 use rand::{seq::SliceRandom, thread_rng};
 
-const EVALUATE_INTERVAL: usize = 100;
+const EVALUATE_INTERVAL: usize = 20;
 
 type _Puzzle = Cube2x2;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![200, 200, 200],
+        hidden_layers: vec![200; 5],
         gamma: 0.9,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
@@ -31,16 +31,16 @@ fn main() {
             instances: 24,
             instance_replay_length: 100,
         },
-        train_size: 256,
-        update_interval: 500,
-        initialize_range: -0.1..0.1,
+        train_size: 1000,
+        update_interval: 100,
+        initialize_range: -0.01..0.01,
         max_replay_size: 100_000,
         penalize_repeats: false,
     })
     .unwrap();
 
     loop {
-        if agent.get_epoch() % 1000 == 0 {
+        if agent.get_epoch() % 500 == 0 {
             fs::write("./agent.ron", ron::to_string(&agent).unwrap()).unwrap();
         }
 
@@ -54,7 +54,7 @@ fn main() {
             println!("Epoch {}", agent.get_epoch());
             let mut puzzle = _Puzzle::new();
             let mut rng = thread_rng();
-            for _ in 0..50 {
+            for _ in 0..100 {
                 puzzle
                     .apply(*puzzle.get_valid_actions().choose(&mut rng).unwrap())
                     .unwrap();
