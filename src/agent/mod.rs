@@ -27,7 +27,7 @@ where
     gamma: f64,
     update_interval: usize,
     sample_strategy: SampleStrategy,
-    train_size: usize,
+    batch_size: usize,
     epsilon: FnValue,
     alpha: FnValue,
     replay: ReplayBuffer<P>,
@@ -42,9 +42,9 @@ where
     where
         R: SampleRange<f64> + Clone,
     {
-        if config.sample_strategy.get_min_observations() < config.train_size {
+        if config.sample_strategy.get_min_observations() < config.batch_size {
             return Err(AgentConfigError::NotEnoughReplay {
-                train_size: config.train_size,
+                batch_size: config.batch_size,
                 min_replay_size: config.sample_strategy.get_min_observations(),
             });
         }
@@ -57,7 +57,7 @@ where
             network,
             epoch: 0,
             gamma: config.gamma,
-            train_size: config.train_size,
+            batch_size: config.batch_size,
             update_interval: config.update_interval,
             sample_strategy: config.sample_strategy,
             epsilon: config.epsilon,
@@ -82,7 +82,7 @@ where
 
         let nudges = self
             .replay
-            .sample(self.train_size, &mut rng)
+            .sample(self.batch_size, &mut rng)
             .into_par_iter()
             .map(|observation| {
                 let expected = observation.reward
@@ -95,7 +95,7 @@ where
                     observation.state,
                     observation.action,
                     expected,
-                    alpha / (self.train_size as f64),
+                    alpha / (self.batch_size as f64),
                 )
             })
             .reduce(Vec::new, |mut a, b| {
@@ -145,7 +145,7 @@ where
     pub gamma: f64,
     pub update_interval: usize,
     pub sample_strategy: SampleStrategy,
-    pub train_size: usize,
+    pub batch_size: usize,
     pub epsilon: FnValue,
     pub alpha: FnValue,
     pub initialize_range: R,
@@ -158,6 +158,6 @@ pub enum AgentConfigError {
     /// There isn't enough replay to provide the required train size
     NotEnoughReplay {
         min_replay_size: usize,
-        train_size: usize,
+        batch_size: usize,
     },
 }

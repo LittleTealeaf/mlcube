@@ -32,7 +32,7 @@ fn main() {
             instance_replay_length: 50,
         },
         // TODO: rename into batch size
-        train_size: 128,
+        batch_size: 128,
         update_interval: 500,
         initialize_range: -0.001..0.001,
         max_replay_size: 24 * 50 * 500,
