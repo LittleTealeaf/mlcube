@@ -20,7 +20,7 @@ fn main() {
             * FnValue::from(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
         epsilon: FnValue::from(0.1)
             + (FnValue::Const(0.5)
-                * FnValue::Const(0.75)
+                * FnValue::Const(0.975)
                     .exp((FnValue::Epoch / FnValue::UpdateInterval).floor() + 1.0.into())),
         sample_strategy: SampleStrategy::RandomScrambleState {
             scramble_min: 1,
