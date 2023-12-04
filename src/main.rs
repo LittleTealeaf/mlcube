@@ -33,9 +33,9 @@ fn main() {
         },
         // TODO: rename into batch size
         train_size: 128,
-        update_interval: 1000,
+        update_interval: 500,
         initialize_range: -0.001..0.001,
-        max_replay_size: 24 * 50 * 1000,
+        max_replay_size: 24 * 50 * 500,
         penalize_repeats: false,
     })
     .unwrap();
