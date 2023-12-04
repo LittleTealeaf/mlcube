@@ -47,7 +47,7 @@ where
             .iter()
             .choose_multiple(rng, count)
             .into_iter()
-            .map(|i| i.clone())
+            .cloned()
             .collect()
     }
 }

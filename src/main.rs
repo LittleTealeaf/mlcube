@@ -59,7 +59,7 @@ fn main() {
 
             println!("{:?}", agent.get_network().apply(puzzle));
 
-            match agent.solve(puzzle.clone(), 10_000) {
+            match agent.solve(puzzle, 10_000) {
                 SolveResult::Solved(actions) => {
                     println!("Solved:");
                     println!("\t{}", puzzle);
