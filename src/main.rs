@@ -17,7 +17,7 @@ fn main() {
         hidden_layers: vec![200; 3],
         gamma: 0.95,
         alpha: FnValue::from(0.1)
-            * FnValue::from(0.975).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
+            * FnValue::from(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
         epsilon: FnValue::from(0.1)
             + (FnValue::Const(0.5)
                 * FnValue::Const(0.75)
@@ -29,7 +29,7 @@ fn main() {
             instance_replay_length: 30,
         },
         train_size: 128,
-        update_interval: 500,
+        update_interval: 100,
         initialize_range: -0.01..0.01,
         max_replay_size: 100_000,
         penalize_repeats: false,
