@@ -20,13 +20,13 @@ fn main() {
             * FnValue::from(0.98).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
         epsilon: FnValue::from(0.25)
             + (FnValue::Const(0.5)
-                * FnValue::Const(0.9)
+                * FnValue::Const(0.75)
                     .exp((FnValue::Epoch / FnValue::UpdateInterval).floor() + 1.0.into())),
         sample_strategy: SampleStrategy::EvenSample {
             scramble_depth: 30,
             instances: 24,
         },
-        train_size: 256,
+        train_size: 128,
         update_interval: 500,
         initialize_range: -0.01..0.01,
         max_replay_size: 100_000,
