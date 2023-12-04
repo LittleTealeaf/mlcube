@@ -4,10 +4,7 @@ use std::fs;
 use mlcube::{
     agent::{Agent, FnValue, NewAgentConfig, SampleStrategy},
     network::SolveResult,
-    puzzle::{
-        environments::{Cube2x2, EightPuzzle, GenerousEight},
-        Puzzle,
-    },
+    puzzle::{environments::Cube2x2, Puzzle},
 };
 use rand::{seq::SliceRandom, thread_rng};
 
