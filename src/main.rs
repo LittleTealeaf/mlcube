@@ -17,10 +17,10 @@ fn main() {
         hidden_layers: vec![_Puzzle::FEATURE_LENGTH; 5],
         gamma: 0.95,
         alpha: FnValue::from(0.1)
-            * FnValue::from(0.95).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
+            * FnValue::from(0.975).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
         epsilon: FnValue::from(0.2)
             + (FnValue::Const(0.7)
-                * FnValue::Const(0.975).exp(
+                * FnValue::Const(0.9).exp(
                     (FnValue::Epoch / FnValue::UpdateInterval).floor()
                         + (FnValue::Epoch % FnValue::UpdateInterval)
                         + 1.0.into(),
