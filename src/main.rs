@@ -28,12 +28,12 @@ fn main() {
         sample_strategy: SampleStrategy::ScrambledState {
             scramble_depth: 18,
             instances: 24,
-            instance_replay_length: 18,
+            instance_replay_length: 200,
         },
-        batch_size: 128,
+        batch_size: 1048,
         update_interval: 1000,
         initialize_range: -0.001..0.001,
-        max_replay_size: 24 * 50 * 500,
+        max_replay_size: 24 * 200 * 1000,
         penalize_repeats: false,
     })
     .unwrap();
