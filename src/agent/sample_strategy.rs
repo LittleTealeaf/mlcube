@@ -194,7 +194,7 @@ impl SampleStrategy {
                     (0..*instance_replay_length)
                         .map(|_| {
                             if puzzle.is_solved() {
-                                for _ in 0..scramble {
+                                for _ in 0..rng.gen_range(0..=scramble) {
                                     puzzle
                                         .apply(
                                             *puzzle.get_valid_actions().choose(&mut rng).unwrap(),
