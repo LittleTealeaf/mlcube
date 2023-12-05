@@ -14,7 +14,7 @@ type _Puzzle = LightsOut<3, 3>;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![200; 2],
+        hidden_layers: vec![81; 2],
         gamma: 0.95,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.975).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
@@ -25,14 +25,12 @@ fn main() {
                         + (FnValue::Epoch % FnValue::UpdateInterval)
                         + 1.0.into(),
                 )),
-        sample_strategy: SampleStrategy::RandomScrambleState {
-            scramble_min: 1,
-            scramble_max: 100,
+        sample_strategy: SampleStrategy::EvenSample {
+            scramble_depth: 20,
             instances: 24,
-            instance_replay_length: 50,
         },
         batch_size: 128,
-        update_interval: 500,
+        update_interval: 100,
         initialize_range: -0.001..0.001,
         max_replay_size: 24 * 50 * 500,
         penalize_repeats: false,
