@@ -75,7 +75,14 @@ where
         let alpha = self.alpha.calculate(&variables);
         let epsilon = self.epsilon.calculate(&variables);
         let mut rng = thread_rng();
-        let replay = self.sample_strategy.build_replay(&self.network, epsilon);
+        let sample_params = SampleParams {
+            epsilon,
+            epoch: self.epoch,
+            update_interval: self.update_interval,
+        };
+        let replay = self
+            .sample_strategy
+            .build_replay(&self.network, sample_params);
         for observation in replay {
             self.replay.insert_observation(observation, &mut rng);
         }

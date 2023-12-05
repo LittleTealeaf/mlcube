@@ -25,15 +25,15 @@ fn main() {
                         + (FnValue::Epoch % FnValue::UpdateInterval)
                         + 1.0.into(),
                 )),
-        sample_strategy: SampleStrategy::ScrambledState {
-            scramble_depth: 18,
+        sample_strategy: SampleStrategy::Iterative {
+            target_updates_per_step: 2,
             instances: 24,
-            instance_replay_length: 200,
+            instance_replay_length: 100,
         },
-        batch_size: 1048,
+        batch_size: 256,
         update_interval: 1000,
         initialize_range: -0.001..0.001,
-        max_replay_size: 24 * 200 * 1000,
+        max_replay_size: 24 * 256 * 1000,
         penalize_repeats: false,
     })
     .unwrap();

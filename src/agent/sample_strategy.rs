@@ -35,10 +35,24 @@ pub enum SampleStrategy {
         instances: usize,
         instance_replay_length: usize,
     },
+    /// Scramble depth based on the number of target updates
+    Iterative {
+        target_updates_per_step: usize,
+        instances: usize,
+        instance_replay_length: usize,
+    },
 }
 
 impl SampleStrategy {
-    pub fn build_replay<P>(&self, network: &Network<P>, epsilon: f64) -> Vec<ReplayObservation<P>>
+    pub fn build_replay<P>(
+        &self,
+        network: &Network<P>,
+        SampleParams {
+            epsilon,
+            update_interval,
+            epoch,
+        }: SampleParams,
+    ) -> Vec<ReplayObservation<P>>
     where
         P: Puzzle + Send + Sync,
     {
@@ -166,6 +180,50 @@ impl SampleStrategy {
                 })
                 .flatten()
                 .collect(),
+            Self::Iterative {
+                target_updates_per_step,
+                instances,
+                instance_replay_length,
+            } => (0..*instances)
+                .into_par_iter()
+                .map(|_| {
+                    let mut puzzle = P::new();
+                    let mut rng = thread_rng();
+                    let scramble = (epoch / update_interval) / target_updates_per_step;
+
+                    (0..*instance_replay_length)
+                        .map(|_| {
+                            if puzzle.is_solved() {
+                                for _ in 0..scramble {
+                                    puzzle
+                                        .apply(
+                                            *puzzle.get_valid_actions().choose(&mut rng).unwrap(),
+                                        )
+                                        .unwrap();
+                                }
+                            }
+
+                            let state = puzzle.clone();
+
+                            let action = if rng.gen_bool(epsilon) {
+                                rng.gen_range(0..P::ACTIONS_LENGTH)
+                            } else {
+                                network.apply(puzzle.clone()).arg_max()
+                            };
+
+                            puzzle.apply(action).unwrap();
+
+                            ReplayObservation {
+                                state,
+                                action,
+                                reward: puzzle.get_reward(),
+                                next_state: puzzle.clone(),
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                })
+                .flatten()
+                .collect(),
         }
     }
 
@@ -187,6 +245,17 @@ impl SampleStrategy {
                 instances,
                 instance_replay_length,
             } => instances * instance_replay_length,
+            Self::Iterative {
+                target_updates_per_step: _,
+                instances,
+                instance_replay_length,
+            } => instances * instance_replay_length,
         }
     }
+}
+
+pub struct SampleParams {
+    pub epsilon: f64,
+    pub update_interval: usize,
+    pub epoch: usize,
 }
