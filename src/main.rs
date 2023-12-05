@@ -4,17 +4,17 @@ use std::fs;
 use mlcube::{
     agent::{Agent, FnValue, NewAgentConfig, SampleStrategy},
     network::SolveResult,
-    puzzle::{environments::Cube2x2, Puzzle},
+    puzzle::{environments::LightsOut, Puzzle},
 };
 use rand::{seq::SliceRandom, thread_rng};
 
 const EVALUATE_INTERVAL: usize = 20;
 
-type _Puzzle = Cube2x2;
+type _Puzzle = LightsOut<3, 3>;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![300; 5],
+        hidden_layers: vec![200; 2],
         gamma: 0.95,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.975).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
@@ -31,7 +31,6 @@ fn main() {
             instances: 24,
             instance_replay_length: 50,
         },
-        // TODO: rename into batch size
         batch_size: 128,
         update_interval: 500,
         initialize_range: -0.001..0.001,

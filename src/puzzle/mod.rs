@@ -1,8 +1,6 @@
-use serde::Serialize;
-
 pub mod environments;
 
-pub trait Puzzle: Clone + Eq + Serialize {
+pub trait Puzzle: Clone + Eq {
     /// Total number of unique actions that can be taken on this puzzle.
     ///
     /// It is possible that a puzzle may not have all actions availiable at all states. To get
