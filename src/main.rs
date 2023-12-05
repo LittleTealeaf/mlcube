@@ -25,10 +25,7 @@ fn main() {
                         + (FnValue::Epoch % FnValue::UpdateInterval)
                         + 1.0.into(),
                 )),
-        sample_strategy: SampleStrategy::EvenSample {
-            scramble_depth: 20,
-            instances: 24,
-        },
+                sample_strategy: SampleStrategy::ScrambledState { scramble_depth: 18, instances: 24, instance_replay_length: 18 },
         batch_size: 128,
         update_interval: 100,
         initialize_range: -0.001..0.001,
