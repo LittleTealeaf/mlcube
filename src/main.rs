@@ -31,7 +31,7 @@ fn main() {
             instance_replay_length: 18,
         },
         batch_size: 128,
-        update_interval: 100,
+        update_interval: 1000,
         initialize_range: -0.001..0.001,
         max_replay_size: 24 * 50 * 500,
         penalize_repeats: false,
