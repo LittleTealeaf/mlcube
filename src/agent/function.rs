@@ -16,11 +16,15 @@ pub enum FnValue {
     Floor(Box<FnValue>),
     Rem(Box<FnValue>, Box<FnValue>),
     Neg(Box<FnValue>),
+    Max(Box<FnValue>, Box<FnValue>),
+    Min(Box<FnValue>, Box<FnValue>),
 }
 
 impl FnValue {
     pub fn calculate(&self, variables: &FunctionVariables) -> f64 {
         match self {
+            FnValue::Max(a, b) => a.calculate(variables).max(b.calculate(variables)),
+            FnValue::Min(a, b) => a.calculate(variables).min(b.calculate(variables)),
             FnValue::Const(val) => *val,
             FnValue::Epoch => variables.epoch as f64,
             FnValue::LastTargetUpdate => variables.last_target_update as f64,

@@ -21,8 +21,8 @@ fn main() {
         epsilon: FnValue::from(0.2)
             + (FnValue::Const(0.7)
                 * FnValue::Const(0.9).exp(
-                    (FnValue::Epoch / FnValue::LastTargetUpdate).floor()
-                        + (FnValue::Epoch % FnValue::LastTargetUpdate)
+                    FnValue::TargetUpdateCount
+                        + (FnValue::Epoch - FnValue::LastTargetUpdate)
                         + 1.0.into(),
                 )),
         sample_strategy: SampleStrategy::Iterative {
