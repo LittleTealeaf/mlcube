@@ -28,7 +28,7 @@ fn main() {
         sample_strategy: SampleStrategy::Iterative {
             target_updates_per_step: 10,
             instances: 48,
-            instance_replay_length: 20,
+            instance_replay_length: 27,
         },
         batch_size: 1024,
         update_interval: 100,
