@@ -26,7 +26,7 @@ fn main() {
                         + 1.0.into(),
                 )),
         sample_strategy: SampleStrategy::Iterative {
-            target_updates_per_step: 10,
+            target_updates_per_step: 1,
             instances: 48,
             instance_replay_length: 27,
         },
