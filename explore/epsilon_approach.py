@@ -1,4 +1,4 @@
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 
 
 def iterate(found: float, expected: float, alpha: float) -> float:

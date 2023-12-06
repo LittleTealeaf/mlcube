@@ -127,6 +127,25 @@ where
         self.epoch += 1;
     }
 
+    pub fn test_target_error(&self, observations: usize) -> f64 {
+        let mut rng = thread_rng();
+
+        let sample = self.replay.sample(observations, &mut rng);
+
+        sample
+            .into_par_iter()
+            .map(|replay| {
+                let q_network = self.network.apply(replay.state)[replay.action];
+                let reward = replay.reward;
+                let target = self.target.apply(replay.next_state).max();
+                let expected = reward + target * self.gamma;
+                let error = q_network - expected;
+                error.abs()
+            })
+            .sum::<f64>()
+            / observations as f64
+    }
+
     pub fn get_epoch(&self) -> usize {
         self.epoch
     }

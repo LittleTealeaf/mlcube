@@ -50,6 +50,8 @@ fn main() {
         }
 
         if agent.get_epoch() % EVALUATE_INTERVAL == 0 {
+            println!("Average Error: {}", agent.test_target_error(100));
+
             println!("Epoch {}", agent.get_epoch());
             let mut puzzle = _Puzzle::new();
             let mut rng = thread_rng();
