@@ -49,8 +49,9 @@ impl SampleStrategy {
         network: &Network<P>,
         SampleParams {
             epsilon,
-            update_interval,
-            epoch,
+            last_target_update: _,
+            target_update_count,
+            epoch: _,
         }: SampleParams,
     ) -> Vec<ReplayObservation<P>>
     where
@@ -189,7 +190,7 @@ impl SampleStrategy {
                 .map(|_| {
                     let mut puzzle = P::new();
                     let mut rng = thread_rng();
-                    let scramble = (epoch / update_interval) / target_updates_per_step;
+                    let scramble = target_update_count / target_updates_per_step;
 
                     (0..*instance_replay_length)
                         .map(|_| {
@@ -256,6 +257,7 @@ impl SampleStrategy {
 
 pub struct SampleParams {
     pub epsilon: f64,
-    pub update_interval: usize,
+    pub last_target_update: usize,
+    pub target_update_count: usize,
     pub epoch: usize,
 }

@@ -6,7 +6,8 @@ use serde::{Deserialize, Serialize};
 pub enum FnValue {
     Const(f64),
     Epoch,
-    UpdateInterval,
+    LastTargetUpdate,
+    TargetUpdateCount,
     Add(Box<FnValue>, Box<FnValue>),
     Sub(Box<FnValue>, Box<FnValue>),
     Mul(Box<FnValue>, Box<FnValue>),
@@ -22,7 +23,8 @@ impl FnValue {
         match self {
             FnValue::Const(val) => *val,
             FnValue::Epoch => variables.epoch as f64,
-            FnValue::UpdateInterval => variables.update_interval as f64,
+            FnValue::LastTargetUpdate => variables.last_target_update as f64,
+            FnValue::TargetUpdateCount => variables.target_update_count as f64,
             FnValue::Add(a, b) => a.calculate(variables) + b.calculate(variables),
             FnValue::Sub(a, b) => a.calculate(variables) - b.calculate(variables),
             FnValue::Mul(a, b) => a.calculate(variables) * b.calculate(variables),
@@ -37,7 +39,8 @@ impl FnValue {
 
 pub struct FunctionVariables {
     pub epoch: usize,
-    pub update_interval: usize,
+    pub last_target_update: usize,
+    pub target_update_count: usize,
 }
 
 impl FnValue {

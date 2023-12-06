@@ -1,7 +1,9 @@
 mod function;
 mod replay_buffer;
 mod sample_strategy;
+mod update_strategy;
 
+pub use update_strategy::*;
 pub use function::*;
 use rand::{distributions::uniform::SampleRange, thread_rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -25,7 +27,9 @@ where
     target: Network<P>,
     epoch: usize,
     gamma: f64,
-    update_interval: usize,
+    last_target_update: usize,
+    target_update_count: usize,
+    update_strategy: UpdateStrategy,
     sample_strategy: SampleStrategy,
     batch_size: usize,
     epsilon: FnValue,
@@ -58,7 +62,9 @@ where
             epoch: 0,
             gamma: config.gamma,
             batch_size: config.batch_size,
-            update_interval: config.update_interval,
+            update_strategy: config.update_strategy,
+            last_target_update: 0,
+            target_update_count: 0,
             sample_strategy: config.sample_strategy,
             epsilon: config.epsilon,
             alpha: config.alpha,
@@ -70,7 +76,8 @@ where
     pub fn train_epoch(&mut self) {
         let variables = FunctionVariables {
             epoch: self.epoch,
-            update_interval: self.update_interval,
+            last_target_update: self.last_target_update,
+            target_update_count: self.target_update_count
         };
         let alpha = self.alpha.calculate(&variables);
         let epsilon = self.epsilon.calculate(&variables);
@@ -78,7 +85,8 @@ where
         let sample_params = SampleParams {
             epsilon,
             epoch: self.epoch,
-            update_interval: self.update_interval,
+            last_target_update: self.last_target_update,
+            target_update_count: self.target_update_count
         };
         let replay = self
             .sample_strategy
@@ -120,8 +128,10 @@ where
 
         self.network.update_weights(nudges);
 
-        if self.epoch % self.update_interval == 0 {
+        if self.update_strategy.do_update(self) {
             self.target = self.network.clone();
+            self.target_update_count += 1;
+            self.last_target_update = self.epoch;
         }
 
         self.epoch += 1;
@@ -169,7 +179,7 @@ where
 {
     pub hidden_layers: Vec<usize>,
     pub gamma: f64,
-    pub update_interval: usize,
+    pub update_strategy: UpdateStrategy,
     pub sample_strategy: SampleStrategy,
     pub batch_size: usize,
     pub epsilon: FnValue,
