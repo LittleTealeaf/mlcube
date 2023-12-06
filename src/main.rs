@@ -34,7 +34,7 @@ fn main() {
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::Threshold {
             initial_update_epoch: 100,
-            test_size: 1000,
+            test_size: 100,
             threshold: 0.01,
         },
         max_replay_size: 100_000,
