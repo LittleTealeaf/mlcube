@@ -9,3 +9,6 @@ pub use eight::*;
 
 mod lightsout;
 pub use lightsout::*;
+
+mod npuzzle;
+pub use npuzzle::*;
