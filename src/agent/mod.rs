@@ -3,12 +3,12 @@ mod replay_buffer;
 mod sample_strategy;
 mod update_strategy;
 
-pub use update_strategy::*;
 pub use function::*;
 use rand::{distributions::uniform::SampleRange, thread_rng};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 pub use replay_buffer::*;
 pub use sample_strategy::*;
+pub use update_strategy::*;
 
 use serde::{Deserialize, Serialize};
 
@@ -77,7 +77,7 @@ where
         let variables = FunctionVariables {
             epoch: self.epoch,
             last_target_update: self.last_target_update,
-            target_update_count: self.target_update_count
+            target_update_count: self.target_update_count,
         };
         let alpha = self.alpha.calculate(&variables);
         let epsilon = self.epsilon.calculate(&variables);
@@ -86,7 +86,7 @@ where
             epsilon,
             epoch: self.epoch,
             last_target_update: self.last_target_update,
-            target_update_count: self.target_update_count
+            target_update_count: self.target_update_count,
         };
         let replay = self
             .sample_strategy
@@ -150,7 +150,7 @@ where
                 let target = self.target.apply(replay.next_state).max();
                 let expected = reward + target * self.gamma;
                 let error = q_network - expected;
-                error.abs()
+                error * error
             })
             .sum::<f64>()
             / observations as f64
