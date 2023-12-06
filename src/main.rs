@@ -17,7 +17,7 @@ fn main() {
         hidden_layers: vec![500; 3],
         gamma: 0.95,
         alpha: FnValue::from(0.1)
-            * FnValue::from(0.975).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
+            * FnValue::from(0.98).exp((FnValue::Epoch % FnValue::UpdateInterval) + 1.0.into()),
         epsilon: FnValue::from(0.2)
             + (FnValue::Const(0.7)
                 * FnValue::Const(0.9).exp(
