@@ -8,7 +8,7 @@ use mlcube::{
 };
 use rand::{seq::SliceRandom, thread_rng};
 
-const EVALUATE_INTERVAL: usize = 20;
+const EVALUATE_INTERVAL: usize = 5;
 
 type _Puzzle = LightsOut<3, 3>;
 
@@ -28,10 +28,10 @@ fn main() {
         sample_strategy: SampleStrategy::Iterative {
             target_updates_per_step: 10,
             instances: 24,
-            instance_replay_length: 100,
+            instance_replay_length: 3 * 3 * 3,
         },
         batch_size: 1024,
-        update_interval: 1000,
+        update_interval: 100,
         initialize_range: -0.001..0.001,
         max_replay_size: 24 * 256 * 1000,
         penalize_repeats: false,
