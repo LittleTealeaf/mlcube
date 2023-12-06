@@ -33,7 +33,7 @@ fn main() {
         batch_size: 1024,
         update_interval: 100,
         initialize_range: -0.001..0.001,
-        max_replay_size: 24 * 256 * 1000,
+        max_replay_size: 100 * 48 * 27,
         penalize_repeats: false,
     })
     .unwrap();
