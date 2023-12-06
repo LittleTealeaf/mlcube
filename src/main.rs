@@ -37,7 +37,7 @@ fn main() {
             test_size: 1000,
             threshold: 0.0001,
         },
-        max_replay_size: 100 * 48 * 27,
+        max_replay_size: 100_000,
         penalize_repeats: false,
     })
     .unwrap();
