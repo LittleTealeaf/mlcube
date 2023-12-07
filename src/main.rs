@@ -16,8 +16,8 @@ fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
         hidden_layers: vec![200; 5],
         gamma: 0.95,
-        alpha: FnValue::from(0.1)
-            * FnValue::from(0.99).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
+        alpha: FnValue::from(0.5)
+            * FnValue::from(0.995).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
         epsilon: FnValue::from(0.2)
             + (FnValue::Const(0.7)
                 * FnValue::Const(0.9).exp(
