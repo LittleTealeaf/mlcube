@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::puzzle::Puzzle;
 
@@ -10,6 +10,7 @@ pub enum UpdateStrategy {
     Threshold {
         initial_update_epoch: usize,
         test_size: usize,
+        minimum_update_interval: usize,
         threshold: f64,
     },
 }
@@ -25,12 +26,15 @@ impl UpdateStrategy {
                 initial_update_epoch,
                 test_size,
                 threshold,
+                minimum_update_interval,
             } => {
                 if agent.epoch <= *initial_update_epoch {
                     agent.epoch == *initial_update_epoch
                 } else {
-                    let error = agent.test_target_error(*test_size);
-                    error < *threshold
+                    agent.epoch - agent.last_target_update >= *minimum_update_interval && {
+                        let error = agent.test_target_error(*test_size);
+                        error < *threshold
+                    }
                 }
             }
         }

@@ -36,6 +36,7 @@ fn main() {
             initial_update_epoch: 100,
             test_size: 100,
             threshold: 0.01,
+            minimum_update_interval: 100,
         },
         max_replay_size: 100_000,
         penalize_repeats: false,
