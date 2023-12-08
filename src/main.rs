@@ -35,11 +35,11 @@ fn main() {
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::Threshold {
             initial_update_epoch: 100,
-            test_size: 100,
+            test_size: 100_000,
             threshold: 1e-7,
             minimum_update_interval: 100,
         },
-        max_replay_size: 100_000,
+        max_replay_size: 1_000_000,
         penalize_repeats: false,
     })
     .unwrap();
