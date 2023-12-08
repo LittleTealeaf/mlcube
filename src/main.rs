@@ -25,10 +25,11 @@ fn main() {
                         + (FnValue::Epoch - FnValue::LastTargetUpdate)
                         + 1.0.into(),
                 )),
-        sample_strategy: SampleStrategy::Iterative {
-            target_updates_per_step: 10,
-            instances: 48,
-            instance_replay_length: 27,
+        sample_strategy: SampleStrategy::RandomScrambleState {
+            scramble_min: 1,
+            scramble_max: 100,
+            instances: 50,
+            instance_replay_length: 25,
         },
         batch_size: 1024,
         initialize_range: -0.001..0.001,
