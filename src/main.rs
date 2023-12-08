@@ -28,18 +28,18 @@ fn main() {
         sample_strategy: SampleStrategy::RandomScrambleState {
             scramble_min: 1,
             scramble_max: 15,
-            instances: 50,
-            instance_replay_length: 25,
+            instances: 25,
+            instance_replay_length: 20,
         },
-        batch_size: 1024,
+        batch_size: 128,
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::Threshold {
             initial_update_epoch: 100,
-            test_size: 10_000,
+            test_size: 1_000,
             threshold: 5e-7,
             minimum_update_interval: 100,
         },
-        max_replay_size: 1_000_000,
+        max_replay_size: 10_000,
         penalize_repeats: false,
     })
     .unwrap();
