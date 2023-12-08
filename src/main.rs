@@ -27,7 +27,7 @@ fn main() {
                 )),
         sample_strategy: SampleStrategy::RandomScrambleState {
             scramble_min: 1,
-            scramble_max: 100,
+            scramble_max: 15,
             instances: 50,
             instance_replay_length: 25,
         },
@@ -35,8 +35,8 @@ fn main() {
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::Threshold {
             initial_update_epoch: 100,
-            test_size: 1_000,
-            threshold: 1e-6,
+            test_size: 10_000,
+            threshold: 5e-7,
             minimum_update_interval: 100,
         },
         max_replay_size: 1_000_000,
