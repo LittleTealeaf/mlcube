@@ -36,7 +36,7 @@ fn main() {
         update_strategy: UpdateStrategy::Threshold {
             initial_update_epoch: 100,
             test_size: 1_000,
-            threshold: 1e-7,
+            threshold: 1e-6,
             minimum_update_interval: 100,
         },
         max_replay_size: 1_000_000,
