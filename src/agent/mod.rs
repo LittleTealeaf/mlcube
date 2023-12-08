@@ -160,6 +160,10 @@ where
         self.epoch
     }
 
+    pub fn get_target_update_count(&self) -> usize {
+        self.target_update_count
+    }
+
     pub fn has_inf_or_nan(&self) -> bool {
         self.network.has_inf_or_nan()
     }

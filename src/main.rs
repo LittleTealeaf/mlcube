@@ -56,7 +56,11 @@ fn main() {
         }
 
         if agent.get_epoch() % EVALUATE_INTERVAL == 0 {
-            println!("Epoch {}", agent.get_epoch());
+            println!(
+                "Epoch {} | Target Updates: {}",
+                agent.get_epoch(),
+                agent.get_target_update_count()
+            );
             let mut puzzle = _Puzzle::new();
             let mut rng = thread_rng();
             for _ in 0..100 {
