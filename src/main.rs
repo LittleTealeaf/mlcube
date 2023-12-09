@@ -14,7 +14,7 @@ type _Puzzle = NPuzzle<3, 3>;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![200; 1],
+        hidden_layers: vec![200; 3],
         gamma: 0.9,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.99).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
@@ -30,7 +30,7 @@ fn main() {
             instances: 24,
             instance_replay_length: 50,
         },
-        batch_size: 128,
+        batch_size: 1024,
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::Threshold {
             initial_update_epoch: 100,
