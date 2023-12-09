@@ -16,7 +16,7 @@ fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
         hidden_layers: vec![200; 3],
         gamma: 0.9,
-        alpha: FnValue::from(0.5)
+        alpha: FnValue::from(0.1)
             * FnValue::from(0.99).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
         epsilon: FnValue::from(0.2)
             + (FnValue::Const(0.7)
@@ -27,10 +27,10 @@ fn main() {
                 )),
         sample_strategy: SampleStrategy::ForcedIterative {
             target_updates_per_step: 10,
-            instances: 50,
-            instance_replay_length: 100,
+            instances: 24,
+            instance_replay_length: 200,
         },
-        batch_size: 16,
+        batch_size: 128,
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::Threshold {
             initial_update_epoch: 100,
