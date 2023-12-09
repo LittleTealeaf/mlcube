@@ -20,7 +20,7 @@ fn main() {
             * FnValue::from(0.99).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
         epsilon: FnValue::from(0.2)
             + (FnValue::Const(0.7)
-                * FnValue::Const(0.9).exp(
+                * FnValue::Const(0.95).exp(
                     FnValue::TargetUpdateCount
                         + (FnValue::Epoch - FnValue::LastTargetUpdate)
                         + 1.0.into(),
