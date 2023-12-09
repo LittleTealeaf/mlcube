@@ -150,7 +150,7 @@ where
                 let target = self.target.apply(replay.next_state).max();
                 let expected = reward + target * self.gamma;
                 let error = q_network - expected;
-                error * error
+                (error * error).sqrt()
             })
             .sum::<f64>()
             / observations as f64
