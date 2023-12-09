@@ -62,7 +62,7 @@ fn main() {
             );
             let mut puzzle = _Puzzle::new();
             let mut rng = thread_rng();
-            for _ in 0..1 {
+            for _ in 0..100 {
                 puzzle
                     .apply(*puzzle.get_valid_actions().choose(&mut rng).unwrap())
                     .unwrap();
