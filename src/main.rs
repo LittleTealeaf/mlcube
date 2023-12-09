@@ -30,7 +30,7 @@ fn main() {
             instances: 50,
             instance_replay_length: 100,
         },
-        batch_size: 512,
+        batch_size: 16,
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::Threshold {
             initial_update_epoch: 100,
