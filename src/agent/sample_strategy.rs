@@ -41,6 +41,16 @@ pub enum SampleStrategy {
         instances: usize,
         instance_replay_length: usize,
     },
+    /// Scramble depth based on number of target updates, only allows the agent to explore a number
+    /// of steps equal to the scramble depth before it gets reset.
+    ///
+    /// This complication will hopefully make the dataset more saturated with near-solved states
+    /// early on, forcing it to learn early and extend later
+    ForcedIterative {
+        target_updates_per_step: usize,
+        instances: usize,
+        instance_replay_length: usize,
+    },
 }
 
 impl SampleStrategy {
@@ -58,7 +68,7 @@ impl SampleStrategy {
         P: Puzzle + Send + Sync,
     {
         match self {
-            SampleStrategy::EvenSample {
+            Self::EvenSample {
                 scramble_depth,
                 instances,
             } => (0..*instances)
@@ -225,6 +235,53 @@ impl SampleStrategy {
                 })
                 .flatten()
                 .collect(),
+            Self::ForcedIterative {
+                target_updates_per_step,
+                instances,
+                instance_replay_length,
+            } => (0..*instances)
+                .into_par_iter()
+                .map(|_| {
+                    let mut puzzle = P::new();
+                    let mut rng = thread_rng();
+                    let scramble = target_update_count / target_updates_per_step;
+                    let mut moves = 0;
+
+                    (0..*instance_replay_length)
+                        .map(|_| {
+                            if puzzle.is_solved() || moves > scramble {
+                                for _ in 0..scramble {
+                                    puzzle
+                                        .apply(
+                                            *puzzle.get_valid_actions().choose(&mut rng).unwrap(),
+                                        )
+                                        .unwrap();
+                                }
+                                moves = 0;
+                            }
+                            moves += 1;
+
+                            let state = puzzle.clone();
+
+                            let action = if rng.gen_bool(epsilon) {
+                                rng.gen_range(0..P::ACTIONS_LENGTH)
+                            } else {
+                                network.apply(puzzle.clone()).arg_max()
+                            };
+
+                            puzzle.apply(action).unwrap();
+
+                            ReplayObservation {
+                                state,
+                                action,
+                                reward: puzzle.get_reward(),
+                                next_state: puzzle.clone(),
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                })
+                .flatten()
+                .collect(),
         }
     }
 
@@ -247,6 +304,11 @@ impl SampleStrategy {
                 instance_replay_length,
             } => instances * instance_replay_length,
             Self::Iterative {
+                target_updates_per_step: _,
+                instances,
+                instance_replay_length,
+            } => instances * instance_replay_length,
+            Self::ForcedIterative {
                 target_updates_per_step: _,
                 instances,
                 instance_replay_length,

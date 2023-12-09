@@ -181,10 +181,15 @@ pub struct NewAgentConfig<R>
 where
     R: SampleRange<f64> + Clone,
 {
+    /// The node count on each of the hidden layers
     pub hidden_layers: Vec<usize>,
+    /// Gamma: The coefficient applied to future utility
     pub gamma: f64,
+    /// The specific strategy used to update the target
     pub update_strategy: UpdateStrategy,
+    /// The strategy used to sample from the replay database
     pub sample_strategy: SampleStrategy,
+    /// Batch Size
     pub batch_size: usize,
     pub epsilon: FnValue,
     pub alpha: FnValue,
