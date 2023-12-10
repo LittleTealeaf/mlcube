@@ -32,11 +32,12 @@ fn main() {
         },
         batch_size: 1024,
         initialize_range: -0.001..0.001,
-        update_strategy: UpdateStrategy::Threshold {
-            initial_update_epoch: 100,
+        update_strategy: UpdateStrategy::TrainThreshold {
             test_size: 1_000,
-            threshold: 0.0001,
-            minimum_update_interval: 100,
+            initial_update: Some(100),
+            min_update: Some(100),
+            max_update: None,
+            threshold: 0.001,
         },
         max_replay_size: 10_000,
         penalize_repeats: false,
@@ -70,7 +71,7 @@ fn main() {
 
             println!("{:?}", agent.get_network().apply(puzzle));
 
-            match agent.solve(puzzle, 10_000) {
+            match agent.solve(puzzle, 100) {
                 SolveResult::Solved(actions) => {
                     println!("Solved:");
                     println!("\t{}", puzzle);
