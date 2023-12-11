@@ -42,15 +42,16 @@ impl<P> Agent<P>
 where
     P: Puzzle + Sync + Send,
 {
-    pub fn new<R>(config: NewAgentConfig<R>) -> Self 
+    pub fn new<R>(config: NewAgentConfig<R>) -> Self
     where
         R: SampleRange<f64> + Clone,
     {
         let mut network = Network::new(config.hidden_layers);
+        let target = network.clone();
         network.randomize(&mut thread_rng(), config.initialize_range);
 
         Self {
-            target: network.clone(),
+            target,
             network,
             epoch: 0,
             gamma: config.gamma,
