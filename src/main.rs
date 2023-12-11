@@ -10,7 +10,7 @@ use rand::{seq::SliceRandom, thread_rng};
 
 const EVALUATE_INTERVAL: usize = 20;
 
-type _Puzzle = Cube2x2;
+type _Puzzle = LightsOut<2, 2>;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
