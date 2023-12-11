@@ -58,34 +58,29 @@ fn main() {
             );
             let mut puzzle = _Puzzle::new();
             let mut rng = thread_rng();
-            for _ in 0..100 {
+            let mut max_steps = 0;
+
+            for steps in 0..100 {
                 puzzle
                     .apply(*puzzle.get_valid_actions().choose(&mut rng).unwrap())
                     .unwrap();
+
+                match agent.solve(puzzle, 100) {
+                    SolveResult::Solved(_) => {
+                        max_steps = steps;
+                    }
+                    SolveResult::TimedOut => {
+                        break;
+                    }
+                    SolveResult::Loop(_) => {
+                        break;
+                    }
+                }
             }
 
+            println!("Solved up to {max_steps} moves away");
             println!("{:?}", agent.get_network().apply(puzzle));
-
-            match agent.solve(puzzle, 100) {
-                SolveResult::Solved(actions) => {
-                    println!("Solved:");
-                    println!("\t{}", puzzle);
-                    for action in actions {
-                        puzzle.apply(action).unwrap();
-                        println!("\t{} | {}", puzzle, action);
-                    }
-                }
-                SolveResult::TimedOut => println!("Timed Out"),
-                SolveResult::Loop(actions) => {
-                    println!("Loop:");
-                    println!("\t{}", puzzle);
-                    for action in actions {
-                        puzzle.apply(action).unwrap();
-                        println!("\t{} | {}", puzzle, action);
-                    }
-                }
-            }
-            println!("Average Error: {}", agent.test_target_error(1_000));
+            println!("Average Error: {}", agent.test_target_error(100));
         }
     }
 }
