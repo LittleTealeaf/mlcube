@@ -78,6 +78,7 @@ fn main() {
                 }
             }
 
+            println!();
             println!("Solved up to {max_steps} moves away");
             println!("{:?}", agent.get_network().apply(puzzle));
             println!("Average Error: {}", agent.test_target_error(100));
