@@ -27,7 +27,7 @@ fn main() {
             instance_replay_length: 10,
         },
         batch_size: 64,
-        initialize_range: -0.001..0.001,
+        initialize_range: -0.1..0.1,
         update_strategy: UpdateStrategy::TrainThreshold {
             test_size: 100,
             initial_update: Some(100),
