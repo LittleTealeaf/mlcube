@@ -10,23 +10,23 @@ use rand::{seq::SliceRandom, thread_rng};
 
 const EVALUATE_INTERVAL: usize = 20;
 
-type _Puzzle = LightsOut<3, 3>;
+type _Puzzle = LightsOut<5, 5>;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![50; 3],
+        hidden_layers: vec![100; 10],
         gamma: 0.9,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.99).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
         epsilon: FnValue::from(0.2)
             + (FnValue::Const(0.7)
-                * FnValue::Const(0.95).exp(
+                * FnValue::Const(0.9).exp(
                     FnValue::TargetUpdateCount
                         + (FnValue::Epoch - FnValue::LastTargetUpdate)
                         + 1.0.into(),
                 )),
         sample_strategy: SampleStrategy::ForcedIterative {
-            target_updates_per_step: 10,
+            target_updates_per_step: 5,
             instances: 24,
             instance_replay_length: 50,
         },
@@ -37,9 +37,9 @@ fn main() {
             initial_update: Some(100),
             min_update: Some(100),
             max_update: Some(10_000),
-            threshold: 0.001,
+            threshold: 0.01,
         },
-        max_replay_size: 10_000,
+        max_replay_size: 100_000,
         penalize_repeats: false,
     })
     .unwrap();
