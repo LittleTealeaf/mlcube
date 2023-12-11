@@ -23,10 +23,10 @@ fn main() {
                 * FnValue::from(0.75).exp(FnValue::TargetUpdateCount + FnValue::from(1.0))),
         sample_strategy: SampleStrategy::ForcedIterative {
             target_updates_per_step: 5,
-            instances: 48,
-            instance_replay_length: 50,
+            instances: 24,
+            instance_replay_length: 9,
         },
-        batch_size: 2048,
+        batch_size: 512,
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::TrainThreshold {
             test_size: 256,
@@ -35,10 +35,9 @@ fn main() {
             max_update: Some(1_000),
             threshold: 0.001,
         },
-        max_replay_size: 100_000,
+        max_replay_size: 1_000_000,
         penalize_repeats: false,
-    })
-    .unwrap();
+    });
 
     loop {
         if agent.get_epoch() % 10_000 == 0 {

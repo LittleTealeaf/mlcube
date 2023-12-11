@@ -42,21 +42,14 @@ impl<P> Agent<P>
 where
     P: Puzzle + Sync + Send,
 {
-    pub fn new<R>(config: NewAgentConfig<R>) -> Result<Self, AgentConfigError>
+    pub fn new<R>(config: NewAgentConfig<R>) -> Self 
     where
         R: SampleRange<f64> + Clone,
     {
-        if config.sample_strategy.get_min_observations() < config.batch_size {
-            return Err(AgentConfigError::NotEnoughReplay {
-                batch_size: config.batch_size,
-                min_replay_size: config.sample_strategy.get_min_observations(),
-            });
-        }
-
         let mut network = Network::new(config.hidden_layers);
         network.randomize(&mut thread_rng(), config.initialize_range);
 
-        Ok(Self {
+        Self {
             target: network.clone(),
             network,
             epoch: 0,
@@ -70,7 +63,7 @@ where
             alpha: config.alpha,
             replay: ReplayBuffer::new(config.max_replay_size),
             penalize_repeats: config.penalize_repeats,
-        })
+        }
     }
 
     pub fn train_epoch(&mut self) {
