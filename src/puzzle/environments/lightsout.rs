@@ -63,7 +63,7 @@ impl<const H: usize, const W: usize> Puzzle for LightsOut<H, W> {
         if self.is_solved() {
             1f64
         } else {
-            -1f64 / (W * H * 2) as f64
+            -1f64 / (W * H).pow(2) as f64
         }
     }
 
