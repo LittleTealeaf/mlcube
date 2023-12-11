@@ -18,18 +18,18 @@ fn main() {
         gamma: 0.9,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.99).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
-        epsilon: FnValue::from(0.1)
+        epsilon: FnValue::from(0.2)
             + (FnValue::from(0.5)
-                * FnValue::from(0.75).exp(FnValue::TargetUpdateCount + FnValue::from(1.0))),
+                * FnValue::from(0.8).exp(FnValue::TargetUpdateCount + FnValue::from(1.0))),
         sample_strategy: SampleStrategy::ForcedIterative {
-            target_updates_per_step: 1,
-            instances: 24,
+            target_updates_per_step: 2,
+            instances: 12,
             instance_replay_length: 9,
         },
-        batch_size: 512,
+        batch_size: 128,
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::TrainThreshold {
-            test_size: 64,
+            test_size: 10_000,
             initial_update: Some(1_000),
             min_update: Some(100),
             max_update: Some(5_000),
