@@ -17,9 +17,9 @@ fn main() {
         hidden_layers: vec![9; 3],
         gamma: 0.9,
         alpha: FnValue::from(0.1)
-            * FnValue::from(0.99).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
-        epsilon: FnValue::from(0.2)
-            + (FnValue::Const(0.7)
+            * FnValue::from(0.995).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
+        epsilon: FnValue::from(0.25)
+            + (FnValue::Const(0.75)
                 * FnValue::Const(0.9).exp(
                     FnValue::TargetUpdateCount
                         + (FnValue::Epoch - FnValue::LastTargetUpdate)
@@ -27,10 +27,10 @@ fn main() {
                 )),
         sample_strategy: SampleStrategy::ForcedIterative {
             target_updates_per_step: 5,
-            instances: 24,
+            instances: 48,
             instance_replay_length: 50,
         },
-        batch_size: 1024,
+        batch_size: 2048,
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::TrainThreshold {
             test_size: 1_000,
