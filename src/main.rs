@@ -14,13 +14,13 @@ type _Puzzle = LightsOut<3, 3>;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![81; 5],
+        hidden_layers: vec![81],
         gamma: 0.9,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.99).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
         epsilon: FnValue::from(0.25)
             + (FnValue::from(0.75)
-                * FnValue::from(0.9).exp(FnValue::TargetUpdateCount + FnValue::from(1.0))),
+                * FnValue::from(0.95).exp(FnValue::TargetUpdateCount + FnValue::from(1.0))),
         sample_strategy: SampleStrategy::ForcedIterative {
             target_updates_per_step: 10,
             instances: 12,
