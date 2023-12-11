@@ -60,7 +60,7 @@ fn main() {
             let mut rng = thread_rng();
             let mut max_steps = 0;
 
-            for steps in 0..100 {
+            for steps in 1..100 {
                 puzzle
                     .apply(*puzzle.get_valid_actions().choose(&mut rng).unwrap())
                     .unwrap();
