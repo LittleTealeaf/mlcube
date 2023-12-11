@@ -22,7 +22,7 @@ fn main() {
             + (FnValue::from(0.5)
                 * FnValue::from(0.8).exp(FnValue::TargetUpdateCount + FnValue::from(1.0))),
         sample_strategy: SampleStrategy::ForcedIterative {
-            target_updates_per_step: 2,
+            target_updates_per_step: 10,
             instances: 12,
             instance_replay_length: 9,
         },
@@ -30,9 +30,9 @@ fn main() {
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::TrainThreshold {
             test_size: 1_000,
-            initial_update: Some(1_000),
+            initial_update: Some(100),
             min_update: Some(100),
-            max_update: Some(1_000),
+            max_update: Some(500),
             threshold: 0.001,
         },
         max_replay_size: 1_000_000,
