@@ -249,7 +249,7 @@ impl SampleStrategy {
 
                     (0..*instance_replay_length)
                         .map(|_| {
-                            if puzzle.is_solved() || moves > scramble {
+                            if puzzle.is_solved() || moves >= scramble {
                                 for _ in 0..scramble {
                                     puzzle
                                         .apply(
