@@ -74,7 +74,8 @@ fn main() {
                     SolveResult::TimedOut => {
                         break;
                     }
-                    SolveResult::Loop(_) => {
+                    SolveResult::Loop(moves) => {
+                        println!("\t {} | {:?}", puzzle, moves);
                         break;
                     }
                 }
