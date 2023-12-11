@@ -18,13 +18,9 @@ fn main() {
         gamma: 0.9,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.995).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
-        epsilon: FnValue::from(0.25)
-            + (FnValue::Const(0.75)
-                * FnValue::Const(0.9).exp(
-                    FnValue::TargetUpdateCount
-                        + (FnValue::Epoch - FnValue::LastTargetUpdate)
-                        + 1.0.into(),
-                )),
+        epsilon: FnValue::from(0.1)
+            + (FnValue::from(0.5)
+                * FnValue::from(0.9).exp(FnValue::TargetUpdateCount + FnValue::from(1.0))),
         sample_strategy: SampleStrategy::ForcedIterative {
             target_updates_per_step: 5,
             instances: 48,
