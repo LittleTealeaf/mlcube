@@ -51,11 +51,6 @@ fn main() {
         }
 
         if agent.get_epoch() % EVALUATE_INTERVAL == 0 {
-            println!(
-                "Epoch {} | Target Updates: {}",
-                agent.get_epoch(),
-                agent.get_target_update_count()
-            );
             let mut puzzle = _Puzzle::new();
             let mut rng = thread_rng();
             let mut max_steps = 0;
@@ -79,6 +74,11 @@ fn main() {
             }
 
             println!();
+            println!(
+                "Epoch {} | Target Updates: {}",
+                agent.get_epoch(),
+                agent.get_target_update_count()
+            );
             println!("Solved up to {max_steps} moves away");
             println!("{:?}", agent.get_network().apply(puzzle));
             println!("Average Error: {}", agent.test_target_error(100));
