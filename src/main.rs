@@ -61,7 +61,8 @@ fn main() {
                     .unwrap();
 
                 match agent.solve(puzzle, 100) {
-                    SolveResult::Solved(_) => {
+                    SolveResult::Solved(moves) => {
+                        println!("{:?}", moves);
                         max_steps = steps;
                     }
                     SolveResult::TimedOut => {
