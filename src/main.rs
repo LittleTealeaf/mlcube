@@ -37,7 +37,7 @@ fn main() {
             initial_update: Some(100),
             min_update: Some(1_000),
             max_update: Some(10_000),
-            threshold: 0.01,
+            threshold: 0.001,
         },
         max_replay_size: 100_000,
         penalize_repeats: false,
