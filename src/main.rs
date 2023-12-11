@@ -62,6 +62,7 @@ fn main() {
 
                 match agent.solve(puzzle, 100) {
                     SolveResult::Solved(moves) => {
+                        println!("{}", puzzle);
                         println!("{:?}", moves);
                         max_steps = steps;
                     }
