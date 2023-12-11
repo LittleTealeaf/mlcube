@@ -8,7 +8,7 @@ use mlcube::{
 };
 use rand::{seq::SliceRandom, thread_rng};
 
-const EVALUATE_INTERVAL: usize = 20;
+const EVALUATE_INTERVAL: usize = 100;
 
 type _Puzzle = LightsOut<3, 3>;
 
