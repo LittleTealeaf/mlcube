@@ -24,12 +24,12 @@ fn main() {
         sample_strategy: SampleStrategy::ForcedIterative {
             target_updates_per_step: 10,
             instances: 12,
-            instance_replay_length: 9,
+            instance_replay_length: 10,
         },
-        batch_size: 128,
+        batch_size: 64,
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::TrainThreshold {
-            test_size: 1_000,
+            test_size: 100,
             initial_update: Some(100),
             min_update: Some(100),
             max_update: Some(500),
