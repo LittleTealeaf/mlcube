@@ -29,7 +29,7 @@ fn main() {
         batch_size: 128,
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::TrainThreshold {
-            test_size: 10_000,
+            test_size: 1_000,
             initial_update: Some(1_000),
             min_update: Some(100),
             max_update: Some(5_000),
