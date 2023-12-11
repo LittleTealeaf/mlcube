@@ -14,7 +14,7 @@ type _Puzzle = LightsOut<3, 3>;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![81, 50],
+        hidden_layers: vec![81; 2],
         gamma: 0.9,
         alpha: FnValue::from(0.1)
             * FnValue::from(0.99).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
@@ -27,7 +27,7 @@ fn main() {
             instance_replay_length: 10,
         },
         batch_size: 128,
-        initialize_range: -0.1..0.1,
+        initialize_range: -0.05..0.05,
         update_strategy: UpdateStrategy::TrainThreshold {
             test_size: 100,
             initial_update: Some(100),
