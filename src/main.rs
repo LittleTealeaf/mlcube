@@ -34,8 +34,8 @@ fn main() {
         initialize_range: -0.001..0.001,
         update_strategy: UpdateStrategy::TrainThreshold {
             test_size: 256,
-            initial_update: Some(1_000),
-            min_update: None,
+            initial_update: Some(100),
+            min_update: Some(1_000),
             max_update: Some(10_000),
             threshold: 0.01,
         },
