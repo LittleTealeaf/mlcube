@@ -250,6 +250,7 @@ impl SampleStrategy {
                     (0..*instance_replay_length)
                         .map(|_| {
                             if puzzle.is_solved() || moves >= scramble {
+                                puzzle = P::new();
                                 for _ in 0..scramble {
                                     puzzle
                                         .apply(
