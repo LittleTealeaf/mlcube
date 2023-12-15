@@ -23,7 +23,7 @@ fn main() {
                 * FnValue::from(0.95).exp(FnValue::TargetUpdateCount + FnValue::from(1.0))),
         sample_strategy: SampleStrategy::ForcedIterative {
             target_updates_per_step: 1,
-            instances: 1_000,
+            instances: 100,
             instance_replay_length: 10,
         },
         batch_size: 10_000,
