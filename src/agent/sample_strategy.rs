@@ -244,7 +244,7 @@ impl SampleStrategy {
                 .map(|_| {
                     let mut puzzle = P::new();
                     let mut rng = thread_rng();
-                    let scramble = target_update_count / target_updates_per_step;
+                    let scramble = target_update_count / target_updates_per_step + 1;
                     let mut moves = 0;
 
                     (0..*instance_replay_length)
