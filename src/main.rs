@@ -16,7 +16,7 @@ fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
         hidden_layers: vec![100; 3],
         gamma: 0.9,
-        alpha: FnValue::from(0.1)
+        alpha: FnValue::from(0.5)
             * FnValue::from(0.995).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
         epsilon: FnValue::from(0.25)
             + (FnValue::from(0.75)
@@ -26,7 +26,7 @@ fn main() {
             instances: 100,
             instance_replay_length: 10,
         },
-        batch_size: 10_000,
+        batch_size: 1_024,
         initialize_range: -0.01..0.01,
         update_strategy: UpdateStrategy::TrainThreshold {
             test_size: 100,
