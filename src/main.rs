@@ -17,7 +17,7 @@ fn main() {
         hidden_layers: vec![250, 250, 250],
         gamma: 0.9,
         alpha: FnValue::from(0.1)
-            * FnValue::from(0.99).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
+            * FnValue::from(0.995).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
         epsilon: FnValue::from(0.25)
             + (FnValue::from(0.75)
                 * FnValue::from(0.95).exp(FnValue::TargetUpdateCount + FnValue::from(1.0))),
@@ -26,7 +26,7 @@ fn main() {
             instances: 1_000,
             instance_replay_length: 10,
         },
-        batch_size: 1024,
+        batch_size: 10_000,
         initialize_range: -0.01..0.01,
         update_strategy: UpdateStrategy::TrainThreshold {
             test_size: 100,
