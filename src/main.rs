@@ -18,7 +18,7 @@ fn main() {
         gamma: 0.9,
         alpha: FnValue::from(0.5)
             * FnValue::from(0.995).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
-        epsilon: FnValue::from(0.25)
+        epsilon: FnValue::from(0.1)
             + (FnValue::from(0.75)
                 * FnValue::from(0.95).exp(
                     ((FnValue::Epoch - FnValue::LastTargetUpdate) / 2.0.into())
