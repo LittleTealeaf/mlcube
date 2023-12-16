@@ -51,6 +51,13 @@ pub enum SampleStrategy {
         instances: usize,
         instance_replay_length: usize,
     },
+    /// Like Forced Iterative except now we look at every possible state as a new observation, so
+    /// multiplying our observations by the move count
+    ForcedIterativeBreadth {
+        target_updates_per_step: usize,
+        instances: usize,
+        instance_replay_length: usize,
+    },
 }
 
 impl SampleStrategy {
@@ -283,6 +290,60 @@ impl SampleStrategy {
                 })
                 .flatten()
                 .collect(),
+
+            Self::ForcedIterativeBreadth {
+                target_updates_per_step,
+                instances,
+                instance_replay_length,
+            } => (0..*instances)
+                .into_par_iter()
+                .map(|_| {
+                    let mut puzzle = P::new();
+                    let mut rng = thread_rng();
+                    let scramble = target_update_count / target_updates_per_step + 1;
+                    let mut moves = 0;
+
+                    (0..*instance_replay_length)
+                        .flat_map(|_| {
+                            if puzzle.is_solved() || moves >= scramble {
+                                puzzle = P::new();
+                                for _ in 0..scramble {
+                                    puzzle
+                                        .apply(
+                                            *puzzle.get_valid_actions().choose(&mut rng).unwrap(),
+                                        )
+                                        .unwrap();
+                                }
+                                moves = 0;
+                            }
+                            moves += 1;
+
+                            let state = puzzle.clone();
+
+                            let action = if rng.gen_bool(epsilon) {
+                                rng.gen_range(0..P::ACTIONS_LENGTH)
+                            } else {
+                                network.apply(puzzle.clone()).arg_max()
+                            };
+
+                            puzzle.apply(action).unwrap();
+
+                            (0..P::ACTIONS_LENGTH).map(move |action| {
+                                let state = state.clone();
+                                let mut puzzle = state.clone();
+                                puzzle.apply(action).unwrap();
+                                ReplayObservation {
+                                    state,
+                                    action,
+                                    reward: puzzle.get_reward(),
+                                    next_state: puzzle,
+                                }
+                            })
+                        })
+                        .collect::<Vec<_>>()
+                })
+                .flatten()
+                .collect(),
         }
     }
 
@@ -309,7 +370,12 @@ impl SampleStrategy {
                 instances,
                 instance_replay_length,
             } => instances * instance_replay_length,
-            Self::ForcedIterative {
+            Self::ForcedIterativeBreadth {
+                target_updates_per_step: _,
+                instances,
+                instance_replay_length,
+            }
+            | Self::ForcedIterative {
                 target_updates_per_step: _,
                 instances,
                 instance_replay_length,

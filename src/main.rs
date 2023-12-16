@@ -25,7 +25,7 @@ fn main() {
                         + FnValue::TargetUpdateCount
                         + FnValue::from(1.0),
                 )),
-        sample_strategy: SampleStrategy::ForcedIterative {
+        sample_strategy: SampleStrategy::ForcedIterativeBreadth {
             target_updates_per_step: 5,
             instances: 10,
             instance_replay_length: 10,
