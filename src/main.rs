@@ -21,7 +21,7 @@ fn main() {
         epsilon: FnValue::from(0.1)
             + (FnValue::from(0.75)
                 * FnValue::from(0.95).exp(
-                    ((FnValue::Epoch - FnValue::LastTargetUpdate) / 2.0.into())
+                    ((FnValue::Epoch - FnValue::LastTargetUpdate) / 100.0.into())
                         + FnValue::TargetUpdateCount
                         + FnValue::from(1.0),
                 )),
