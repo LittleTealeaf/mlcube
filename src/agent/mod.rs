@@ -36,6 +36,7 @@ where
     alpha: FnValue,
     replay: ReplayBuffer<P>,
     penalize_repeats: bool,
+    experimental_update: bool,
 }
 
 impl<P> Agent<P>
@@ -64,6 +65,7 @@ where
             alpha: config.alpha,
             replay: ReplayBuffer::new(config.max_replay_size),
             penalize_repeats: config.penalize_repeats,
+            experimental_update: config.experimental_update,
         }
     }
 
@@ -126,6 +128,9 @@ where
             self.target = self.network.clone();
             self.target_update_count += 1;
             self.last_target_update = self.epoch;
+            if self.experimental_update {
+                self.network = self.network.copy_size();
+            }
         }
 
         self.epoch += 1;
@@ -190,6 +195,8 @@ where
     pub initialize_range: R,
     pub max_replay_size: usize,
     pub penalize_repeats: bool,
+    /// Experimentally reset the Q-network whenever the target update gets updated
+    pub experimental_update: bool,
 }
 
 #[derive(Debug)]

@@ -41,6 +41,7 @@ fn main() {
         },
         max_replay_size: 100_000_000,
         penalize_repeats: false,
+        experimental_update: true,
     });
 
     loop {
