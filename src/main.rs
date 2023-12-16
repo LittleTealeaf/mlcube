@@ -75,7 +75,7 @@ fn main() {
                         break;
                     }
                     SolveResult::Loop(moves) => {
-                        println!("\t {} | {:?}", puzzle, moves);
+                        println!("\t {} | Looped: {:?}", puzzle, moves);
                         break;
                     }
                 }
