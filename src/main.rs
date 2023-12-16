@@ -36,7 +36,7 @@ fn main() {
             test_size: 100,
             initial_update: Some(100),
             min_update: Some(100),
-            max_update: Some(10_000),
+            max_update: Some(5_000),
             threshold: 0.05,
         },
         max_replay_size: 100_000_000,
