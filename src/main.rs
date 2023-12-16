@@ -35,7 +35,7 @@ fn main() {
         update_strategy: UpdateStrategy::TrainThreshold {
             test_size: 100,
             initial_update: Some(100),
-            min_update: Some(100),
+            min_update: Some(500),
             max_update: Some(5_000),
             threshold: 0.001,
         },
