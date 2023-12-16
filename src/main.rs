@@ -10,11 +10,11 @@ use rand::{seq::SliceRandom, thread_rng};
 
 const EVALUATE_INTERVAL: usize = 100;
 
-type _Puzzle = LightsOut<3, 3>;
+type _Puzzle = LightsOut<2, 2>;
 
 fn main() {
     let mut agent: Agent<_Puzzle> = Agent::new(NewAgentConfig {
-        hidden_layers: vec![100],
+        hidden_layers: vec![40, 40],
         gamma: 0.9,
         alpha: FnValue::from(0.5)
             * FnValue::from(0.995).exp((FnValue::Epoch - FnValue::LastTargetUpdate) + 1.0.into()),
