@@ -26,7 +26,7 @@ fn main() {
                         + FnValue::from(1.0),
                 )),
         sample_strategy: SampleStrategy::ForcedIterativeBreadth {
-            target_updates_per_step: 5,
+            target_updates_per_step: 1,
             instances: 10,
             instance_replay_length: 5,
         },
